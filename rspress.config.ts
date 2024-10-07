@@ -1,5 +1,7 @@
 import * as path from 'path';
 import { defineConfig } from 'rspress/config';
+import ghPages from 'rspress-plugin-gh-pages';
+import ga from 'rspress-plugin-google-analytics';
 
 export default defineConfig({
   root: path.join(__dirname, 'docs'),
@@ -12,7 +14,17 @@ export default defineConfig({
   },
   themeConfig: {
     socialLinks: [
-      { icon: 'github', mode: 'link', content: 'https://github.com/web-infra-dev/rspress' },
+      { icon: 'github', mode: 'link', content: 'https://github.com/anycms/website' },
     ],
   },
+  plugins:[
+    ghPages({
+      repo: 'git@github.com:anycms/website.git',
+      branch: 'gh-pages',
+      siteBase:'/'
+    }),
+    ga({
+      id: 'G-Y3YQ0W814W',
+    }),
+  ]
 });
