@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh"
+      data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>主题 · AnyCMS SSG</title>
+  <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
+  <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/highlight.css">
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3YQ0W814W"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Y3YQ0W814W');
+  </script>
+  <style>
+    :root{
+      --accent: #2563eb;
+    }
+  </style>
+  
+  
+  <link rel="alternate" hreflang="zh" href="https://anycms.org/themes/">
+  
+  
+  
+  
+  
+  
+</head>
+<body>
+  
+  <header class="site-header">
+    <div class="site-header-inner wrap">
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true">
+      <a class="brand" href="/">
+        <span class="brand-mark">A</span>
+        <span>AnyCMS SSG</span>
+      </a>
+      <label for="nav-toggle" class="nav-burger" aria-label="切换菜单" role="button">
+        <span></span><span></span><span></span>
+      </label>
+      <nav class="site-nav">
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <a href="/" class="active">首页</a>
+        
+        
+        
+        <a href="/docs/">文档</a>
+        
+        
+        
+        <a href="/plugins/">插件</a>
+        
+        
+        
+        <a href="/themes/" class="active">主题</a>
+        
+        
+        
+        <a href="https://github.com/anycms/anycms-ssg">GitHub</a>
+        
+        <a class="nav-cta" href="https://github.com/anycms/anycms-ssg">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    
+<header class="page-head">
+  <div class="page-head-inner">
+    <span class="eyebrow">主题</span>
+    <h1>主题</h1>
+    <div class="prose"><p>三个官方主题随仓库发布，分别面向博客、文档与作品集。它们既是开箱即用的设计，也是主题契约的参考实现。</p>
+<div class="cards" style="margin-top:2rem;">
+  <article class="card">
+    <div class="card-head">
+      <span class="card-icon">ink</span>
+      <div><h3>ink</h3><span class="card-tag">参考默认主题</span></div>
+    </div>
+    <p>极简博客主题。衬线字体、单栏布局、纸墨质感。包含全套模板、feeds、sitemap、代码高亮与 params 主题化。是学习主题契约的起点。</p>
+    <div class="chips"><span class="chip">blog</span><span class="chip">typography</span><span class="chip">dark mode</span></div>
+  </article>
+  <article class="card">
+    <div class="card-head">
+      <span class="card-icon">man</span>
+      <div><h3>manual</h3><span class="card-tag">文档 / 手册</span></div>
+    </div>
+    <p>面向文档站点。无衬线字体、顶部搜索栏、页内目录（TOC）、section 导航，并生成 search.json 供客户端搜索。</p>
+    <div class="chips"><span class="chip">docs</span><span class="chip">TOC</span><span class="chip">search</span></div>
+  </article>
+  <article class="card">
+    <div class="card-head">
+      <span class="card-icon">fol</span>
+      <div><h3>folio</h3><span class="card-tag">作品集 / 视觉</span></div>
+    </div>
+    <p>面向作品集与视觉展示。粗体展示字、响应式画廊网格、项目卡片，支持 <code>columns</code> 参数调整布局。</p>
+    <div class="chips"><span class="chip">portfolio</span><span class="chip">gallery</span><span class="chip">landing</span></div>
+  </article>
+</div>
+<h2 id="heading">安装主题</h2>
+<pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> theme install ../themes/ink<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>root</span> ./my-site</span>
+</span></code></pre>
+<p>然后在 <code>site.kdl</code> 中启用，并删除 site 自带的 <code>templates/</code> 与 <code>sass/</code> 让主题接管（见<a href="/docs/getting-started/#%E4%BD%BF%E7%94%A8%E4%B8%BB%E9%A2%98">快速开始</a>）：</p>
+<pre><code>theme "ink"
+</code></pre>
+<h2 id="heading-2">主题契约速览</h2>
+<p>每个主题是一个 bundle：<code>theme.kdl</code> manifest（含 <code>engine-version</code>、<code>params</code> 声明）+ 必需的 <code>templates/</code> + 可选 <code>static/</code> / <code>sass/</code>。详见<a href="/docs/themes/">主题文档</a>。</p>
+<blockquote>
+<p>本官方网站<strong>不使用任何主题</strong>——它自带 <code>templates/</code> 与 <code>sass/</code>，完全自包含。这也是一种合法的用法：当你想要完全定制的设计时，直接在 site 内写模板即可。</p>
+</blockquote>
+</div>
+  </div>
+</header>
+
+
+
+  </main>
+
+  
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <span class="brand-mark">A</span>
+          <span>AnyCMS SSG</span>
+        </a>
+        <p>用 Rust 编写的插件驱动静态网站生成器。WASM 插件贯穿内容发现、Markdown 渲染、模板上下文、SEO 与资源处理的每一个阶段。</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>资源</h5>
+          <ul>
+            <li><a href="/docs/">文档</a></li>
+            <li><a href="/docs/getting-started/">快速开始</a></li>
+            <li><a href="/plugins/">插件</a></li>
+            <li><a href="/themes/">主题</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>社区</h5>
+          <ul>
+            <li><a href="https://github.com/anycms/anycms-ssg">GitHub</a></li>
+            <li><a href="/tags/">标签</a></li>
+            <li><a href="/atom.xml">Atom 订阅</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; AnyCMS SSG · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+    </div>
+  </footer>
+
+  
+  
+</body>
+</html>

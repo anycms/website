@@ -1,0 +1,22 @@
+/* AnyCMS SSG site — syntect classed-span highlighting (ClassStyle::Spaced).
+   Tuned for the dark code surface (--code-bg). Classes are space-separated,
+   so a token may carry several (e.g. "keyword control"). */
+.source { color: inherit; }
+.comment, .punctuation.definition.comment { color: #6b7394; font-style: italic; }
+.string { color: #a5d6a7; }
+.constant.numeric, .constant.language { color: #f0b67c; }
+.constant.character { color: #e6c07b; }
+.keyword { color: #c792ea; }
+.keyword.control { color: #c792ea; }
+.keyword.operator { color: #89ddff; }
+.storage.type, .storage.modifier { color: #c792ea; }
+.support.type, .support.class, .support.constant { color: #4ec9b0; }
+.support.function { color: #82aaff; }
+.entity.name.function { color: #82aaff; }
+.entity.name.class, .entity.name.type, .entity.name.struct { color: #4ec9b0; }
+.entity.name.tag { color: #f07178; }
+.entity.other.attribute-name { color: #e6c07b; }
+.variable.parameter, .variable { color: #eeffff; }
+.variable.language { color: #f07178; }
+.punctuation { color: #89ddff; }
+.meta.preprocessor { color: #82aaff; }

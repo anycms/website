@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh"
+      data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>文档 · AnyCMS SSG</title>
+  <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
+  <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/highlight.css">
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3YQ0W814W"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Y3YQ0W814W');
+  </script>
+  <style>
+    :root{
+      --accent: #2563eb;
+    }
+  </style>
+  
+  
+  <link rel="alternate" hreflang="zh" href="https://anycms.org/docs/">
+  
+  
+  
+  
+  
+  
+</head>
+<body>
+  
+  <header class="site-header">
+    <div class="site-header-inner wrap">
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true">
+      <a class="brand" href="/">
+        <span class="brand-mark">A</span>
+        <span>AnyCMS SSG</span>
+      </a>
+      <label for="nav-toggle" class="nav-burger" aria-label="切换菜单" role="button">
+        <span></span><span></span><span></span>
+      </label>
+      <nav class="site-nav">
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <a href="/" class="active">首页</a>
+        
+        
+        
+        <a href="/docs/" class="active">文档</a>
+        
+        
+        
+        <a href="/plugins/">插件</a>
+        
+        
+        
+        <a href="/themes/">主题</a>
+        
+        
+        
+        <a href="https://github.com/anycms/anycms-ssg">GitHub</a>
+        
+        <a class="nav-cta" href="https://github.com/anycms/anycms-ssg">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    
+<header class="page-head">
+  <div class="page-head-inner">
+    <span class="eyebrow">文档</span>
+    <h1>文档</h1>
+    <div class="prose"><p>欢迎来到 <strong>AnyCMS SSG</strong> 文档。这里涵盖了从安装、内容创作、模板与主题，到插件开发与部署的完整流程。</p>
+<p>如果你是第一次使用，建议按顺序阅读；如果想快速跑起来一个站点，直接看<a href="/docs/getting-started/">快速开始</a>。</p>
+</div>
+  </div>
+</header>
+
+
+<section class="listing">
+  <ul class="post-list">
+    
+    <li>
+      <a class="title" href="/docs/introduction/">介绍</a>
+      <p class="desc">AnyCMS SSG 是什么，以及它和 Hugo &#x2f; Zola 的根本差异</p>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/getting-started/">快速开始</a>
+      <p class="desc">三步生成你的第一个 AnyCMS SSG 站点</p>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/site-structure/">站点结构</a>
+      <p class="desc">一个 anycms 站点的标准目录布局</p>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/configuration/">配置（site.kdl）</a>
+      <p class="desc">站点与主题配置使用 KDL，字段说明与示例</p>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/content/">内容模型</a>
+      <p class="desc">Page、Section、front matter、分类法、摘要与代码高亮</p>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/templates/">模板</a>
+      <p class="desc">MiniJinja 模板语法、overlay 解析与契约变量</p>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/assets/">资源管线</a>
+      <p class="desc">Sass 编译、TypeScript 转译、HTML 压缩与静态资源拷贝</p>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/themes/">主题</a>
+      <p class="desc">主题是可分发的 bundle，含 manifest、模板与可选静态资源</p>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/plugins/">插件系统</a>
+      <p class="desc">WASM 插件、两层扩展点、权限化 host 函数与贡献机制</p>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/i18n/">多语言</a>
+      <p class="desc">内容多语言：文件名后缀组织、per-language URL 与 hreflang</p>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/registry/">分发：静态注册中心</a>
+      <p class="desc">从一个带 index.json 的静态目录分发插件与主题</p>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/deployment/">部署</a>
+      <p class="desc">把构建产物 public&#x2f; 部署到任意静态托管</p>
+    </li>
+    
+  </ul>
+</section>
+
+
+  </main>
+
+  
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <span class="brand-mark">A</span>
+          <span>AnyCMS SSG</span>
+        </a>
+        <p>用 Rust 编写的插件驱动静态网站生成器。WASM 插件贯穿内容发现、Markdown 渲染、模板上下文、SEO 与资源处理的每一个阶段。</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>资源</h5>
+          <ul>
+            <li><a href="/docs/">文档</a></li>
+            <li><a href="/docs/getting-started/">快速开始</a></li>
+            <li><a href="/plugins/">插件</a></li>
+            <li><a href="/themes/">主题</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>社区</h5>
+          <ul>
+            <li><a href="https://github.com/anycms/anycms-ssg">GitHub</a></li>
+            <li><a href="/tags/">标签</a></li>
+            <li><a href="/atom.xml">Atom 订阅</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; AnyCMS SSG · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+    </div>
+  </footer>
+
+  
+  
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh"
+      data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>配置（site.kdl） · AnyCMS SSG 文档</title>
+  <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
+  <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/highlight.css">
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3YQ0W814W"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Y3YQ0W814W');
+  </script>
+  <style>
+    :root{
+      --accent: #2563eb;
+    }
+  </style>
+  
+  
+  <link rel="alternate" hreflang="zh" href="https://anycms.org/docs/configuration/">
+  
+  
+  
+  
+  
+  
+</head>
+<body>
+  
+  <header class="site-header">
+    <div class="site-header-inner wrap">
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true">
+      <a class="brand" href="/">
+        <span class="brand-mark">A</span>
+        <span>AnyCMS SSG</span>
+      </a>
+      <label for="nav-toggle" class="nav-burger" aria-label="切换菜单" role="button">
+        <span></span><span></span><span></span>
+      </label>
+      <nav class="site-nav">
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <a href="/" class="active">首页</a>
+        
+        
+        
+        <a href="/docs/" class="active">文档</a>
+        
+        
+        
+        <a href="/plugins/">插件</a>
+        
+        
+        
+        <a href="/themes/">主题</a>
+        
+        
+        
+        <a href="https://github.com/anycms/anycms-ssg">GitHub</a>
+        
+        <a class="nav-cta" href="https://github.com/anycms/anycms-ssg">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    
+<div class="docs">
+  
+  <aside class="docs-sidebar">
+    <h5>文档</h5>
+    <ul>
+      
+      
+      <li><a href="/docs/introduction/">介绍</a></li>
+      
+      <li><a href="/docs/getting-started/">快速开始</a></li>
+      
+      <li><a href="/docs/site-structure/">站点结构</a></li>
+      
+      <li><a href="/docs/configuration/" class="active">配置（site.kdl）</a></li>
+      
+      <li><a href="/docs/content/">内容模型</a></li>
+      
+      <li><a href="/docs/templates/">模板</a></li>
+      
+      <li><a href="/docs/assets/">资源管线</a></li>
+      
+      <li><a href="/docs/themes/">主题</a></li>
+      
+      <li><a href="/docs/plugins/">插件系统</a></li>
+      
+      <li><a href="/docs/i18n/">多语言</a></li>
+      
+      <li><a href="/docs/registry/">分发：静态注册中心</a></li>
+      
+      <li><a href="/docs/deployment/">部署</a></li>
+      
+    </ul>
+  </aside>
+
+  <article class="docs-body prose">
+    <h1>配置（site.kdl）</h1>
+    <p class="muted" style="margin-top:-0.5rem;font-size:1.1rem;">站点与主题配置使用 KDL，字段说明与示例</p>
+    <div class="post-body">
+      <p>站点与主题配置使用 <strong><a href="https://kdl.dev/">KDL</a></strong>。<code>anycms init</code> 生成的最小配置：</p>
+<pre><code>title "My AnyCMS Site"
+base_url "https://example.com"
+default_language "en"
+output_dir "public"
+
+taxonomies {
+    taxonomy name="tags"
+}
+
+languages {
+    language code="fr"
+}
+
+theme "ink"            // 启用主题 overlay（可选）
+
+// 插件级配置覆盖：覆盖各插件 manifest 中的 config {} 默认值（site 胜出）
+plugins {
+    plugin "reading-time" {
+        wpm 250
+    }
+}
+</code></pre>
+<h2 id="heading">字段说明</h2>
+<table><thead><tr><th>字段</th><th>说明</th></tr></thead><tbody>
+<tr><th><code>title</code> / <code>base_url</code></th><th>站点标题与基准 URL（用于绝对链接、feeds、sitemap）</th></tr>
+<tr><th><code>default_language</code></th><th>默认语言代码</th></tr>
+<tr><th><code>output_dir</code></th><th>构建输出目录（默认 <code>public</code>）</th></tr>
+<tr><th><code>theme</code></th><th>启用的主题名（对应 <code>themes/&lt;name&gt;/</code>）</th></tr>
+<tr><th><code>taxonomies</code></th><th>自定义分类法（<code>tags</code> / <code>categories</code> …）</th></tr>
+<tr><th><code>languages</code></th><th>额外支持的语言代码</th></tr>
+<tr><th><code>params</code></th><th>自由参数表，主题默认值会被合并进来，模板中通过 <code>config.params.&lt;key&gt;</code> 读取</th></tr>
+<tr><th><code>plugins</code></th><th>各插件的配置覆盖（递归合并，site 覆盖 manifest 默认值）</th></tr>
+<tr><th><code>menu</code></th><th>声明式、按语言组织的导航菜单</th></tr>
+</tbody></table>
+<h2 id="heading-2">声明式导航菜单</h2>
+<p>用 <code>menu {}</code> 块声明导航，模板中通过 <code>config.menu</code> 读取。裸 <code>item</code> 节点构成默认语言菜单，<code>lang "&lt;code&gt;" {}</code> 子块提供按语言的覆盖：</p>
+<pre><code>menu {
+    item "Home" url="/"
+    item "Docs" url="/docs/" weight=10
+    item "GitHub" url="https://github.com/anycms/anycms-ssg" weight=90
+
+    lang "fr" {
+        item "Accueil" url="/fr/"
+        item "Docs" url="/fr/docs/" weight=10
+    }
+}
+</code></pre>
+<p>菜单按 <code>weight</code> 升序排序；绝对 URL（<code>http(s)://</code>）视为外链。</p>
+<blockquote>
+<p><strong>KDL 注释</strong>是 <code>//</code>，不是 <code>#</code>——<code>#</code> 在 KDL 里是布尔字面量前缀，写成注释会导致解析失败。</p>
+</blockquote>
+
+    </div>
+    <div class="doc-meta">
+      <span>用 <strong>AnyCMS SSG</strong> 构建</span>
+      <a href="https://github.com/anycms/anycms-ssg">在 GitHub 上编辑 ↗</a>
+    </div>
+  </article>
+</div>
+
+  </main>
+
+  
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <span class="brand-mark">A</span>
+          <span>AnyCMS SSG</span>
+        </a>
+        <p>用 Rust 编写的插件驱动静态网站生成器。WASM 插件贯穿内容发现、Markdown 渲染、模板上下文、SEO 与资源处理的每一个阶段。</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>资源</h5>
+          <ul>
+            <li><a href="/docs/">文档</a></li>
+            <li><a href="/docs/getting-started/">快速开始</a></li>
+            <li><a href="/plugins/">插件</a></li>
+            <li><a href="/themes/">主题</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>社区</h5>
+          <ul>
+            <li><a href="https://github.com/anycms/anycms-ssg">GitHub</a></li>
+            <li><a href="/tags/">标签</a></li>
+            <li><a href="/atom.xml">Atom 订阅</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; AnyCMS SSG · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+    </div>
+  </footer>
+
+  
+  
+</body>
+</html>

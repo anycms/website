@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh"
+      data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>资源管线 · AnyCMS SSG 文档</title>
+  <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
+  <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/highlight.css">
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3YQ0W814W"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Y3YQ0W814W');
+  </script>
+  <style>
+    :root{
+      --accent: #2563eb;
+    }
+  </style>
+  
+  
+  <link rel="alternate" hreflang="zh" href="https://anycms.org/docs/assets/">
+  
+  
+  
+  
+  
+  
+</head>
+<body>
+  
+  <header class="site-header">
+    <div class="site-header-inner wrap">
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true">
+      <a class="brand" href="/">
+        <span class="brand-mark">A</span>
+        <span>AnyCMS SSG</span>
+      </a>
+      <label for="nav-toggle" class="nav-burger" aria-label="切换菜单" role="button">
+        <span></span><span></span><span></span>
+      </label>
+      <nav class="site-nav">
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <a href="/" class="active">首页</a>
+        
+        
+        
+        <a href="/docs/" class="active">文档</a>
+        
+        
+        
+        <a href="/plugins/">插件</a>
+        
+        
+        
+        <a href="/themes/">主题</a>
+        
+        
+        
+        <a href="https://github.com/anycms/anycms-ssg">GitHub</a>
+        
+        <a class="nav-cta" href="https://github.com/anycms/anycms-ssg">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    
+<div class="docs">
+  
+  <aside class="docs-sidebar">
+    <h5>文档</h5>
+    <ul>
+      
+      
+      <li><a href="/docs/introduction/">介绍</a></li>
+      
+      <li><a href="/docs/getting-started/">快速开始</a></li>
+      
+      <li><a href="/docs/site-structure/">站点结构</a></li>
+      
+      <li><a href="/docs/configuration/">配置（site.kdl）</a></li>
+      
+      <li><a href="/docs/content/">内容模型</a></li>
+      
+      <li><a href="/docs/templates/">模板</a></li>
+      
+      <li><a href="/docs/assets/" class="active">资源管线</a></li>
+      
+      <li><a href="/docs/themes/">主题</a></li>
+      
+      <li><a href="/docs/plugins/">插件系统</a></li>
+      
+      <li><a href="/docs/i18n/">多语言</a></li>
+      
+      <li><a href="/docs/registry/">分发：静态注册中心</a></li>
+      
+      <li><a href="/docs/deployment/">部署</a></li>
+      
+    </ul>
+  </aside>
+
+  <article class="docs-body prose">
+    <h1>资源管线</h1>
+    <p class="muted" style="margin-top:-0.5rem;font-size:1.1rem;">Sass 编译、TypeScript 转译、HTML 压缩与静态资源拷贝</p>
+    <div class="post-body">
+      <p>构建时，AnyCMS SSG 自动处理以下资源：</p>
+<table><thead><tr><th>输入</th><th>处理</th><th>输出</th></tr></thead><tbody>
+<tr><th><code>sass/main.scss</code></th><th>grass 编译 + 压缩</th><th><code>public/main.css</code></th></tr>
+<tr><th><code>ts/main.ts</code> / <code>*.tsx</code></th><th>oxc 转译 + minify（不做类型检查 / bundle）</th><th><code>public/*.js</code></th></tr>
+<tr><th>HTML 输出</th><th>minify-html 压缩</th><th>压缩后的 <code>public/**/*.html</code></th></tr>
+<tr><th><code>static/**</code></th><th>原样拷贝</th><th><code>public/**</code></th></tr>
+</tbody></table>
+<h2 id="sass">Sass</h2>
+<p><code>sass/main.scss</code> 是入口。主题的 <code>sass/</code> 会被加入 Sass include path，因此可以直接 <code>@use</code> 主题的 partial。Sass 输出经过压缩。</p>
+<pre><code>@use "tokens";
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
+</code></pre>
+<p>主题的 <code>static/</code> 与 site 的 <code>static/</code> 做 overlay 合并（site 胜出）。</p>
+<h2 id="typescript-tsx">TypeScript / TSX</h2>
+<p><code>ts/</code> 下的 <code>.ts</code> / <code>.tsx</code> 由 <strong>oxc</strong> 转译为 JS 并 minify。特点：</p>
+<ul>
+<li>纯 Rust 实现，无外部依赖、无 Node.js</li>
+<li><strong>仅转译，不做 bundle，也不做类型检查</strong></li>
+<li>适合写少量交互脚本，而非完整前端应用</li>
+</ul>
+<h2 id="html">HTML 压缩</h2>
+<p>所有渲染出的 HTML 都会经过 minify-html 压缩（去注释、折叠空白、缩短布尔属性等）。</p>
+<h2 id="heading">设计参数</h2>
+<p>主题通过 <code>params</code> 声明可调设计令牌，site 在 <code>params {}</code> 中覆盖，模板内联注入的 <code>:root</code> CSS 变量会覆盖主题默认值。本站就是用这种方式让 <code>--accent</code> / <code>--accent-2</code> 可在 <code>site.kdl</code> 里调整：</p>
+<pre><code>params {
+    accent "#4f46e5"
+    accent_secondary "#7c3aed"
+}
+</code></pre>
+
+    </div>
+    <div class="doc-meta">
+      <span>用 <strong>AnyCMS SSG</strong> 构建</span>
+      <a href="https://github.com/anycms/anycms-ssg">在 GitHub 上编辑 ↗</a>
+    </div>
+  </article>
+</div>
+
+  </main>
+
+  
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <span class="brand-mark">A</span>
+          <span>AnyCMS SSG</span>
+        </a>
+        <p>用 Rust 编写的插件驱动静态网站生成器。WASM 插件贯穿内容发现、Markdown 渲染、模板上下文、SEO 与资源处理的每一个阶段。</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>资源</h5>
+          <ul>
+            <li><a href="/docs/">文档</a></li>
+            <li><a href="/docs/getting-started/">快速开始</a></li>
+            <li><a href="/plugins/">插件</a></li>
+            <li><a href="/themes/">主题</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>社区</h5>
+          <ul>
+            <li><a href="https://github.com/anycms/anycms-ssg">GitHub</a></li>
+            <li><a href="/tags/">标签</a></li>
+            <li><a href="/atom.xml">Atom 订阅</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; AnyCMS SSG · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+    </div>
+  </footer>
+
+  
+  
+</body>
+</html>

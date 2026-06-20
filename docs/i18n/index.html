@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh"
+      data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>多语言 · AnyCMS SSG 文档</title>
+  <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
+  <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/highlight.css">
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3YQ0W814W"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Y3YQ0W814W');
+  </script>
+  <style>
+    :root{
+      --accent: #2563eb;
+    }
+  </style>
+  
+  
+  <link rel="alternate" hreflang="zh" href="https://anycms.org/docs/i18n/">
+  
+  
+  
+  
+  
+  
+</head>
+<body>
+  
+  <header class="site-header">
+    <div class="site-header-inner wrap">
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true">
+      <a class="brand" href="/">
+        <span class="brand-mark">A</span>
+        <span>AnyCMS SSG</span>
+      </a>
+      <label for="nav-toggle" class="nav-burger" aria-label="切换菜单" role="button">
+        <span></span><span></span><span></span>
+      </label>
+      <nav class="site-nav">
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <a href="/" class="active">首页</a>
+        
+        
+        
+        <a href="/docs/" class="active">文档</a>
+        
+        
+        
+        <a href="/plugins/">插件</a>
+        
+        
+        
+        <a href="/themes/">主题</a>
+        
+        
+        
+        <a href="https://github.com/anycms/anycms-ssg">GitHub</a>
+        
+        <a class="nav-cta" href="https://github.com/anycms/anycms-ssg">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    
+<div class="docs">
+  
+  <aside class="docs-sidebar">
+    <h5>文档</h5>
+    <ul>
+      
+      
+      <li><a href="/docs/introduction/">介绍</a></li>
+      
+      <li><a href="/docs/getting-started/">快速开始</a></li>
+      
+      <li><a href="/docs/site-structure/">站点结构</a></li>
+      
+      <li><a href="/docs/configuration/">配置（site.kdl）</a></li>
+      
+      <li><a href="/docs/content/">内容模型</a></li>
+      
+      <li><a href="/docs/templates/">模板</a></li>
+      
+      <li><a href="/docs/assets/">资源管线</a></li>
+      
+      <li><a href="/docs/themes/">主题</a></li>
+      
+      <li><a href="/docs/plugins/">插件系统</a></li>
+      
+      <li><a href="/docs/i18n/" class="active">多语言</a></li>
+      
+      <li><a href="/docs/registry/">分发：静态注册中心</a></li>
+      
+      <li><a href="/docs/deployment/">部署</a></li>
+      
+    </ul>
+  </aside>
+
+  <article class="docs-body prose">
+    <h1>多语言</h1>
+    <p class="muted" style="margin-top:-0.5rem;font-size:1.1rem;">内容多语言：文件名后缀组织、per-language URL 与 hreflang</p>
+    <div class="post-body">
+      <p>AnyCMS SSG 的多语言指<strong>内容多语言</strong>（不包含工具自身 UI 的系统本地化）。采用<strong>文件名后缀</strong>组织（Zola 模式，最少侵入）。</p>
+<h2 id="heading">文件名约定</h2>
+<p><code>hello-world.md</code>（默认语言）+ <code>hello-world.fr.md</code>（法语）：</p>
+<pre><code>content/
+├── hello-world.md        # 默认语言（en）
+└── hello-world.fr.md     # 法语翻译
+</code></pre>
+<p>翻译自动关联，生成 per-language URL、hreflang 互链、per-language feeds / sitemap。</p>
+<h2 id="heading-2">声明支持的语言</h2>
+<p>在 <code>site.kdl</code> 中声明额外支持的语言：</p>
+<pre><code>default_language "en"
+
+languages {
+    language code="fr"
+    language code="zh"
+}
+</code></pre>
+<p>默认语言无需在 <code>languages</code> 中重复声明。</p>
+<h2 id="per-language">per-language 菜单</h2>
+<p><code>menu {}</code> 块支持按语言覆盖。默认语言的裸 <code>item</code> 节点之外，用 <code>lang "&lt;code&gt;" {}</code> 子块提供翻译：</p>
+<pre><code>menu {
+    item "Home" url="/"
+    item "Docs" url="/docs/" weight=10
+
+    lang "fr" {
+        item "Accueil" url="/fr/"
+        item "Docs" url="/fr/docs/" weight=10
+    }
+}
+</code></pre>
+<h2 id="heading-3">自动生成的产物</h2>
+<ul>
+<li>per-language URL 前缀（如 <code>/fr/...</code>）</li>
+<li>页面间的 <code>&lt;link rel="alternate" hreflang&gt;</code> 互链</li>
+<li>per-language 的 <code>rss.xml</code> / <code>atom.xml</code> / <code>sitemap.xml</code></li>
+</ul>
+<blockquote>
+<p>演示站点 <code>demo-ink</code> 就是中英双语，可以参考它的 <code>content/</code> 与 <code>site.kdl</code>。</p>
+</blockquote>
+
+    </div>
+    <div class="doc-meta">
+      <span>用 <strong>AnyCMS SSG</strong> 构建</span>
+      <a href="https://github.com/anycms/anycms-ssg">在 GitHub 上编辑 ↗</a>
+    </div>
+  </article>
+</div>
+
+  </main>
+
+  
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <span class="brand-mark">A</span>
+          <span>AnyCMS SSG</span>
+        </a>
+        <p>用 Rust 编写的插件驱动静态网站生成器。WASM 插件贯穿内容发现、Markdown 渲染、模板上下文、SEO 与资源处理的每一个阶段。</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>资源</h5>
+          <ul>
+            <li><a href="/docs/">文档</a></li>
+            <li><a href="/docs/getting-started/">快速开始</a></li>
+            <li><a href="/plugins/">插件</a></li>
+            <li><a href="/themes/">主题</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>社区</h5>
+          <ul>
+            <li><a href="https://github.com/anycms/anycms-ssg">GitHub</a></li>
+            <li><a href="/tags/">标签</a></li>
+            <li><a href="/atom.xml">Atom 订阅</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; AnyCMS SSG · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+    </div>
+  </footer>
+
+  
+  
+</body>
+</html>

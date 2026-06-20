@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh"
+      data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>主题 · AnyCMS SSG 文档</title>
+  <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
+  <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/highlight.css">
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3YQ0W814W"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Y3YQ0W814W');
+  </script>
+  <style>
+    :root{
+      --accent: #2563eb;
+    }
+  </style>
+  
+  
+  <link rel="alternate" hreflang="zh" href="https://anycms.org/docs/themes/">
+  
+  
+  
+  
+  
+  
+</head>
+<body>
+  
+  <header class="site-header">
+    <div class="site-header-inner wrap">
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true">
+      <a class="brand" href="/">
+        <span class="brand-mark">A</span>
+        <span>AnyCMS SSG</span>
+      </a>
+      <label for="nav-toggle" class="nav-burger" aria-label="切换菜单" role="button">
+        <span></span><span></span><span></span>
+      </label>
+      <nav class="site-nav">
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <a href="/" class="active">首页</a>
+        
+        
+        
+        <a href="/docs/" class="active">文档</a>
+        
+        
+        
+        <a href="/plugins/">插件</a>
+        
+        
+        
+        <a href="/themes/">主题</a>
+        
+        
+        
+        <a href="https://github.com/anycms/anycms-ssg">GitHub</a>
+        
+        <a class="nav-cta" href="https://github.com/anycms/anycms-ssg">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    
+<div class="docs">
+  
+  <aside class="docs-sidebar">
+    <h5>文档</h5>
+    <ul>
+      
+      
+      <li><a href="/docs/introduction/">介绍</a></li>
+      
+      <li><a href="/docs/getting-started/">快速开始</a></li>
+      
+      <li><a href="/docs/site-structure/">站点结构</a></li>
+      
+      <li><a href="/docs/configuration/">配置（site.kdl）</a></li>
+      
+      <li><a href="/docs/content/">内容模型</a></li>
+      
+      <li><a href="/docs/templates/">模板</a></li>
+      
+      <li><a href="/docs/assets/">资源管线</a></li>
+      
+      <li><a href="/docs/themes/" class="active">主题</a></li>
+      
+      <li><a href="/docs/plugins/">插件系统</a></li>
+      
+      <li><a href="/docs/i18n/">多语言</a></li>
+      
+      <li><a href="/docs/registry/">分发：静态注册中心</a></li>
+      
+      <li><a href="/docs/deployment/">部署</a></li>
+      
+    </ul>
+  </aside>
+
+  <article class="docs-body prose">
+    <h1>主题</h1>
+    <p class="muted" style="margin-top:-0.5rem;font-size:1.1rem;">主题是可分发的 bundle，含 manifest、模板与可选静态资源</p>
+    <div class="post-body">
+      <p>主题是可分发的 bundle：<code>theme.kdl</code> manifest + <code>templates/</code>（必需）+ 可选 <code>static/</code> / <code>sass/</code>。三个官方主题随仓库发布：</p>
+<table><thead><tr><th>主题</th><th>定位</th><th>设计</th><th>展示能力</th></tr></thead><tbody>
+<tr><th><a href="/themes/"><code>ink</code></a></th><th>极简博客（<strong>参考默认主题</strong>）</th><th>衬线、单栏、纸墨感</th><th>全套模板、feeds、sitemap、高亮、params 主题化</th></tr>
+<tr><th><a href="/themes/"><code>manual</code></a></th><th>文档 / 手册</th><th>无衬线、顶部搜索、页内 TOC</th><th>section 导航、客户端 TOC、search.json</th></tr>
+<tr><th><a href="/themes/"><code>folio</code></a></th><th>作品集 / 视觉</th><th>粗体展示字、响应式画廊网格</th><th>landing、项目卡片、<code>columns</code> 参数</th></tr>
+</tbody></table>
+<h2 id="theme-kdl">theme.kdl</h2>
+<pre><code>theme {
+  name "ink"
+  version "0.1.0"
+  engine-version "0.1"        // 必需：必须与 host engine 的 major.minor 匹配
+  author "AnyCMS"
+  description "Minimal blog theme"
+  params {
+    accent default="#333"
+    dark default="auto" enum="auto,on,off"
+  }
+}
+</code></pre>
+<h2 id="engine-version">engine-version 校验</h2>
+<p>安装时与构建时都会检查：主题声明的 <code>engine-version</code> 必须与 host engine 共享 <code>major.minor</code>，否则拒绝。这保证主题与 host 的模板契约兼容。</p>
+<h2 id="params">params 合并</h2>
+<p>主题在 <code>params {}</code> 中声明默认值，site 的 <code>params {}</code> 覆盖之，模板中读 <code>config.params.&lt;key&gt;</code>。</p>
+<h2 id="heading">主题管理命令</h2>
+<pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> theme install <span class="keyword operator assignment redirection shell">&lt;</span>SOURCE<span class="keyword operator assignment redirection shell">&gt;</span> <span class="keyword control regexp set begin shell">[</span>-<span class="keyword operator word shell">-</span>root ROOT<span class="keyword control regexp set end shell">]</span> <span class="keyword control regexp set begin shell">[</span>-<span class="keyword operator word shell">-</span>force<span class="keyword control regexp set end shell">]</span> <span class="keyword control regexp set begin shell">[</span>-<span class="keyword operator word shell">-</span>registry BASE<span class="keyword control regexp set end shell">]</span> <span class="keyword control regexp set begin shell">[</span>-<span class="keyword operator word shell">-</span>version VER<span class="keyword control regexp set end shell">]</span></span>
+<span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> theme list   <span class="keyword control regexp set begin shell">[</span>-<span class="keyword operator word shell">-</span>root ROOT<span class="keyword control regexp set end shell">]</span></span>
+<span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> theme uninstall <span class="keyword operator assignment redirection shell">&lt;</span>NAME<span class="keyword operator assignment redirection shell">&gt;</span> <span class="keyword control regexp set begin shell">[</span>-<span class="keyword operator word shell">-</span>root ROOT<span class="keyword control regexp set end shell">]</span></span>
+<span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> theme package <span class="keyword operator assignment redirection shell">&lt;</span>DIR<span class="keyword operator assignment redirection shell">&gt;</span> <span class="keyword control regexp set begin shell">[</span>-<span class="keyword operator word shell">-</span>output FILE<span class="keyword control regexp set end shell">]</span> <span class="keyword control regexp set begin shell">[</span>-<span class="keyword operator word shell">-</span>force<span class="keyword control regexp set end shell">]</span>     <span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> 打包为 &lt;name&gt;-&lt;version&gt;.zip</span><span class="comment line number-sign shell">
+</span></span></span></code></pre>
+<p>详见 <a href="https://github.com/anycms/anycms-ssg/blob/master/docs/themes.md"><code>docs/themes.md</code></a>。</p>
+
+    </div>
+    <div class="doc-meta">
+      <span>用 <strong>AnyCMS SSG</strong> 构建</span>
+      <a href="https://github.com/anycms/anycms-ssg">在 GitHub 上编辑 ↗</a>
+    </div>
+  </article>
+</div>
+
+  </main>
+
+  
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <span class="brand-mark">A</span>
+          <span>AnyCMS SSG</span>
+        </a>
+        <p>用 Rust 编写的插件驱动静态网站生成器。WASM 插件贯穿内容发现、Markdown 渲染、模板上下文、SEO 与资源处理的每一个阶段。</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>资源</h5>
+          <ul>
+            <li><a href="/docs/">文档</a></li>
+            <li><a href="/docs/getting-started/">快速开始</a></li>
+            <li><a href="/plugins/">插件</a></li>
+            <li><a href="/themes/">主题</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>社区</h5>
+          <ul>
+            <li><a href="https://github.com/anycms/anycms-ssg">GitHub</a></li>
+            <li><a href="/tags/">标签</a></li>
+            <li><a href="/atom.xml">Atom 订阅</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; AnyCMS SSG · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+    </div>
+  </footer>
+
+  
+  
+</body>
+</html>

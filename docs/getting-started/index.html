@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh"
+      data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>快速开始 · AnyCMS SSG 文档</title>
+  <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
+  <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/highlight.css">
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3YQ0W814W"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Y3YQ0W814W');
+  </script>
+  <style>
+    :root{
+      --accent: #2563eb;
+    }
+  </style>
+  
+  
+  <link rel="alternate" hreflang="zh" href="https://anycms.org/docs/getting-started/">
+  
+  
+  
+  
+  
+  
+</head>
+<body>
+  
+  <header class="site-header">
+    <div class="site-header-inner wrap">
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true">
+      <a class="brand" href="/">
+        <span class="brand-mark">A</span>
+        <span>AnyCMS SSG</span>
+      </a>
+      <label for="nav-toggle" class="nav-burger" aria-label="切换菜单" role="button">
+        <span></span><span></span><span></span>
+      </label>
+      <nav class="site-nav">
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <a href="/" class="active">首页</a>
+        
+        
+        
+        <a href="/docs/" class="active">文档</a>
+        
+        
+        
+        <a href="/plugins/">插件</a>
+        
+        
+        
+        <a href="/themes/">主题</a>
+        
+        
+        
+        <a href="https://github.com/anycms/anycms-ssg">GitHub</a>
+        
+        <a class="nav-cta" href="https://github.com/anycms/anycms-ssg">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    
+<div class="docs">
+  
+  <aside class="docs-sidebar">
+    <h5>文档</h5>
+    <ul>
+      
+      
+      <li><a href="/docs/introduction/">介绍</a></li>
+      
+      <li><a href="/docs/getting-started/" class="active">快速开始</a></li>
+      
+      <li><a href="/docs/site-structure/">站点结构</a></li>
+      
+      <li><a href="/docs/configuration/">配置（site.kdl）</a></li>
+      
+      <li><a href="/docs/content/">内容模型</a></li>
+      
+      <li><a href="/docs/templates/">模板</a></li>
+      
+      <li><a href="/docs/assets/">资源管线</a></li>
+      
+      <li><a href="/docs/themes/">主题</a></li>
+      
+      <li><a href="/docs/plugins/">插件系统</a></li>
+      
+      <li><a href="/docs/i18n/">多语言</a></li>
+      
+      <li><a href="/docs/registry/">分发：静态注册中心</a></li>
+      
+      <li><a href="/docs/deployment/">部署</a></li>
+      
+    </ul>
+  </aside>
+
+  <article class="docs-body prose">
+    <h1>快速开始</h1>
+    <p class="muted" style="margin-top:-0.5rem;font-size:1.1rem;">三步生成你的第一个 AnyCMS SSG 站点</p>
+    <div class="post-body">
+      <h2 id="heading">前置要求</h2>
+<ul>
+<li><strong>Rust 1.85+</strong>（edition 2024，stable 工具链）</li>
+<li>编写插件还需添加 wasm 编译目标：<code>rustup target add wasm32-unknown-unknown</code></li>
+</ul>
+<h2 id="heading-2">安装</h2>
+<pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">git</span></span><span class="meta function-call arguments shell"> clone <span class="keyword operator assignment redirection shell">&lt;</span>repo-url<span class="keyword operator assignment redirection shell">&gt;</span> anycms-ssg</span>
+<span class="meta function-call shell"><span class="support function cd shell">cd</span></span><span class="meta function-call arguments shell"> anycms-ssg</span>
+<span class="meta function-call shell"><span class="variable function shell">cargo</span></span><span class="meta function-call arguments shell"> install<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>path</span> .        <span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> 安装 `anycms` 二进制到 ~/.cargo/bin</span><span class="comment line number-sign shell">
+</span></span></span></code></pre>
+<blockquote>
+<p>也可直接用 <code>cargo run --</code> 代替已安装的 <code>anycms</code>。</p>
+</blockquote>
+<h2 id="heading-3">三步生成你的第一个站点</h2>
+<pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> init my-site           <span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> 生成站点骨架（site.kdl + content + templates + sass + ts）</span><span class="comment line number-sign shell">
+</span></span><span class="meta function-call shell"><span class="support function cd shell">cd</span></span><span class="meta function-call arguments shell"> my-site</span>
+<span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> build                  <span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> → public/（渲染 Markdown、编译 Sass、转译 TS、压缩 HTML）</span><span class="comment line number-sign shell">
+</span></span><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> serve                  <span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> → http://127.0.0.1:1111 实时热重载</span><span class="comment line number-sign shell">
+</span></span></span></code></pre>
+<p>编辑 <code>content/</code> 下的 Markdown，保存后浏览器自动刷新。</p>
+<h2 id="heading-4">使用主题</h2>
+<pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> init my-site</span>
+<span class="meta function-call shell"><span class="support function cd shell">cd</span></span><span class="meta function-call arguments shell"> my-site</span>
+<span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> theme install ../themes/ink      <span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> 安装内置主题到 ./themes/ink</span><span class="comment line number-sign shell">
+</span></span><span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> 在 site.kdl 中设置 theme &quot;ink&quot;，并删除 site 自带的 templates/ 和 sass/ 让主题生效：</span><span class="comment line number-sign shell">
+</span><span class="meta function-call shell"><span class="variable function shell">rm</span></span><span class="meta function-call arguments shell"><span class="variable parameter option shell"><span class="punctuation definition parameter shell"> -</span>rf</span> templates sass</span>
+<span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> build</span> <span class="keyword operator logical and shell">&amp;&amp;</span> <span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> serve</span>
+</span></code></pre>
+<blockquote>
+<p><strong>overlay 优先级</strong>：site 的 <code>templates/*.html</code> 与 <code>sass/main.scss</code> 会<strong>覆盖</strong>主题同名文件。
+全新 <code>init</code> 会同时生成这两者，要让已安装主题接管布局与样式，需先删除它们。详见<a href="/docs/themes/">主题</a>。</p>
+</blockquote>
+<h2 id="heading-5">安装一个插件</h2>
+<pre><code class="language-sh"><span class="source shell bash"><span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> 从内置示例构建并安装一个插件</span><span class="comment line number-sign shell">
+</span><span class="meta function-call shell"><span class="support function cd shell">cd</span></span><span class="meta function-call arguments shell"> examples/plugins/reading-time</span>
+<span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> plugin build<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>install</span> ../../sites/demo-ink<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>release</span></span>
+
+<span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> 构建站点，插件自动加载</span><span class="comment line number-sign shell">
+</span><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> build<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>root</span> ../../sites/demo-ink</span>
+</span></code></pre>
+<h2 id="heading-6">下一步</h2>
+<ul>
+<li>了解<a href="/docs/site-structure/">站点结构</a></li>
+<li>配置你的 <a href="/docs/configuration/"><code>site.kdl</code></a></li>
+<li>编写你的<a href="/docs/plugins/">第一个插件</a></li>
+</ul>
+
+    </div>
+    <div class="doc-meta">
+      <span>用 <strong>AnyCMS SSG</strong> 构建</span>
+      <a href="https://github.com/anycms/anycms-ssg">在 GitHub 上编辑 ↗</a>
+    </div>
+  </article>
+</div>
+
+  </main>
+
+  
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <span class="brand-mark">A</span>
+          <span>AnyCMS SSG</span>
+        </a>
+        <p>用 Rust 编写的插件驱动静态网站生成器。WASM 插件贯穿内容发现、Markdown 渲染、模板上下文、SEO 与资源处理的每一个阶段。</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>资源</h5>
+          <ul>
+            <li><a href="/docs/">文档</a></li>
+            <li><a href="/docs/getting-started/">快速开始</a></li>
+            <li><a href="/plugins/">插件</a></li>
+            <li><a href="/themes/">主题</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>社区</h5>
+          <ul>
+            <li><a href="https://github.com/anycms/anycms-ssg">GitHub</a></li>
+            <li><a href="/tags/">标签</a></li>
+            <li><a href="/atom.xml">Atom 订阅</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; AnyCMS SSG · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+    </div>
+  </footer>
+
+  
+  
+</body>
+</html>

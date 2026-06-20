@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh"
+      data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>插件系统 · AnyCMS SSG 文档</title>
+  <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
+  <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/highlight.css">
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3YQ0W814W"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Y3YQ0W814W');
+  </script>
+  <style>
+    :root{
+      --accent: #2563eb;
+    }
+  </style>
+  
+  
+  <link rel="alternate" hreflang="zh" href="https://anycms.org/docs/plugins/">
+  
+  
+  
+  
+  
+  
+</head>
+<body>
+  
+  <header class="site-header">
+    <div class="site-header-inner wrap">
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true">
+      <a class="brand" href="/">
+        <span class="brand-mark">A</span>
+        <span>AnyCMS SSG</span>
+      </a>
+      <label for="nav-toggle" class="nav-burger" aria-label="切换菜单" role="button">
+        <span></span><span></span><span></span>
+      </label>
+      <nav class="site-nav">
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <a href="/" class="active">首页</a>
+        
+        
+        
+        <a href="/docs/" class="active">文档</a>
+        
+        
+        
+        <a href="/plugins/">插件</a>
+        
+        
+        
+        <a href="/themes/">主题</a>
+        
+        
+        
+        <a href="https://github.com/anycms/anycms-ssg">GitHub</a>
+        
+        <a class="nav-cta" href="https://github.com/anycms/anycms-ssg">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    
+<div class="docs">
+  
+  <aside class="docs-sidebar">
+    <h5>文档</h5>
+    <ul>
+      
+      
+      <li><a href="/docs/introduction/">介绍</a></li>
+      
+      <li><a href="/docs/getting-started/">快速开始</a></li>
+      
+      <li><a href="/docs/site-structure/">站点结构</a></li>
+      
+      <li><a href="/docs/configuration/">配置（site.kdl）</a></li>
+      
+      <li><a href="/docs/content/">内容模型</a></li>
+      
+      <li><a href="/docs/templates/">模板</a></li>
+      
+      <li><a href="/docs/assets/">资源管线</a></li>
+      
+      <li><a href="/docs/themes/">主题</a></li>
+      
+      <li><a href="/docs/plugins/" class="active">插件系统</a></li>
+      
+      <li><a href="/docs/i18n/">多语言</a></li>
+      
+      <li><a href="/docs/registry/">分发：静态注册中心</a></li>
+      
+      <li><a href="/docs/deployment/">部署</a></li>
+      
+    </ul>
+  </aside>
+
+  <article class="docs-body prose">
+    <h1>插件系统</h1>
+    <p class="muted" style="margin-top:-0.5rem;font-size:1.1rem;">WASM 插件、两层扩展点、权限化 host 函数与贡献机制</p>
+    <div class="post-body">
+      <p>插件是 WebAssembly 模块，构建时由 host 加载并按 <strong>priority 顺序</strong>（数字越小越先执行）调度。</p>
+<h2 id="heading">两层扩展点</h2>
+<ul>
+<li><strong>Layer 1 — 10 个通用管线 hook</strong>：<code>on_build_start</code> / <code>on_build_end</code> / <code>on_config</code> / <code>on_content_discover</code> / <code>on_page_parse</code> / <code>on_markdown</code> / <code>on_markdown_html</code> / <code>on_template_context</code> / <code>on_template_output</code> / <code>on_asset</code>。</li>
+<li><strong>Layer 2 — 5 个业务域</strong>：<code>on_seo</code> / <code>on_sitemap</code> / <code>on_search_document</code> / <code>on_feed_entry</code> / <code>on_head_inject</code>·<code>on_body_inject</code>。</li>
+<li><strong>贡献（contribute）</strong>：插件向模板引擎注册 <code>filter</code> / <code>global_function</code>。</li>
+</ul>
+<h2 id="heading-2">写一个插件</h2>
+<pre><code class="language-rust"><span class="source rust"><span class="keyword other rust">use</span> <span class="meta path rust">anycms_ssg_plugin_sdk<span class="punctuation accessor rust">::</span></span><span class="meta block rust"><span class="punctuation section block begin rust">{</span>plugin_fn<span class="punctuation separator rust">,</span> FnResult<span class="punctuation separator rust">,</span> TemplateContext</span><span class="meta block rust"><span class="punctuation section block end rust">}</span></span><span class="punctuation terminator rust">;</span>
+
+<span class="comment line documentation rust"><span class="punctuation definition comment rust">///</span> 注入 reading_time 模板变量
+</span><span class="meta annotation rust"><span class="punctuation definition annotation rust">#</span><span class="punctuation section group begin rust">[</span><span class="variable annotation rust">plugin_fn</span><span class="punctuation section group end rust">]</span></span>
+<span class="meta function rust"><span class="meta function rust"><span class="storage modifier rust">pub</span> <span class="storage type function rust">fn</span> </span><span class="entity name function rust">on_template_context</span></span><span class="meta function rust"><span class="meta function parameters rust"><span class="punctuation section parameters begin rust">(</span><span class="storage modifier rust">mut</span> <span class="variable parameter rust">ctx</span><span class="punctuation separator rust">:</span> TemplateContext</span><span class="meta function rust"><span class="meta function parameters rust"><span class="punctuation section parameters end rust">)</span></span></span></span><span class="meta function rust"> <span class="meta function return-type rust"><span class="punctuation separator rust">-&gt;</span> <span class="meta generic rust">FnResult<span class="punctuation definition generic begin rust">&lt;</span>TemplateContext<span class="punctuation definition generic end rust">&gt;</span></span></span> </span><span class="meta function rust"><span class="meta block rust"><span class="punctuation section block begin rust">{</span>
+    <span class="storage type rust">let</span> words <span class="keyword operator rust">=</span> ctx.page.content.<span class="support function rust">split_whitespace</span><span class="meta group rust"><span class="punctuation section group begin rust">(</span></span><span class="meta group rust"><span class="punctuation section group end rust">)</span></span>.<span class="support function rust">count</span><span class="meta group rust"><span class="punctuation section group begin rust">(</span></span><span class="meta group rust"><span class="punctuation section group end rust">)</span></span><span class="punctuation terminator rust">;</span>
+    <span class="storage type rust">let</span> minutes <span class="keyword operator rust">=</span> <span class="meta group rust"><span class="punctuation section group begin rust">(</span>words <span class="keyword operator rust">as</span> <span class="storage type rust">f64</span> <span class="keyword operator rust">/</span> <span class="constant numeric float rust">200.</span><span class="constant numeric float rust">0</span></span><span class="meta group rust"><span class="punctuation section group end rust">)</span></span>.<span class="support function rust">ceil</span><span class="meta group rust"><span class="punctuation section group begin rust">(</span></span><span class="meta group rust"><span class="punctuation section group end rust">)</span></span> <span class="keyword operator rust">as</span> <span class="storage type rust">u64</span><span class="punctuation terminator rust">;</span>
+    ctx.vars.<span class="support function rust">insert</span><span class="meta group rust"><span class="punctuation section group begin rust">(</span><span class="string quoted double rust"><span class="punctuation definition string begin rust">&quot;</span>reading_time<span class="punctuation definition string end rust">&quot;</span></span>.<span class="support function rust">to_string</span><span class="meta group rust"><span class="punctuation section group begin rust">(</span></span><span class="meta group rust"><span class="punctuation section group end rust">)</span></span><span class="punctuation separator rust">,</span> minutes.<span class="support function rust">into</span><span class="meta group rust"><span class="punctuation section group begin rust">(</span></span><span class="meta group rust"><span class="punctuation section group end rust">)</span></span></span><span class="meta group rust"><span class="punctuation section group end rust">)</span></span><span class="punctuation terminator rust">;</span>
+    <span class="support type rust">Ok</span><span class="meta group rust"><span class="punctuation section group begin rust">(</span>ctx</span><span class="meta group rust"><span class="punctuation section group end rust">)</span></span>
+</span><span class="meta block rust"><span class="punctuation section block end rust">}</span></span></span>
+</span></code></pre>
+<p><code>Cargo.toml</code>：</p>
+<pre><code>[lib]
+crate-type = ["cdylib"]                      # 产出 .wasm
+
+[dependencies]
+anycms-ssg-plugin-sdk = "0.1"                # 唯一需要引入的包
+extism-pdk = "1"                             # #[plugin_fn] 宏的直接依赖
+</code></pre>
+<p>构建目标必须是 <strong><code>wasm32-unknown-unknown</code></strong>（不是 <code>wasm32-wasip2</code>）。</p>
+<h2 id="manifest-name-kdl">manifest（<code>&lt;name&gt;.kdl</code>）</h2>
+<pre><code>plugin {
+  name "reading-time"
+  version "0.1.0"
+  api-version "0.1"                 // 必须为 "0.1"
+  author "Liangdi"
+
+  hooks {
+    on-template-context priority=100
+  }
+
+  permissions {                     // 权限声明，host 每次调用强制校验
+    net "https://api.example.com/**"
+    fs-read "./data/**"
+    fs-write "./generated/**"
+  }
+
+  config {                          // 默认值，可被 site.kdl 覆盖
+    wpm 200
+  }
+}
+</code></pre>
+<h2 id="host-functions">Host Functions（权限化）</h2>
+<table><thead><tr><th>Host 函数</th><th>所需权限</th><th>说明</th></tr></thead><tbody>
+<tr><th><code>host::get_config()</code></th><th>无</th><th>当前 SiteConfig 视图</th></tr>
+<tr><th><code>host::get_plugin_config()</code></th><th>无</th><th>本插件合并后的配置</th></tr>
+<tr><th><code>host::get_page(url)</code></th><th>无</th><th>内容库中的页面（Option）</th></tr>
+<tr><th><code>host::get_taxonomy(name)</code></th><th>无</th><th>指定分类法的 term 列表</th></tr>
+<tr><th><code>host::now()</code></th><th>无</th><th>当前 unix 时间戳</th></tr>
+<tr><th><code>host::get_state</code> / <code>set_state</code></th><th>无</th><th>插件私有跨 hook 键值状态</th></tr>
+<tr><th><code>host::log(level, msg)</code></th><th>无</th><th>日志</th></tr>
+<tr><th><code>host::http_get(url)</code></th><th><code>net</code></th><th>HTTP GET（host 精确匹配 + path 前缀）</th></tr>
+<tr><th><code>host::http_post(url, body)</code></th><th><code>net</code></th><th>HTTP POST</th></tr>
+<tr><th><code>host::read_file(path)</code></th><th><code>fs-read</code></th><th>读站点根下文件（拒绝 <code>..</code> 穿越）</th></tr>
+<tr><th><code>host::write_output(path, bytes)</code></th><th><code>fs-write</code></th><th>写输出目录</th></tr>
+</tbody></table>
+<p>未声明权限的插件只能观察 / 转换 host 交给它的数据，无法触达文件系统或网络。host 用 <code>extism::Plugin::new</code> 加载插件且不传递 Manifest / <code>allowed_paths</code>，<strong>WASI 文件系统访问完全禁用</strong>，所有 FS / 网络访问都收敛到受权限保护的 host function。</p>
+<h2 id="strict">Strict 模式</h2>
+<p>设置环境变量 <code>ANYCMS_PLUGIN_STRICT=1</code>（任何非空非 <code>"0"</code> 值）后，任何插件的 hook 调度错误会<strong>中止整个构建</strong>（而非默认的 log + 跳过）。适用于 CI / 严格场景。</p>
+<h2 id="heading-3">示例插件</h2>
+<p><a href="https://github.com/anycms/anycms-ssg/tree/master/examples/plugins"><code>examples/plugins/</code></a> 下有十多个端到端可运行的示例，覆盖每个 hook 与 host 函数。完整开发指南见 <a href="https://github.com/anycms/anycms-ssg/blob/master/docs/plugins.md"><code>docs/plugins.md</code></a>。</p>
+
+    </div>
+    <div class="doc-meta">
+      <span>用 <strong>AnyCMS SSG</strong> 构建</span>
+      <a href="https://github.com/anycms/anycms-ssg">在 GitHub 上编辑 ↗</a>
+    </div>
+  </article>
+</div>
+
+  </main>
+
+  
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <span class="brand-mark">A</span>
+          <span>AnyCMS SSG</span>
+        </a>
+        <p>用 Rust 编写的插件驱动静态网站生成器。WASM 插件贯穿内容发现、Markdown 渲染、模板上下文、SEO 与资源处理的每一个阶段。</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>资源</h5>
+          <ul>
+            <li><a href="/docs/">文档</a></li>
+            <li><a href="/docs/getting-started/">快速开始</a></li>
+            <li><a href="/plugins/">插件</a></li>
+            <li><a href="/themes/">主题</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>社区</h5>
+          <ul>
+            <li><a href="https://github.com/anycms/anycms-ssg">GitHub</a></li>
+            <li><a href="/tags/">标签</a></li>
+            <li><a href="/atom.xml">Atom 订阅</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; AnyCMS SSG · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+    </div>
+  </footer>
+
+  
+  
+</body>
+</html>

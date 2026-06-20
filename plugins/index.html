@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh"
+      data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>插件 · AnyCMS SSG</title>
+  <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
+  <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/highlight.css">
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3YQ0W814W"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Y3YQ0W814W');
+  </script>
+  <style>
+    :root{
+      --accent: #2563eb;
+    }
+  </style>
+  
+  
+  <link rel="alternate" hreflang="zh" href="https://anycms.org/plugins/">
+  
+  
+  
+  
+  
+  
+</head>
+<body>
+  
+  <header class="site-header">
+    <div class="site-header-inner wrap">
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true">
+      <a class="brand" href="/">
+        <span class="brand-mark">A</span>
+        <span>AnyCMS SSG</span>
+      </a>
+      <label for="nav-toggle" class="nav-burger" aria-label="切换菜单" role="button">
+        <span></span><span></span><span></span>
+      </label>
+      <nav class="site-nav">
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <a href="/" class="active">首页</a>
+        
+        
+        
+        <a href="/docs/">文档</a>
+        
+        
+        
+        <a href="/plugins/" class="active">插件</a>
+        
+        
+        
+        <a href="/themes/">主题</a>
+        
+        
+        
+        <a href="https://github.com/anycms/anycms-ssg">GitHub</a>
+        
+        <a class="nav-cta" href="https://github.com/anycms/anycms-ssg">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    
+<header class="page-head">
+  <div class="page-head-inner">
+    <span class="eyebrow">插件</span>
+    <h1>插件</h1>
+    <div class="prose"><p>AnyCMS SSG 的能力边界由插件定义。下面是随仓库发布的<strong>官方插件</strong>（Tier 1），每个都演示了一类 Layer-2 业务域的增强。</p>
+<div class="cards" style="margin-top:2rem;">
+  <article class="card">
+    <div class="card-head">
+      <span class="card-icon">SS</span>
+      <div><h3>seo-suite</h3><span class="card-tag">on_seo</span></div>
+    </div>
+    <p>配置驱动的 SEO 增强：OpenGraph 图片 / site_name、Twitter card、canonical URL、description 回退，以及去重的 JSON-LD（WebSite、Organization、BreadcrumbList、Article）。</p>
+    <div class="chips"><span class="chip">OG</span><span class="chip">Twitter</span><span class="chip">JSON-LD</span></div>
+  </article>
+  <article class="card">
+    <div class="card-head">
+      <span class="card-icon">SR</span>
+      <div><h3>sitemap-robots</h3><span class="card-tag">on_sitemap</span></div>
+    </div>
+    <p>按 URL 深度设置 changefreq / priority 默认值，可选过滤 draft / noindex，丰富 lastmod，并生成配套的 robots.txt。</p>
+    <div class="chips"><span class="chip">sitemap.xml</span><span class="chip">robots.txt</span></div>
+  </article>
+  <article class="card">
+    <div class="card-head">
+      <span class="card-icon">SI</span>
+      <div><h3>search-index</h3><span class="card-tag">on_search_document</span></div>
+    </div>
+    <p>清洗正文 HTML、推导智能摘要与语言、设置 boost、附加分类法 / 日期 / 类型 / 阅读时长字段，并应用排除规则。host 内置的 search provider 聚合出 search.json。</p>
+    <div class="chips"><span class="chip">search.json</span><span class="chip">excerpt</span></div>
+  </article>
+  <article class="card">
+    <div class="card-head">
+      <span class="card-icon">FS</span>
+      <div><h3>feed-suite</h3><span class="card-tag">on_feed_entry</span></div>
+    </div>
+    <p>订阅源条目增强器：为每个 feed entry 补全 summary、content、author、categories、url。host 内置的 feed provider 负责真正的 RSS / Atom / JSON Feed 渲染。</p>
+    <div class="chips"><span class="chip">RSS</span><span class="chip">Atom</span><span class="chip">JSON Feed</span></div>
+  </article>
+  <article class="card">
+    <div class="card-head">
+      <span class="card-icon">RI</span>
+      <div><h3>responsive-images</h3><span class="card-tag">on_markdown_html</span></div>
+    </div>
+    <p>按命名约定为 <code>&lt;img&gt;</code> 补充 loading / decoding / srcset / sizes 属性。纯 HTML 标记增强，不做图像重编码。</p>
+    <div class="chips"><span class="chip">srcset</span><span class="chip">lazy</span></div>
+  </article>
+</div>
+<h2 id="heading">示例插件</h2>
+<p>仓库的 <a href="https://github.com/anycms/anycms-ssg/tree/master/examples/plugins"><code>examples/plugins/</code></a> 下还有十多个端到端可运行的最小示例，覆盖<strong>每一个</strong> Layer-1 hook 与 host 函数——它们是学习插件开发的最佳起点：</p>
+<div class="chips" style="margin-top:0.5rem;">
+  <span class="chip">reading-time</span>
+  <span class="chip">site-title</span>
+  <span class="chip">uppercasify</span>
+  <span class="chip">virtual-page</span>
+  <span class="chip">body-inject</span>
+  <span class="chip">head-assets</span>
+  <span class="chip">shout (contribute)</span>
+  <span class="chip">config-demo</span>
+  <span class="chip">state-demo</span>
+  <span class="chip">now-demo</span>
+  <span class="chip">http-post-demo</span>
+  <span class="chip">taxonomy-demo</span>
+  <span class="chip">multi-filter</span>
+  <span class="chip">badge</span>
+</div>
+<h2 id="heading-2">自己写一个</h2>
+<p>插件开发只需要一个 crate、一个 manifest，编译到 <code>wasm32-unknown-unknown</code>。详见<a href="/docs/plugins/">插件系统文档</a>。</p>
+<pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> plugin new my-plugin<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>dest</span> ./my-plugin</span>
+<span class="meta function-call shell"><span class="support function cd shell">cd</span></span><span class="meta function-call arguments shell"> my-plugin</span>
+<span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> plugin build<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>install</span> ../my-site<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>release</span></span>
+</span></code></pre>
+</div>
+  </div>
+</header>
+
+
+
+  </main>
+
+  
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <span class="brand-mark">A</span>
+          <span>AnyCMS SSG</span>
+        </a>
+        <p>用 Rust 编写的插件驱动静态网站生成器。WASM 插件贯穿内容发现、Markdown 渲染、模板上下文、SEO 与资源处理的每一个阶段。</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>资源</h5>
+          <ul>
+            <li><a href="/docs/">文档</a></li>
+            <li><a href="/docs/getting-started/">快速开始</a></li>
+            <li><a href="/plugins/">插件</a></li>
+            <li><a href="/themes/">主题</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>社区</h5>
+          <ul>
+            <li><a href="https://github.com/anycms/anycms-ssg">GitHub</a></li>
+            <li><a href="/tags/">标签</a></li>
+            <li><a href="/atom.xml">Atom 订阅</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; AnyCMS SSG · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+    </div>
+  </footer>
+
+  
+  
+</body>
+</html>

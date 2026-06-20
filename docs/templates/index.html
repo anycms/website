@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh"
+      data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>模板 · AnyCMS SSG 文档</title>
+  <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
+  <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/highlight.css">
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3YQ0W814W"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Y3YQ0W814W');
+  </script>
+  <style>
+    :root{
+      --accent: #2563eb;
+    }
+  </style>
+  
+  
+  <link rel="alternate" hreflang="zh" href="https://anycms.org/docs/templates/">
+  
+  
+  
+  
+  
+  
+</head>
+<body>
+  
+  <header class="site-header">
+    <div class="site-header-inner wrap">
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true">
+      <a class="brand" href="/">
+        <span class="brand-mark">A</span>
+        <span>AnyCMS SSG</span>
+      </a>
+      <label for="nav-toggle" class="nav-burger" aria-label="切换菜单" role="button">
+        <span></span><span></span><span></span>
+      </label>
+      <nav class="site-nav">
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <a href="/" class="active">首页</a>
+        
+        
+        
+        <a href="/docs/" class="active">文档</a>
+        
+        
+        
+        <a href="/plugins/">插件</a>
+        
+        
+        
+        <a href="/themes/">主题</a>
+        
+        
+        
+        <a href="https://github.com/anycms/anycms-ssg">GitHub</a>
+        
+        <a class="nav-cta" href="https://github.com/anycms/anycms-ssg">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    
+<div class="docs">
+  
+  <aside class="docs-sidebar">
+    <h5>文档</h5>
+    <ul>
+      
+      
+      <li><a href="/docs/introduction/">介绍</a></li>
+      
+      <li><a href="/docs/getting-started/">快速开始</a></li>
+      
+      <li><a href="/docs/site-structure/">站点结构</a></li>
+      
+      <li><a href="/docs/configuration/">配置（site.kdl）</a></li>
+      
+      <li><a href="/docs/content/">内容模型</a></li>
+      
+      <li><a href="/docs/templates/" class="active">模板</a></li>
+      
+      <li><a href="/docs/assets/">资源管线</a></li>
+      
+      <li><a href="/docs/themes/">主题</a></li>
+      
+      <li><a href="/docs/plugins/">插件系统</a></li>
+      
+      <li><a href="/docs/i18n/">多语言</a></li>
+      
+      <li><a href="/docs/registry/">分发：静态注册中心</a></li>
+      
+      <li><a href="/docs/deployment/">部署</a></li>
+      
+    </ul>
+  </aside>
+
+  <article class="docs-body prose">
+    <h1>模板</h1>
+    <p class="muted" style="margin-top:-0.5rem;font-size:1.1rem;">MiniJinja 模板语法、overlay 解析与契约变量</p>
+    <div class="post-body">
+      <p>模板引擎是 <strong><a href="https://github.com/mitsuhiko/minijinja">MiniJinja</a></strong>（Jinja2 语法）。</p>
+<ul>
+<li><code>{{ … }}</code> 输出</li>
+<li><code>{% … %}</code> 控制流</li>
+<li><code>{% extends %}</code> / <code>{% block %}</code> 继承</li>
+</ul>
+<h2 id="overlay">overlay 解析（三级回退）</h2>
+<p>模板按 <strong>site → theme → 内置技术模板</strong> 的顺序解析。内置的 sitemap / rss / robots 模板可以被 site 或主题的同名文件覆盖。</p>
+<h2 id="heading">契约变量</h2>
+<p><code>base.html</code> 必须用 <code>| safe</code> 渲染三个接缝变量——插件注入和 SEO 才有落点：</p>
+<pre><code class="language-html"><span class="text html basic"><span class="meta tag structure any html"><span class="punctuation definition tag begin html">&lt;</span><span class="entity name tag structure any html">head</span><span class="punctuation definition tag end html">&gt;</span></span>
+  {{ seo_head | safe }}      {# SEO meta/canonical/OG/JSON-LD，由 host 生成 #}
+  {{ head_inject | safe }}    {# 插件 on_head_inject 注入的 <span class="meta tag structure any html"><span class="punctuation definition tag begin html">&lt;</span><span class="entity name tag structure any html">head</span><span class="punctuation definition tag end html">&gt;</span></span> 标签 #}
+<span class="meta tag structure any html"><span class="punctuation definition tag begin html">&lt;/</span><span class="entity name tag structure any html">head</span><span class="punctuation definition tag end html">&gt;</span></span>
+<span class="meta tag structure any html"><span class="punctuation definition tag begin html">&lt;</span><span class="entity name tag structure any html">body</span><span class="punctuation definition tag end html">&gt;</span></span>
+  {{ body_inject | safe }}    {# 插件 on_body_inject，在 <span class="meta tag structure any html"><span class="punctuation definition tag begin html">&lt;/</span><span class="entity name tag structure any html">body</span><span class="punctuation definition tag end html">&gt;</span></span> 之前 #}
+<span class="meta tag structure any html"><span class="punctuation definition tag begin html">&lt;/</span><span class="entity name tag structure any html">body</span><span class="punctuation definition tag end html">&gt;</span></span>
+</span></code></pre>
+<blockquote>
+<p>⚠️ MiniJinja 会把生成 URL 中的 <code>/</code> 转义成 <code>&amp;#x2f;</code>，因此所有生成的链接在 <code>href</code> / <code>src</code> 中须标记 <code>| safe</code>。</p>
+</blockquote>
+<h2 id="heading-2">可用变量</h2>
+<p>页面模板（<code>page.html</code>）上下文：</p>
+<table><thead><tr><th>变量</th><th>说明</th></tr></thead><tbody>
+<tr><th><code>page.title</code> / <code>page.content</code></th><th>标题与渲染后的 HTML</th></tr>
+<tr><th><code>page.date</code> / <code>page.description</code></th><th>元数据</th></tr>
+<tr><th><code>page.url</code> / <code>page.lang</code></th><th>URL 与语言</th></tr>
+<tr><th><code>page.summary</code> / <code>page.toc</code></th><th>摘要与目录</th></tr>
+<tr><th><code>page.translations</code></th><th>其它语言翻译（<code>[{lang, url}]</code>）</th></tr>
+<tr><th><code>page.older</code> / <code>page.newer</code></th><th>前后页</th></tr>
+<tr><th><code>page.taxonomies</code></th><th>分类法赋值</th></tr>
+</tbody></table>
+<p>Section 模板（<code>section.html</code>）额外有 <code>section.title</code>、<code>section.content</code>、<code>section.pages</code>、<code>section.translations</code>。</p>
+<p>全局变量：<code>config</code>（站点配置）、<code>current_lang</code>、<code>taxonomy</code>、<code>term</code>。</p>
+<h2 id="heading-3">模板全局函数</h2>
+<table><thead><tr><th>函数</th><th>说明</th></tr></thead><tbody>
+<tr><th><code>get_page(url)</code></th><th>按 URL 查询任意页面，返回 page view 或空</th></tr>
+<tr><th><code>get_section(url)</code></th><th>按 URL 查询任意 section，含 <code>.pages</code> 列表</th></tr>
+</tbody></table>
+<p>这两个全局函数让模板能在服务端做跨 section 的内容聚合（如文档侧边栏、相关页面），无需客户端脚本。本站的文档侧边栏就是用 <code>get_section("/docs/")</code> 自动生成的。</p>
+<h2 id="heading-4">导航菜单</h2>
+<p><code>config.menu</code> 是一个「语言代码 → 菜单项数组」的映射。渲染当前语言的菜单，缺失时回退到默认语言：</p>
+<pre><code>{% set ml = current_lang | default(value=config.default_language) %}
+{% set items = config.menu[ml] | default(value=config.menu[config.default_language]) %}
+{% for item in items %}
+  &lt;a href="{{ item.url | safe }}"&gt;{{ item.label }}&lt;/a&gt;
+{% endfor %}
+</code></pre>
+<p>每个菜单项有 <code>label</code>、<code>url</code>、<code>weight</code> 三个字段。</p>
+
+    </div>
+    <div class="doc-meta">
+      <span>用 <strong>AnyCMS SSG</strong> 构建</span>
+      <a href="https://github.com/anycms/anycms-ssg">在 GitHub 上编辑 ↗</a>
+    </div>
+  </article>
+</div>
+
+  </main>
+
+  
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <span class="brand-mark">A</span>
+          <span>AnyCMS SSG</span>
+        </a>
+        <p>用 Rust 编写的插件驱动静态网站生成器。WASM 插件贯穿内容发现、Markdown 渲染、模板上下文、SEO 与资源处理的每一个阶段。</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>资源</h5>
+          <ul>
+            <li><a href="/docs/">文档</a></li>
+            <li><a href="/docs/getting-started/">快速开始</a></li>
+            <li><a href="/plugins/">插件</a></li>
+            <li><a href="/themes/">主题</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>社区</h5>
+          <ul>
+            <li><a href="https://github.com/anycms/anycms-ssg">GitHub</a></li>
+            <li><a href="/tags/">标签</a></li>
+            <li><a href="/atom.xml">Atom 订阅</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; AnyCMS SSG · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+    </div>
+  </footer>
+
+  
+  
+</body>
+</html>

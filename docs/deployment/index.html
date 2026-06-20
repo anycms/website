@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh"
+      data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>部署 · AnyCMS SSG 文档</title>
+  <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
+  <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/highlight.css">
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3YQ0W814W"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Y3YQ0W814W');
+  </script>
+  <style>
+    :root{
+      --accent: #2563eb;
+    }
+  </style>
+  
+  
+  <link rel="alternate" hreflang="zh" href="https://anycms.org/docs/deployment/">
+  
+  
+  
+  
+  
+  
+</head>
+<body>
+  
+  <header class="site-header">
+    <div class="site-header-inner wrap">
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true">
+      <a class="brand" href="/">
+        <span class="brand-mark">A</span>
+        <span>AnyCMS SSG</span>
+      </a>
+      <label for="nav-toggle" class="nav-burger" aria-label="切换菜单" role="button">
+        <span></span><span></span><span></span>
+      </label>
+      <nav class="site-nav">
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <a href="/" class="active">首页</a>
+        
+        
+        
+        <a href="/docs/" class="active">文档</a>
+        
+        
+        
+        <a href="/plugins/">插件</a>
+        
+        
+        
+        <a href="/themes/">主题</a>
+        
+        
+        
+        <a href="https://github.com/anycms/anycms-ssg">GitHub</a>
+        
+        <a class="nav-cta" href="https://github.com/anycms/anycms-ssg">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    
+<div class="docs">
+  
+  <aside class="docs-sidebar">
+    <h5>文档</h5>
+    <ul>
+      
+      
+      <li><a href="/docs/introduction/">介绍</a></li>
+      
+      <li><a href="/docs/getting-started/">快速开始</a></li>
+      
+      <li><a href="/docs/site-structure/">站点结构</a></li>
+      
+      <li><a href="/docs/configuration/">配置（site.kdl）</a></li>
+      
+      <li><a href="/docs/content/">内容模型</a></li>
+      
+      <li><a href="/docs/templates/">模板</a></li>
+      
+      <li><a href="/docs/assets/">资源管线</a></li>
+      
+      <li><a href="/docs/themes/">主题</a></li>
+      
+      <li><a href="/docs/plugins/">插件系统</a></li>
+      
+      <li><a href="/docs/i18n/">多语言</a></li>
+      
+      <li><a href="/docs/registry/">分发：静态注册中心</a></li>
+      
+      <li><a href="/docs/deployment/" class="active">部署</a></li>
+      
+    </ul>
+  </aside>
+
+  <article class="docs-body prose">
+    <h1>部署</h1>
+    <p class="muted" style="margin-top:-0.5rem;font-size:1.1rem;">把构建产物 public&#x2f; 部署到任意静态托管</p>
+    <div class="post-body">
+      <p>AnyCMS SSG 输出的是纯静态文件（默认 <code>public/</code>），可以部署到任何静态托管服务。</p>
+<h2 id="heading">构建生产产物</h2>
+<pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> build            <span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> 渲染 Markdown、编译 Sass、转译 TS、压缩 HTML</span><span class="comment line number-sign shell">
+</span></span></span></code></pre>
+<p>产物全部在 <code>output_dir</code>（默认 <code>public/</code>）下，包含：</p>
+<ul>
+<li><code>index.html</code> 及所有页面 HTML（已压缩）</li>
+<li><code>main.css</code> / <code>main.js</code></li>
+<li><code>rss.xml</code> / <code>atom.xml</code> / <code>sitemap.xml</code> / <code>robots.txt</code></li>
+<li><code>static/</code> 原样拷贝的文件</li>
+</ul>
+<h2 id="heading-2">常见部署目标</h2>
+<table><thead><tr><th>平台</th><th>做法</th></tr></thead><tbody>
+<tr><th>GitHub Pages</th><th>把 <code>public/</code> 推送到 <code>gh-pages</code> 分支或用 Actions 上传 artifact</th></tr>
+<tr><th>Netlify / Vercel</th><th>构建命令 <code>anycms build</code>，发布目录 <code>public</code></th></tr>
+<tr><th>Cloudflare Pages</th><th>同上，构建命令指向 <code>anycms build</code></th></tr>
+<tr><th>自建 / Nginx</th><th>把 <code>public/</code> 拷贝到 web 根目录</th></tr>
+<tr><th>S3 + CloudFront</th><th><code>aws s3 sync public/ s3://&lt;bucket&gt; --delete</code></th></tr>
+</tbody></table>
+<h2 id="base-url">base_url</h2>
+<p>部署前确认 <code>site.kdl</code> 的 <code>base_url</code> 指向最终域名——它影响绝对链接、feeds 与 sitemap 中的 URL。</p>
+<blockquote>
+<p>部署到子路径（如 <code>https://user.github.io/repo/</code>）时，需要相应调整 <code>base_url</code> 与资源路径策略。</p>
+</blockquote>
+<h2 id="ci">CI 建议</h2>
+<p>在 CI 中运行质量门后再部署：</p>
+<pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">cargo</span></span><span class="meta function-call arguments shell"> fmt<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>all</span><span class="keyword operator end-of-options shell"> --</span></span><span class="meta function-call arguments shell"> --check</span>
+<span class="meta function-call shell"><span class="variable function shell">cargo</span></span><span class="meta function-call arguments shell"> clippy<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>workspace</span><span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>all-targets</span><span class="keyword operator end-of-options shell"> --</span></span><span class="meta function-call arguments shell"> -D warnings</span>
+<span class="meta function-call shell"><span class="variable function shell">cargo</span></span><span class="meta function-call arguments shell"> build<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>workspace</span><span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>all-targets</span></span>
+<span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> build              <span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> 站点构建本身也应零错误退出</span><span class="comment line number-sign shell">
+</span></span></span></code></pre>
+<p>设置 <code>ANYCMS_PLUGIN_STRICT=1</code> 可让任何插件 hook 错误中止构建，避免静默发布坏页面。</p>
+
+    </div>
+    <div class="doc-meta">
+      <span>用 <strong>AnyCMS SSG</strong> 构建</span>
+      <a href="https://github.com/anycms/anycms-ssg">在 GitHub 上编辑 ↗</a>
+    </div>
+  </article>
+</div>
+
+  </main>
+
+  
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <span class="brand-mark">A</span>
+          <span>AnyCMS SSG</span>
+        </a>
+        <p>用 Rust 编写的插件驱动静态网站生成器。WASM 插件贯穿内容发现、Markdown 渲染、模板上下文、SEO 与资源处理的每一个阶段。</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>资源</h5>
+          <ul>
+            <li><a href="/docs/">文档</a></li>
+            <li><a href="/docs/getting-started/">快速开始</a></li>
+            <li><a href="/plugins/">插件</a></li>
+            <li><a href="/themes/">主题</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>社区</h5>
+          <ul>
+            <li><a href="https://github.com/anycms/anycms-ssg">GitHub</a></li>
+            <li><a href="/tags/">标签</a></li>
+            <li><a href="/atom.xml">Atom 订阅</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; AnyCMS SSG · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+    </div>
+  </footer>
+
+  
+  
+</body>
+</html>

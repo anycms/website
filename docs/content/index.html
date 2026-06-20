@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh"
+      data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>内容模型 · AnyCMS SSG 文档</title>
+  <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
+  <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/highlight.css">
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3YQ0W814W"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Y3YQ0W814W');
+  </script>
+  <style>
+    :root{
+      --accent: #2563eb;
+    }
+  </style>
+  
+  
+  <link rel="alternate" hreflang="zh" href="https://anycms.org/docs/content/">
+  
+  
+  
+  
+  
+  
+</head>
+<body>
+  
+  <header class="site-header">
+    <div class="site-header-inner wrap">
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true">
+      <a class="brand" href="/">
+        <span class="brand-mark">A</span>
+        <span>AnyCMS SSG</span>
+      </a>
+      <label for="nav-toggle" class="nav-burger" aria-label="切换菜单" role="button">
+        <span></span><span></span><span></span>
+      </label>
+      <nav class="site-nav">
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <a href="/" class="active">首页</a>
+        
+        
+        
+        <a href="/docs/" class="active">文档</a>
+        
+        
+        
+        <a href="/plugins/">插件</a>
+        
+        
+        
+        <a href="/themes/">主题</a>
+        
+        
+        
+        <a href="https://github.com/anycms/anycms-ssg">GitHub</a>
+        
+        <a class="nav-cta" href="https://github.com/anycms/anycms-ssg">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    
+<div class="docs">
+  
+  <aside class="docs-sidebar">
+    <h5>文档</h5>
+    <ul>
+      
+      
+      <li><a href="/docs/introduction/">介绍</a></li>
+      
+      <li><a href="/docs/getting-started/">快速开始</a></li>
+      
+      <li><a href="/docs/site-structure/">站点结构</a></li>
+      
+      <li><a href="/docs/configuration/">配置（site.kdl）</a></li>
+      
+      <li><a href="/docs/content/" class="active">内容模型</a></li>
+      
+      <li><a href="/docs/templates/">模板</a></li>
+      
+      <li><a href="/docs/assets/">资源管线</a></li>
+      
+      <li><a href="/docs/themes/">主题</a></li>
+      
+      <li><a href="/docs/plugins/">插件系统</a></li>
+      
+      <li><a href="/docs/i18n/">多语言</a></li>
+      
+      <li><a href="/docs/registry/">分发：静态注册中心</a></li>
+      
+      <li><a href="/docs/deployment/">部署</a></li>
+      
+    </ul>
+  </aside>
+
+  <article class="docs-body prose">
+    <h1>内容模型</h1>
+    <p class="muted" style="margin-top:-0.5rem;font-size:1.1rem;">Page、Section、front matter、分类法、摘要与代码高亮</p>
+    <div class="post-body">
+      <h2 id="page-section">Page 与 Section</h2>
+<ul>
+<li><strong>Page</strong>：单个 Markdown 文件，对应一个 URL。</li>
+<li><strong>Section</strong>：一个目录，<code>_index.md</code> 是该 section 的列表页。</li>
+</ul>
+<h2 id="front-matter">Front matter</h2>
+<p>正文开头的元数据，支持 <code>+++ … +++</code>（TOML）或 <code>--- … ---</code>（YAML）两种格式：</p>
+<pre><code class="language-markdown"><span class="text html markdown"><span class="meta paragraph markdown">+++
+title = &quot;Hello World&quot;
+date = 2025-06-01
+draft = false
+slug = &quot;hello&quot;
+template = &quot;page.html&quot;
+[taxonomies]
+tags = [&quot;rust&quot;, &quot;ssg&quot;]
++++
+
+</span><span class="meta paragraph markdown">正文内容，支持 <span class="markup raw inline markdown"><span class="punctuation definition raw begin markdown">`</span>
+<span class="punctuation definition raw end markdown">`</span></span> 分割摘要。
+
+</span><span class="meta disable-markdown"><span class="comment block html"><span class="punctuation definition comment begin html">&lt;!--</span> more <span class="punctuation definition comment end html">--&gt;</span></span></span><span class="meta disable-markdown">
+</span>
+<span class="meta paragraph markdown">摘要之后的内容。
+</span></span></code></pre>
+<h2 id="heading">排序</h2>
+<p>Section 中的页面按 <strong><code>weight</code> 升序</strong>排序；<code>weight</code> 相同或缺失时按 <strong><code>date</code> 降序</strong>。文档类内容建议显式设置 <code>weight</code> 控制顺序。</p>
+<h2 id="front-matter-2">常用 front matter 字段</h2>
+<table><thead><tr><th>字段</th><th>作用</th></tr></thead><tbody>
+<tr><th><code>title</code></th><th>页面标题（必需）</th></tr>
+<tr><th><code>date</code></th><th>发布日期，影响排序与 feeds</th></tr>
+<tr><th><code>description</code></th><th>描述 / 摘要，用于 SEO 与列表页</th></tr>
+<tr><th><code>draft</code></th><th><code>true</code> 的页面在 <code>build</code> 时被排除</th></tr>
+<tr><th><code>slug</code></th><th>自定义 URL slug</th></tr>
+<tr><th><code>weight</code></th><th>排序权重（升序）</th></tr>
+<tr><th><code>template</code></th><th>覆盖默认模板（如 <code>template = "docs.html"</code>）</th></tr>
+<tr><th><code>taxonomies</code></th><th>分类法赋值（如 <code>tags = ["rust"]</code>）</th></tr>
+</tbody></table>
+<h2 id="heading-2">摘要与目录</h2>
+<ul>
+<li><strong>摘要</strong>：用 <code>&lt;!-- more --&gt;</code> 分割，前半段作为 <code>page.summary</code>。</li>
+<li><strong>目录（TOC）</strong>：由标题自动生成，通过 <code>page.toc</code> 暴露给模板。</li>
+</ul>
+<h2 id="heading-3">分类法页</h2>
+<p>由 <code>taxonomies</code> 配置自动生成。例如声明 <code>taxonomy name="tags"</code> 后，带 <code>tags = ["rust"]</code> 的页面会出现在 <code>/tags/rust/</code>。</p>
+<h2 id="heading-4">代码高亮</h2>
+<p>用围栏代码块并声明语言，输出 class-based span，配合 <code>static/highlight.css</code> 着色：</p>
+<pre><code class="language-markdown"><span class="text html markdown"><span class="meta paragraph markdown"><span class="markup raw code-fence markdown"><span class="punctuation definition raw code-fence begin markdown">```</span><span class="constant other language-name markdown">rust</span>
+fn main() {
+    println!(&quot;Hello, AnyCMS!&quot;);
+}
+<span class="punctuation definition raw code-fence end markdown">```
+</span></span></span></span></code></pre>
+<h2 id="heading-5">内容互链</h2>
+<p>Markdown 中的相对链接会被解析为站点内链接，无需手写完整路径。</p>
+
+    </div>
+    <div class="doc-meta">
+      <span>用 <strong>AnyCMS SSG</strong> 构建</span>
+      <a href="https://github.com/anycms/anycms-ssg">在 GitHub 上编辑 ↗</a>
+    </div>
+  </article>
+</div>
+
+  </main>
+
+  
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <span class="brand-mark">A</span>
+          <span>AnyCMS SSG</span>
+        </a>
+        <p>用 Rust 编写的插件驱动静态网站生成器。WASM 插件贯穿内容发现、Markdown 渲染、模板上下文、SEO 与资源处理的每一个阶段。</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>资源</h5>
+          <ul>
+            <li><a href="/docs/">文档</a></li>
+            <li><a href="/docs/getting-started/">快速开始</a></li>
+            <li><a href="/plugins/">插件</a></li>
+            <li><a href="/themes/">主题</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>社区</h5>
+          <ul>
+            <li><a href="https://github.com/anycms/anycms-ssg">GitHub</a></li>
+            <li><a href="/tags/">标签</a></li>
+            <li><a href="/atom.xml">Atom 订阅</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; AnyCMS SSG · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+    </div>
+  </footer>
+
+  
+  
+</body>
+</html>

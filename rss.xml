@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<channel>
+<title>AnyCMS SSG</title>
+<link>https://anycms.org</link>
+<description>AnyCMS SSG</description>
+
+<item>
+<title>快速开始</title>
+<link>https://anycms.org/docs/getting-started/</link>
+<guid>https://anycms.org/docs/getting-started/</guid>
+
+<pubDate>2026-06-01</pubDate>
+<description>三步生成你的第一个 AnyCMS SSG 站点</description>
+</item>
+
+<item>
+<title>插件系统</title>
+<link>https://anycms.org/docs/plugins/</link>
+<guid>https://anycms.org/docs/plugins/</guid>
+
+<pubDate>2026-06-01</pubDate>
+<description>WASM 插件、两层扩展点、权限化 host 函数与贡献机制</description>
+</item>
+
+<item>
+<title>介绍</title>
+<link>https://anycms.org/docs/introduction/</link>
+<guid>https://anycms.org/docs/introduction/</guid>
+
+<pubDate>2026-06-01</pubDate>
+<description>AnyCMS SSG 是什么，以及它和 Hugo &#x2f; Zola 的根本差异</description>
+</item>
+
+<item>
+<title>配置（site.kdl）</title>
+<link>https://anycms.org/docs/configuration/</link>
+<guid>https://anycms.org/docs/configuration/</guid>
+
+<pubDate>2026-06-01</pubDate>
+<description>站点与主题配置使用 KDL，字段说明与示例</description>
+</item>
+
+<item>
+<title>资源管线</title>
+<link>https://anycms.org/docs/assets/</link>
+<guid>https://anycms.org/docs/assets/</guid>
+
+<pubDate>2026-06-01</pubDate>
+<description>Sass 编译、TypeScript 转译、HTML 压缩与静态资源拷贝</description>
+</item>
+
+<item>
+<title>多语言</title>
+<link>https://anycms.org/docs/i18n/</link>
+<guid>https://anycms.org/docs/i18n/</guid>
+
+<pubDate>2026-06-01</pubDate>
+<description>内容多语言：文件名后缀组织、per-language URL 与 hreflang</description>
+</item>
+
+<item>
+<title>分发：静态注册中心</title>
+<link>https://anycms.org/docs/registry/</link>
+<guid>https://anycms.org/docs/registry/</guid>
+
+<pubDate>2026-06-01</pubDate>
+<description>从一个带 index.json 的静态目录分发插件与主题</description>
+</item>
+
+<item>
+<title>内容模型</title>
+<link>https://anycms.org/docs/content/</link>
+<guid>https://anycms.org/docs/content/</guid>
+
+<pubDate>2026-06-01</pubDate>
+<description>&lt;h2 id=&quot;page-section&quot;&gt;Page 与 Section&lt;&#x2f;h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Page&lt;&#x2f;strong&gt;：单个 Markdown 文件，对应一个 URL。&lt;&#x2f;li&gt;
+&lt;li&gt;&lt;strong&gt;Section&lt;&#x2f;strong&gt;：一个目录，&lt;code&gt;_index.md&lt;&#x2f;code&gt; 是该 section 的列表页。&lt;&#x2f;li&gt;
+&lt;&#x2f;ul&gt;
+&lt;h2 id=&quot;front-matter&quot;&gt;Front matter&lt;&#x2f;h2&gt;
+&lt;p&gt;正文开头的元数据，支持 &lt;code&gt;+++ … +++&lt;&#x2f;code&gt;（TOML）或 &lt;code&gt;--- … ---&lt;&#x2f;code&gt;（YAML）两种格式：&lt;&#x2f;p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-markdown&quot;&gt;&lt;span class=&quot;text html markdown&quot;&gt;&lt;span class=&quot;meta paragraph markdown&quot;&gt;+++
+title = &amp;quot;Hello World&amp;quot;
+date = 2025-06-01
+draft = false
+slug = &amp;quot;hello&amp;quot;
+template = &amp;quot;page.html&amp;quot;
+[taxonomies]
+tags = [&amp;quot;rust&amp;quot;, &amp;quot;ssg&amp;quot;]
++++
+
+&lt;&#x2f;span&gt;&lt;span class=&quot;meta paragraph markdown&quot;&gt;正文内容，支持 &lt;span class=&quot;markup raw inline markdown&quot;&gt;&lt;span class=&quot;punctuation definition raw begin markdown&quot;&gt;`&lt;&#x2f;span&gt;&lt;&#x2f;span&gt;&lt;&#x2f;span&gt;&lt;&#x2f;span&gt;&lt;&#x2f;code&gt;&lt;&#x2f;pre&gt;
+</description>
+</item>
+
+<item>
+<title>模板</title>
+<link>https://anycms.org/docs/templates/</link>
+<guid>https://anycms.org/docs/templates/</guid>
+
+<pubDate>2026-06-01</pubDate>
+<description>MiniJinja 模板语法、overlay 解析与契约变量</description>
+</item>
+
+<item>
+<title>主题</title>
+<link>https://anycms.org/docs/themes/</link>
+<guid>https://anycms.org/docs/themes/</guid>
+
+<pubDate>2026-06-01</pubDate>
+<description>主题是可分发的 bundle，含 manifest、模板与可选静态资源</description>
+</item>
+
+<item>
+<title>部署</title>
+<link>https://anycms.org/docs/deployment/</link>
+<guid>https://anycms.org/docs/deployment/</guid>
+
+<pubDate>2026-06-01</pubDate>
+<description>把构建产物 public&#x2f; 部署到任意静态托管</description>
+</item>
+
+<item>
+<title>站点结构</title>
+<link>https://anycms.org/docs/site-structure/</link>
+<guid>https://anycms.org/docs/site-structure/</guid>
+
+<pubDate>2026-06-01</pubDate>
+<description>一个 anycms 站点的标准目录布局</description>
+</item>
+
+</channel>
+</rss>
