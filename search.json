@@ -1,37 +1,10 @@
 [
   {
-    "url": "/docs/getting-started/",
-    "title": "快速开始",
-    "body": "前置要求 Rust 1.85+（edition 2024，stable 工具链） 编写插件还需添加 wasm 编译目标：rustup target add wasm32-unknown-unknown 安装 git clone <repo-url> anycms-ssg cd anycms-ssg cargo install --path . # 安装 `anycms` 二进制到 ~/.cargo/bin 也可直接用 cargo run -- 代替已安装的 anycms。 三步生成你的第一个站点 anycms init my-site # 生成站点骨架（site.kdl + content + templates + sass + ts） cd my-site anycms build # → public/（渲染 Markdown、编译 Sass、转译 TS、压缩 HTML） anycms serve # → http://127.0.0.1:1111 实时热重载 编辑 content/ 下的 Markdown，保存后浏览器自动刷新。 使用主题 anycms init my-site cd my-site anycms theme install ../themes/ink # 安装内置主题到 ./themes/ink # 在 site.kdl 中设置 theme \"ink\"，并删除 site 自带的 templates/ 和 sass/ 让主题生效： rm -rf templates sass anycms build && anycms serve overlay 优先级：site 的 templates/*.html 与 sass/main.scss 会覆盖主题同名文件。 全新 init 会同时生成这两者，要让已安装主题接管布局与样式，需先删除它们。详见主题。 安装一个插件 # 从内置示例构建并安装一个插件 cd examples/plugins/reading-time anycms plugin build --install ../../sites/demo-ink --release # 构建站点，插件自动加载 anycms build --root ../../sites/demo-ink 下一步 了解站点结构 配置你的 site.kdl 编写你的第一个插件",
+    "url": "/docs/i18n/",
+    "title": "多语言",
+    "body": "AnyCMS SSG 的多语言指内容多语言（不包含工具自身 UI 的系统本地化）。采用文件名后缀组织（Zola 模式，最少侵入）。 文件名约定 hello-world.md（默认语言）+ hello-world.fr.md（法语）： content/ ├── hello-world.md # 默认语言（en） └── hello-world.fr.md # 法语翻译 翻译自动关联，生成 per-language URL、hreflang 互链、per-language feeds / sitemap。 声明支持的语言 在 site.kdl 中声明额外支持的语言： default_language \"en\" languages { language code=\"fr\" language code=\"zh\" } 默认语言无需在 languages 中重复声明。 per-language 菜单 menu {} 块支持按语言覆盖。默认语言的裸 item 节点之外，用 lang \"<code>\" {} 子块提供翻译： menu { item \"Home\" url=\"/\" item \"Docs\" url=\"/docs/\" weight=10 lang \"fr\" { item \"Accueil\" url=\"/fr/\" item \"Docs\" url=\"/fr/docs/\" weight=10 } } 自动生成的产物 per-language URL 前缀（如 /fr/...） 页面间的 <link rel=\"alternate\" hreflang> 互链 per-language 的 rss.xml / atom.xml / sitemap.xml 演示站点 demo-ink 就是中英双语，可以参考它的 content/ 与 site.kdl。",
     "lang": "zh",
-    "excerpt": "三步生成你的第一个 AnyCMS SSG 站点",
-    "fields": {},
-    "boost": 1.0
-  },
-  {
-    "url": "/docs/plugins/",
-    "title": "插件系统",
-    "body": "插件是 WebAssembly 模块，构建时由 host 加载并按 priority 顺序（数字越小越先执行）调度。 两层扩展点 Layer 1 — 10 个通用管线 hook：on_build_start / on_build_end / on_config / on_content_discover / on_page_parse / on_markdown / on_markdown_html / on_template_context / on_template_output / on_asset。 Layer 2 — 5 个业务域：on_seo / on_sitemap / on_search_document / on_feed_entry / on_head_inject·on_body_inject。 贡献（contribute）：插件向模板引擎注册 filter / global_function。 写一个插件 use anycms_ssg_plugin_sdk::{plugin_fn, FnResult, TemplateContext}; /// 注入 reading_time 模板变量 #[plugin_fn] pub fn on_template_context(mut ctx: TemplateContext) -> FnResult<TemplateContext> { let words = ctx.page.content.split_whitespace().count(); let minutes = (words as f64 / 200.0).ceil() as u64; ctx.vars.insert(\"reading_time\".to_string(), minutes.into()); Ok(ctx) } Cargo.toml： [lib] crate-type = [\"cdylib\"] # 产出 .wasm [dependencies] anycms-ssg-plugin-sdk = \"0.1\" # 唯一需要引入的包 extism-pdk = \"1\" # #[plugin_fn] 宏的直接依赖 构建目标必须是 wasm32-unknown-unknown（不是 wasm32-wasip2）。 manifest（<name>.kdl） plugin { name \"reading-time\" version \"0.1.0\" api-version \"0.1\" // 必须为 \"0.1\" author \"Liangdi\" hooks { on-template-context priority=100 } permissions { // 权限声明，host 每次调用强制校验 net \"https://api.example.com/**\" fs-read \"./data/**\" fs-write \"./generated/**\" } config { // 默认值，可被 site.kdl 覆盖 wpm 200 } } Host Functions（权限化） Host 函数所需权限说明 host::get_config()无当前 SiteConfig 视图 host::get_plugin_config()无本插件合并后的配置 host::get_page(url)无内容库中的页面（Option） host::get_taxonomy(name)无指定分类法的 term 列表 host::now()无当前 unix 时间戳 host::get_state / set_state无插件私有跨 hook 键值状态 host::log(level, msg)无日志 host::http_get(url)netHTTP GET（host 精确匹配 + path 前缀） host::http_post(url, body)netHTTP POST host::read_file(path)fs-read读站点根下文件（拒绝 .. 穿越） host::write_output(path, bytes)fs-write写输出目录 未声明权限的插件只能观察 / 转换 host 交给它的数据，无法触达文件系统或网络。host 用 extism::Plugin::new 加载插件且不传递 Manifest / allowed_paths，WASI 文件系统访问完全禁用，所有 FS / 网络访问都收敛到受权限保护的 host function。 Strict 模式 设置环境变量 ANYCMS_PLUGIN_STRICT=1（任何非空非 \"0\" 值）后，任何插件的 hook 调度错误会中止整个构建（而非默认的 log + 跳过）。适用于 CI / 严格场景。 示例插件 examples/plugins/ 下有十多个端到端可运行的示例，覆盖每个 hook 与 host 函数。完整开发指南见 docs/plugins.md。",
-    "lang": "zh",
-    "excerpt": "WASM 插件、两层扩展点、权限化 host 函数与贡献机制",
-    "fields": {},
-    "boost": 1.0
-  },
-  {
-    "url": "/docs/introduction/",
-    "title": "介绍",
-    "body": "AnyCMS SSG 是 anycms 生态中的静态站点生成器（Static Site Generator），用 Rust 编写。 输入：Markdown + KDL 配置 + 主题；输出：可直接部署的静态 HTML 站点。 它解决了什么 与 Hugo / Zola 等「常规 SSG」相比，AnyCMS SSG 的根本差异在于： WASM 插件扩展机制 + 插件 / 主题市场。 插件在这里不是附加功能，而是贯穿整个构建管线的主轴——内容发现、Markdown 渲染、模板上下文、SEO、sitemap、feed、资源处理，每一个阶段都可以被插件 hook。 技术栈 模板引擎：MiniJinja（Jinja2 的 Rust 实现） Markdown：pulldown-cmark（GFM 扩展） 样式：grass（纯 Rust Sass 编译 + 压缩） HTML 压缩：minify-html TypeScript：oxc（纯 Rust 转译 + minify，无外部依赖） 代码高亮：syntect（Sublime 语法，class-based） 配置：站点 / 主题用 KDL，front matter 兼容 TOML / YAML 插件运行时：extism wasm 沙箱（host SDK + PDK） 开发服务器：axum + notify + WebSocket 实时热重载 适用场景 个人博客、技术文档、作品集 需要在构建期对内容做程序化加工的站点（阅读时长、聚合页、外部数据拉取、SEO 增强……） 希望用代码而非配置扩展 SSG 能力的开发者 准备好之后，前往快速开始生成你的第一个站点。",
-    "lang": "zh",
-    "excerpt": "AnyCMS SSG 是什么，以及它和 Hugo / Zola 的根本差异",
-    "fields": {},
-    "boost": 1.0
-  },
-  {
-    "url": "/docs/configuration/",
-    "title": "配置（site.kdl）",
-    "body": "站点与主题配置使用 KDL。anycms init 生成的最小配置： title \"My AnyCMS Site\" base_url \"https://example.com\" default_language \"en\" output_dir \"public\" taxonomies { taxonomy name=\"tags\" } languages { language code=\"fr\" } theme \"ink\" // 启用主题 overlay（可选） // 插件级配置覆盖：覆盖各插件 manifest 中的 config {} 默认值（site 胜出） plugins { plugin \"reading-time\" { wpm 250 } } 字段说明 字段说明 title / base_url站点标题与基准 URL（用于绝对链接、feeds、sitemap） default_language默认语言代码 output_dir构建输出目录（默认 public） theme启用的主题名（对应 themes/<name>/） taxonomies自定义分类法（tags / categories …） languages额外支持的语言代码 params自由参数表，主题默认值会被合并进来，模板中通过 config.params.<key> 读取 plugins各插件的配置覆盖（递归合并，site 覆盖 manifest 默认值） menu声明式、按语言组织的导航菜单 声明式导航菜单 用 menu {} 块声明导航，模板中通过 config.menu 读取。裸 item 节点构成默认语言菜单，lang \"<code>\" {} 子块提供按语言的覆盖： menu { item \"Home\" url=\"/\" item \"Docs\" url=\"/docs/\" weight=10 item \"GitHub\" url=\"https://github.com/anycms/anycms-ssg\" weight=90 lang \"fr\" { item \"Accueil\" url=\"/fr/\" item \"Docs\" url=\"/fr/docs/\" weight=10 } } 菜单按 weight 升序排序；绝对 URL（http(s)://）视为外链。 KDL 注释是 //，不是 #——# 在 KDL 里是布尔字面量前缀，写成注释会导致解析失败。",
-    "lang": "zh",
-    "excerpt": "站点与主题配置使用 KDL，字段说明与示例",
+    "excerpt": "内容多语言：文件名后缀组织、per-language URL 与 hreflang",
     "fields": {},
     "boost": 1.0
   },
@@ -45,20 +18,11 @@
     "boost": 1.0
   },
   {
-    "url": "/docs/i18n/",
-    "title": "多语言",
-    "body": "AnyCMS SSG 的多语言指内容多语言（不包含工具自身 UI 的系统本地化）。采用文件名后缀组织（Zola 模式，最少侵入）。 文件名约定 hello-world.md（默认语言）+ hello-world.fr.md（法语）： content/ ├── hello-world.md # 默认语言（en） └── hello-world.fr.md # 法语翻译 翻译自动关联，生成 per-language URL、hreflang 互链、per-language feeds / sitemap。 声明支持的语言 在 site.kdl 中声明额外支持的语言： default_language \"en\" languages { language code=\"fr\" language code=\"zh\" } 默认语言无需在 languages 中重复声明。 per-language 菜单 menu {} 块支持按语言覆盖。默认语言的裸 item 节点之外，用 lang \"<code>\" {} 子块提供翻译： menu { item \"Home\" url=\"/\" item \"Docs\" url=\"/docs/\" weight=10 lang \"fr\" { item \"Accueil\" url=\"/fr/\" item \"Docs\" url=\"/fr/docs/\" weight=10 } } 自动生成的产物 per-language URL 前缀（如 /fr/...） 页面间的 <link rel=\"alternate\" hreflang> 互链 per-language 的 rss.xml / atom.xml / sitemap.xml 演示站点 demo-ink 就是中英双语，可以参考它的 content/ 与 site.kdl。",
+    "url": "/docs/deployment/",
+    "title": "部署",
+    "body": "AnyCMS SSG 输出的是纯静态文件（默认 public/），可以部署到任何静态托管服务。 构建生产产物 anycms build # 渲染 Markdown、编译 Sass、转译 TS、压缩 HTML 产物全部在 output_dir（默认 public/）下，包含： index.html 及所有页面 HTML（已压缩） main.css / main.js rss.xml / atom.xml / sitemap.xml / robots.txt static/ 原样拷贝的文件 常见部署目标 平台做法 GitHub Pages把 public/ 推送到 gh-pages 分支或用 Actions 上传 artifact Netlify / Vercel构建命令 anycms build，发布目录 public Cloudflare Pages同上，构建命令指向 anycms build 自建 / Nginx把 public/ 拷贝到 web 根目录 S3 + CloudFrontaws s3 sync public/ s3://<bucket> --delete base_url 部署前确认 site.kdl 的 base_url 指向最终域名——它影响绝对链接、feeds 与 sitemap 中的 URL。 部署到子路径（如 https://user.github.io/repo/）时，需要相应调整 base_url 与资源路径策略。 CI 建议 在 CI 中运行质量门后再部署： cargo fmt --all -- --check cargo clippy --workspace --all-targets -- -D warnings cargo build --workspace --all-targets anycms build # 站点构建本身也应零错误退出 设置 ANYCMS_PLUGIN_STRICT=1 可让任何插件 hook 错误中止构建，避免静默发布坏页面。",
     "lang": "zh",
-    "excerpt": "内容多语言：文件名后缀组织、per-language URL 与 hreflang",
-    "fields": {},
-    "boost": 1.0
-  },
-  {
-    "url": "/docs/registry/",
-    "title": "分发：静态注册中心",
-    "body": "插件与主题可从静态注册中心分发——一个带 index.json 索引的目录，托管在任何静态服务上（GitHub Pages、S3、本地目录）。无需动态服务器、鉴权或数据库。 维护者：构建注册中心 # 把制品放入版本化目录后重建索引 anycms-registry build /path/to/registry-root # 扫描 + 打包 theme tar.gz + 算 sha256 + 写 index.json anycms-registry serve /path/to/registry-root --port 1111 # 本地静态服务（用于测试） anycms-registry 是一个独立二进制。 用户：从注册中心安装 anycms plugin install shout --registry https://example.com/registry --root ./my-site anycms theme install ink --registry https://example.com/registry --root ./my-site --version 0.1.0 anycms plugin install shout --registry /srv/registry --root ./my-site # 本地路径也行 每个可下载制品在索引中带 sha256，下载时校验。 安装源自动判别 install 的 SOURCE 自动判别： http(s):// / git@ / ssh:// 开头 → git 仓库 否则 → 本地目录 配合 --registry → 注册中心包名 完整流程 打包 → 发布到注册中心 → 用户安装。详见 docs/publishing.md 与 docs/registry.md。",
-    "lang": "zh",
-    "excerpt": "从一个带 index.json 的静态目录分发插件与主题",
+    "excerpt": "把构建产物 public/ 部署到任意静态托管",
     "fields": {},
     "boost": 1.0
   },
@@ -72,11 +36,56 @@
     "boost": 1.0
   },
   {
+    "url": "/docs/getting-started/",
+    "title": "快速开始",
+    "body": "前置要求 Rust 1.85+（edition 2024，stable 工具链） 编写插件还需添加 wasm 编译目标：rustup target add wasm32-unknown-unknown 安装 git clone <repo-url> anycms-ssg cd anycms-ssg cargo install --path . # 安装 `anycms` 二进制到 ~/.cargo/bin 也可直接用 cargo run -- 代替已安装的 anycms。 三步生成你的第一个站点 anycms init my-site # 生成站点骨架（site.kdl + content + templates + sass + ts） cd my-site anycms build # → public/（渲染 Markdown、编译 Sass、转译 TS、压缩 HTML） anycms serve # → http://127.0.0.1:1111 实时热重载 编辑 content/ 下的 Markdown，保存后浏览器自动刷新。 使用主题 anycms init my-site cd my-site anycms theme install ../themes/ink # 安装内置主题到 ./themes/ink # 在 site.kdl 中设置 theme \"ink\"，并删除 site 自带的 templates/ 和 sass/ 让主题生效： rm -rf templates sass anycms build && anycms serve overlay 优先级：site 的 templates/*.html 与 sass/main.scss 会覆盖主题同名文件。 全新 init 会同时生成这两者，要让已安装主题接管布局与样式，需先删除它们。详见主题。 安装一个插件 # 从内置示例构建并安装一个插件 cd examples/plugins/reading-time anycms plugin build --install ../../sites/demo-ink --release # 构建站点，插件自动加载 anycms build --root ../../sites/demo-ink 下一步 了解站点结构 配置你的 site.kdl 编写你的第一个插件",
+    "lang": "zh",
+    "excerpt": "三步生成你的第一个 AnyCMS SSG 站点",
+    "fields": {},
+    "boost": 1.0
+  },
+  {
     "url": "/docs/templates/",
     "title": "模板",
     "body": "模板引擎是 MiniJinja（Jinja2 语法）。 {{ … }} 输出 {% … %} 控制流 {% extends %} / {% block %} 继承 overlay 解析（三级回退） 模板按 site → theme → 内置技术模板 的顺序解析。内置的 sitemap / rss / robots 模板可以被 site 或主题的同名文件覆盖。 契约变量 base.html 必须用 | safe 渲染三个接缝变量——插件注入和 SEO 才有落点： <head> {{ seo_head | safe }} {# SEO meta/canonical/OG/JSON-LD，由 host 生成 #} {{ head_inject | safe }} {# 插件 on_head_inject 注入的 <head> 标签 #} </head> <body> {{ body_inject | safe }} {# 插件 on_body_inject，在 </body> 之前 #} </body> ⚠️ MiniJinja 会把生成 URL 中的 / 转义成 &#x2f;，因此所有生成的链接在 href / src 中须标记 | safe。 可用变量 页面模板（page.html）上下文： 变量说明 page.title / page.content标题与渲染后的 HTML page.date / page.description元数据 page.url / page.langURL 与语言 page.summary / page.toc摘要与目录 page.translations其它语言翻译（[{lang, url}]） page.older / page.newer前后页 page.taxonomies分类法赋值 Section 模板（section.html）额外有 section.title、section.content、section.pages、section.translations。 全局变量：config（站点配置）、current_lang、taxonomy、term。 模板全局函数 函数说明 get_page(url)按 URL 查询任意页面，返回 page view 或空 get_section(url)按 URL 查询任意 section，含 .pages 列表 这两个全局函数让模板能在服务端做跨 section 的内容聚合（如文档侧边栏、相关页面），无需客户端脚本。本站的文档侧边栏就是用 get_section(\"/docs/\") 自动生成的。 导航菜单 config.menu 是一个「语言代码 → 菜单项数组」的映射。渲染当前语言的菜单，缺失时回退到默认语言： {% set ml = current_lang | default(value=config.default_language) %} {% set items = config.menu[ml] | default(value=config.menu[config.default_language]) %} {% for item in items %} <a href=\"{{ item.url | safe }}\">{{ item.label }}</a> {% endfor %} 每个菜单项有 label、url、weight 三个字段。",
     "lang": "zh",
     "excerpt": "MiniJinja 模板语法、overlay 解析与契约变量",
+    "fields": {},
+    "boost": 1.0
+  },
+  {
+    "url": "/docs/plugins/",
+    "title": "插件系统",
+    "body": "插件是 WebAssembly 模块，构建时由 host 加载并按 priority 顺序（数字越小越先执行）调度。 两层扩展点 Layer 1 — 10 个通用管线 hook：on_build_start / on_build_end / on_config / on_content_discover / on_page_parse / on_markdown / on_markdown_html / on_template_context / on_template_output / on_asset。 Layer 2 — 5 个业务域：on_seo / on_sitemap / on_search_document / on_feed_entry / on_head_inject·on_body_inject。 贡献（contribute）：插件向模板引擎注册 filter / global_function。 写一个插件 use anycms_ssg_plugin_sdk::{plugin_fn, FnResult, TemplateContext}; /// 注入 reading_time 模板变量 #[plugin_fn] pub fn on_template_context(mut ctx: TemplateContext) -> FnResult<TemplateContext> { let words = ctx.page.content.split_whitespace().count(); let minutes = (words as f64 / 200.0).ceil() as u64; ctx.vars.insert(\"reading_time\".to_string(), minutes.into()); Ok(ctx) } Cargo.toml： [lib] crate-type = [\"cdylib\"] # 产出 .wasm [dependencies] anycms-ssg-plugin-sdk = \"0.1\" # 唯一需要引入的包 extism-pdk = \"1\" # #[plugin_fn] 宏的直接依赖 构建目标必须是 wasm32-unknown-unknown（不是 wasm32-wasip2）。 manifest（<name>.kdl） plugin { name \"reading-time\" version \"0.1.0\" api-version \"0.1\" // 必须为 \"0.1\" author \"Liangdi\" hooks { on-template-context priority=100 } permissions { // 权限声明，host 每次调用强制校验 net \"https://api.example.com/**\" fs-read \"./data/**\" fs-write \"./generated/**\" } config { // 默认值，可被 site.kdl 覆盖 wpm 200 } } Host Functions（权限化） Host 函数所需权限说明 host::get_config()无当前 SiteConfig 视图 host::get_plugin_config()无本插件合并后的配置 host::get_page(url)无内容库中的页面（Option） host::get_taxonomy(name)无指定分类法的 term 列表 host::now()无当前 unix 时间戳 host::get_state / set_state无插件私有跨 hook 键值状态 host::log(level, msg)无日志 host::http_get(url)netHTTP GET（host 精确匹配 + path 前缀） host::http_post(url, body)netHTTP POST host::read_file(path)fs-read读站点根下文件（拒绝 .. 穿越） host::write_output(path, bytes)fs-write写输出目录 未声明权限的插件只能观察 / 转换 host 交给它的数据，无法触达文件系统或网络。host 用 extism::Plugin::new 加载插件且不传递 Manifest / allowed_paths，WASI 文件系统访问完全禁用，所有 FS / 网络访问都收敛到受权限保护的 host function。 Strict 模式 设置环境变量 ANYCMS_PLUGIN_STRICT=1（任何非空非 \"0\" 值）后，任何插件的 hook 调度错误会中止整个构建（而非默认的 log + 跳过）。适用于 CI / 严格场景。 示例插件 examples/plugins/ 下有十多个端到端可运行的示例，覆盖每个 hook 与 host 函数。完整开发指南见 docs/plugins.md。",
+    "lang": "zh",
+    "excerpt": "WASM 插件、两层扩展点、权限化 host 函数与贡献机制",
+    "fields": {},
+    "boost": 1.0
+  },
+  {
+    "url": "/docs/site-structure/",
+    "title": "站点结构",
+    "body": "一个 anycms 站点的标准目录布局： my-site/ ├── site.kdl # 站点配置（KDL） ├── content/ # Markdown 内容 │ ├── _index.md # 首页内容 │ ├── _index.fr.md # 首页法语翻译 │ └── blog/ │ ├── _index.md # blog section 列表页 │ └── hello-world.md ├── templates/ # MiniJinja 模板（覆盖主题同名模板） │ ├── base.html │ ├── index.html │ └── page.html ├── sass/ # Sass 源（编译为 public/main.css） │ └── main.scss ├── ts/ # TypeScript 源（转译为 public/main.js） │ └── main.ts ├── static/ # 原样拷贝到 public/ ├── themes/ # 已安装主题（overlay 来源） │ └── ink/ ├── plugins/ # 已安装插件（<name>.wasm + <name>.kdl） │ └── reading-time.{wasm,kdl} └── public/ # 构建输出（生成物，勿提交） 关键目录 目录 / 文件作用 site.kdl站点配置，唯一必需的入口文件（至少要有 title） content/所有 Markdown 内容，目录结构映射为 URL templates/MiniJinja 模板，overlay 优先级最高 sass/main.scss 会被编译为 public/main.css ts/TypeScript 会被转译 + minify 为 public/*.js static/原样拷贝到输出目录 themes/通过 theme install 安装的主题 plugins/通过 plugin install 安装的插件 public/构建产物，应当加入 .gitignore overlay 三级回退 模板与静态资源按 site → theme → 内置 的顺序回退： site 的 templates/*.html、sass/main.scss、static/** 优先级最高； 其次是已启用的主题； 最后是 host 的内置技术模板（sitemap / rss / robots，可被覆盖）。 本官方网站就是完全自包含的站点：它自带 templates/ 与 sass/，不依赖任何主题——这同样是一种合法的用法。 最小化站点 一个最小可构建的站点只需要： my-site/ ├── site.kdl # title \"Hello\" └── content/ └── _index.md # # Hello world 其余目录都是可选的。",
+    "lang": "zh",
+    "excerpt": "一个 anycms 站点的标准目录布局",
+    "fields": {},
+    "boost": 1.0
+  },
+  {
+    "url": "/docs/configuration/",
+    "title": "配置（site.kdl）",
+    "body": "站点与主题配置使用 KDL。anycms init 生成的最小配置： title \"My AnyCMS Site\" base_url \"https://example.com\" default_language \"en\" output_dir \"public\" taxonomies { taxonomy name=\"tags\" } languages { language code=\"fr\" } theme \"ink\" // 启用主题 overlay（可选） // 插件级配置覆盖：覆盖各插件 manifest 中的 config {} 默认值（site 胜出） plugins { plugin \"reading-time\" { wpm 250 } } 字段说明 字段说明 title / base_url站点标题与基准 URL（用于绝对链接、feeds、sitemap） default_language默认语言代码 output_dir构建输出目录（默认 public） theme启用的主题名（对应 themes/<name>/） taxonomies自定义分类法（tags / categories …） languages额外支持的语言代码 params自由参数表，主题默认值会被合并进来，模板中通过 config.params.<key> 读取 plugins各插件的配置覆盖（递归合并，site 覆盖 manifest 默认值） menu声明式、按语言组织的导航菜单 声明式导航菜单 用 menu {} 块声明导航，模板中通过 config.menu 读取。裸 item 节点构成默认语言菜单，lang \"<code>\" {} 子块提供按语言的覆盖： menu { item \"Home\" url=\"/\" item \"Docs\" url=\"/docs/\" weight=10 item \"GitHub\" url=\"https://github.com/anycms/anycms-ssg\" weight=90 lang \"fr\" { item \"Accueil\" url=\"/fr/\" item \"Docs\" url=\"/fr/docs/\" weight=10 } } 菜单按 weight 升序排序；绝对 URL（http(s)://）视为外链。 KDL 注释是 //，不是 #——# 在 KDL 里是布尔字面量前缀，写成注释会导致解析失败。",
+    "lang": "zh",
+    "excerpt": "站点与主题配置使用 KDL，字段说明与示例",
+    "fields": {},
+    "boost": 1.0
+  },
+  {
+    "url": "/docs/introduction/",
+    "title": "介绍",
+    "body": "AnyCMS SSG 是 anycms 生态中的静态站点生成器（Static Site Generator），用 Rust 编写。 输入：Markdown + KDL 配置 + 主题；输出：可直接部署的静态 HTML 站点。 它解决了什么 与 Hugo / Zola 等「常规 SSG」相比，AnyCMS SSG 的根本差异在于： WASM 插件扩展机制 + 插件 / 主题市场。 插件在这里不是附加功能，而是贯穿整个构建管线的主轴——内容发现、Markdown 渲染、模板上下文、SEO、sitemap、feed、资源处理，每一个阶段都可以被插件 hook。 技术栈 模板引擎：MiniJinja（Jinja2 的 Rust 实现） Markdown：pulldown-cmark（GFM 扩展） 样式：grass（纯 Rust Sass 编译 + 压缩） HTML 压缩：minify-html TypeScript：oxc（纯 Rust 转译 + minify，无外部依赖） 代码高亮：syntect（Sublime 语法，class-based） 配置：站点 / 主题用 KDL，front matter 兼容 TOML / YAML 插件运行时：extism wasm 沙箱（host SDK + PDK） 开发服务器：axum + notify + WebSocket 实时热重载 适用场景 个人博客、技术文档、作品集 需要在构建期对内容做程序化加工的站点（阅读时长、聚合页、外部数据拉取、SEO 增强……） 希望用代码而非配置扩展 SSG 能力的开发者 准备好之后，前往快速开始生成你的第一个站点。",
+    "lang": "zh",
+    "excerpt": "AnyCMS SSG 是什么，以及它和 Hugo / Zola 的根本差异",
     "fields": {},
     "boost": 1.0
   },
@@ -90,20 +99,11 @@
     "boost": 1.0
   },
   {
-    "url": "/docs/deployment/",
-    "title": "部署",
-    "body": "AnyCMS SSG 输出的是纯静态文件（默认 public/），可以部署到任何静态托管服务。 构建生产产物 anycms build # 渲染 Markdown、编译 Sass、转译 TS、压缩 HTML 产物全部在 output_dir（默认 public/）下，包含： index.html 及所有页面 HTML（已压缩） main.css / main.js rss.xml / atom.xml / sitemap.xml / robots.txt static/ 原样拷贝的文件 常见部署目标 平台做法 GitHub Pages把 public/ 推送到 gh-pages 分支或用 Actions 上传 artifact Netlify / Vercel构建命令 anycms build，发布目录 public Cloudflare Pages同上，构建命令指向 anycms build 自建 / Nginx把 public/ 拷贝到 web 根目录 S3 + CloudFrontaws s3 sync public/ s3://<bucket> --delete base_url 部署前确认 site.kdl 的 base_url 指向最终域名——它影响绝对链接、feeds 与 sitemap 中的 URL。 部署到子路径（如 https://user.github.io/repo/）时，需要相应调整 base_url 与资源路径策略。 CI 建议 在 CI 中运行质量门后再部署： cargo fmt --all -- --check cargo clippy --workspace --all-targets -- -D warnings cargo build --workspace --all-targets anycms build # 站点构建本身也应零错误退出 设置 ANYCMS_PLUGIN_STRICT=1 可让任何插件 hook 错误中止构建，避免静默发布坏页面。",
+    "url": "/docs/registry/",
+    "title": "分发：静态注册中心",
+    "body": "插件与主题可从静态注册中心分发——一个带 index.json 索引的目录，托管在任何静态服务上（GitHub Pages、S3、本地目录）。无需动态服务器、鉴权或数据库。 维护者：构建注册中心 # 把制品放入版本化目录后重建索引 anycms-registry build /path/to/registry-root # 扫描 + 打包 theme tar.gz + 算 sha256 + 写 index.json anycms-registry serve /path/to/registry-root --port 1111 # 本地静态服务（用于测试） anycms-registry 是一个独立二进制。 用户：从注册中心安装 anycms plugin install shout --registry https://example.com/registry --root ./my-site anycms theme install ink --registry https://example.com/registry --root ./my-site --version 0.1.0 anycms plugin install shout --registry /srv/registry --root ./my-site # 本地路径也行 每个可下载制品在索引中带 sha256，下载时校验。 安装源自动判别 install 的 SOURCE 自动判别： http(s):// / git@ / ssh:// 开头 → git 仓库 否则 → 本地目录 配合 --registry → 注册中心包名 完整流程 打包 → 发布到注册中心 → 用户安装。详见 docs/publishing.md 与 docs/registry.md。",
     "lang": "zh",
-    "excerpt": "把构建产物 public/ 部署到任意静态托管",
-    "fields": {},
-    "boost": 1.0
-  },
-  {
-    "url": "/docs/site-structure/",
-    "title": "站点结构",
-    "body": "一个 anycms 站点的标准目录布局： my-site/ ├── site.kdl # 站点配置（KDL） ├── content/ # Markdown 内容 │ ├── _index.md # 首页内容 │ ├── _index.fr.md # 首页法语翻译 │ └── blog/ │ ├── _index.md # blog section 列表页 │ └── hello-world.md ├── templates/ # MiniJinja 模板（覆盖主题同名模板） │ ├── base.html │ ├── index.html │ └── page.html ├── sass/ # Sass 源（编译为 public/main.css） │ └── main.scss ├── ts/ # TypeScript 源（转译为 public/main.js） │ └── main.ts ├── static/ # 原样拷贝到 public/ ├── themes/ # 已安装主题（overlay 来源） │ └── ink/ ├── plugins/ # 已安装插件（<name>.wasm + <name>.kdl） │ └── reading-time.{wasm,kdl} └── public/ # 构建输出（生成物，勿提交） 关键目录 目录 / 文件作用 site.kdl站点配置，唯一必需的入口文件（至少要有 title） content/所有 Markdown 内容，目录结构映射为 URL templates/MiniJinja 模板，overlay 优先级最高 sass/main.scss 会被编译为 public/main.css ts/TypeScript 会被转译 + minify 为 public/*.js static/原样拷贝到输出目录 themes/通过 theme install 安装的主题 plugins/通过 plugin install 安装的插件 public/构建产物，应当加入 .gitignore overlay 三级回退 模板与静态资源按 site → theme → 内置 的顺序回退： site 的 templates/*.html、sass/main.scss、static/** 优先级最高； 其次是已启用的主题； 最后是 host 的内置技术模板（sitemap / rss / robots，可被覆盖）。 本官方网站就是完全自包含的站点：它自带 templates/ 与 sass/，不依赖任何主题——这同样是一种合法的用法。 最小化站点 一个最小可构建的站点只需要： my-site/ ├── site.kdl # title \"Hello\" └── content/ └── _index.md # # Hello world 其余目录都是可选的。",
-    "lang": "zh",
-    "excerpt": "一个 anycms 站点的标准目录布局",
+    "excerpt": "从一个带 index.json 的静态目录分发插件与主题",
     "fields": {},
     "boost": 1.0
   }

@@ -1,9 +1,21 @@
 <!DOCTYPE html>
 <html lang="zh"
-      data-theme="light">
+      >
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("theme");
+        if (t !== "light" && t !== "dark") {
+          t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
   <title>站点结构 · AnyCMS SSG 文档</title>
   <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
   <link rel="stylesheet" href="/main.css">
@@ -16,6 +28,7 @@
     gtag('js', new Date());
     gtag('config', 'G-Y3YQ0W814W');
   </script>
+  <script src="/main.js" defer></script>
   <style>
     :root{
       --accent: #2563eb;
@@ -35,15 +48,13 @@
   
   <header class="site-header">
     <div class="site-header-inner wrap">
-      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true">
       <a class="brand" href="/">
         <span class="brand-mark">A</span>
         <span>AnyCMS SSG</span>
       </a>
-      <label for="nav-toggle" class="nav-burger" aria-label="切换菜单" role="button">
-        <span></span><span></span><span></span>
-      </label>
-      <nav class="site-nav">
+      <div class="site-header-right">
+        <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true">
+        <nav class="site-nav">
         
         
         
@@ -67,12 +78,16 @@
         
         <a href="/themes/">主题</a>
         
-        
-        
-        <a href="https://github.com/anycms/anycms-ssg">GitHub</a>
-        
         <a class="nav-cta" href="https://github.com/anycms/anycms-ssg">GitHub</a>
       </nav>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="切换主题">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <label for="nav-toggle" class="nav-burger" aria-label="切换菜单" role="button">
+        <span></span><span></span><span></span>
+      </label>
+      </div>
     </div>
   </header>
 
