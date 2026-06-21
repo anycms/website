@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh"
+      data-theme="dark"
       >
 <head>
   <meta charset="utf-8">
@@ -10,13 +11,17 @@
       try {
         var t = localStorage.getItem("theme");
         if (t !== "light" && t !== "dark") {
+          // No saved choice: honor the server-rendered data-theme on <html>.
+          t = document.documentElement.getAttribute("data-theme");
+        }
+        if (t !== "light" && t !== "dark") {
           t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
         }
         document.documentElement.setAttribute("data-theme", t);
       } catch (e) {}
     })();
   </script>
-  <title>多语言 · AnyCMS SSG 文档</title>
+  <title>多语言 · AnyCMS 文档</title>
   <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
   <link rel="stylesheet" href="/main.css">
   <link rel="stylesheet" href="/highlight.css">
@@ -124,6 +129,20 @@
       
       <li><a href="/docs/deployment/">部署</a></li>
       
+      <li><a href="/docs/check/">链接检查器</a></li>
+      
+      <li><a href="/docs/devtools/">开发调试面板</a></li>
+      
+      <li><a href="/docs/search/">搜索索引</a></li>
+      
+      <li><a href="/docs/official-plugins/">官方插件指南</a></li>
+      
+      <li><a href="/docs/builtin-functions/">模板内置函数与过滤器</a></li>
+      
+      <li><a href="/docs/image-processing/">图像处理管线</a></li>
+      
+      <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
+      
     </ul>
   </aside>
 
@@ -173,7 +192,7 @@ languages {
 
     </div>
     <div class="doc-meta">
-      <span>用 <strong>AnyCMS SSG</strong> 构建</span>
+      <span>用 <strong>AnyCMS</strong> 构建</span>
       <a href="https://github.com/anycms/anycms-ssg">在 GitHub 上编辑 ↗</a>
     </div>
   </article>
@@ -212,7 +231,7 @@ languages {
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; AnyCMS SSG · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+      &copy; AnyCMS · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
     </div>
   </footer>
 

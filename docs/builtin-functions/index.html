@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh"
+      data-theme="dark"
+      >
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("theme");
+        if (t !== "light" && t !== "dark") {
+          // No saved choice: honor the server-rendered data-theme on <html>.
+          t = document.documentElement.getAttribute("data-theme");
+        }
+        if (t !== "light" && t !== "dark") {
+          t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+  <title>模板内置函数与过滤器 · AnyCMS 文档</title>
+  <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
+  <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/highlight.css">
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3YQ0W814W"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Y3YQ0W814W');
+  </script>
+  <script src="/main.js" defer></script>
+  <style>
+    :root{
+      --accent: #2563eb;
+    }
+  </style>
+  
+  
+  <link rel="alternate" hreflang="zh" href="https://anycms.org/docs/builtin-functions/">
+  
+  
+  
+  
+  
+  
+</head>
+<body>
+  
+  <header class="site-header">
+    <div class="site-header-inner wrap">
+      <a class="brand" href="/">
+        <span class="brand-mark">A</span>
+        <span>AnyCMS SSG</span>
+      </a>
+      <div class="site-header-right">
+        <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true">
+        <nav class="site-nav">
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <a href="/" class="active">首页</a>
+        
+        
+        
+        <a href="/docs/" class="active">文档</a>
+        
+        
+        
+        <a href="/plugins/">插件</a>
+        
+        
+        
+        <a href="/themes/">主题</a>
+        
+        <a class="nav-cta" href="https://github.com/anycms/anycms-ssg">GitHub</a>
+      </nav>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="切换主题">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <label for="nav-toggle" class="nav-burger" aria-label="切换菜单" role="button">
+        <span></span><span></span><span></span>
+      </label>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+<div class="docs">
+  
+  <aside class="docs-sidebar">
+    <h5>文档</h5>
+    <ul>
+      
+      
+      <li><a href="/docs/introduction/">介绍</a></li>
+      
+      <li><a href="/docs/getting-started/">快速开始</a></li>
+      
+      <li><a href="/docs/site-structure/">站点结构</a></li>
+      
+      <li><a href="/docs/configuration/">配置（site.kdl）</a></li>
+      
+      <li><a href="/docs/content/">内容模型</a></li>
+      
+      <li><a href="/docs/templates/">模板</a></li>
+      
+      <li><a href="/docs/assets/">资源管线</a></li>
+      
+      <li><a href="/docs/themes/">主题</a></li>
+      
+      <li><a href="/docs/plugins/">插件系统</a></li>
+      
+      <li><a href="/docs/i18n/">多语言</a></li>
+      
+      <li><a href="/docs/registry/">分发：静态注册中心</a></li>
+      
+      <li><a href="/docs/deployment/">部署</a></li>
+      
+      <li><a href="/docs/check/">链接检查器</a></li>
+      
+      <li><a href="/docs/devtools/">开发调试面板</a></li>
+      
+      <li><a href="/docs/search/">搜索索引</a></li>
+      
+      <li><a href="/docs/official-plugins/">官方插件指南</a></li>
+      
+      <li><a href="/docs/builtin-functions/" class="active">模板内置函数与过滤器</a></li>
+      
+      <li><a href="/docs/image-processing/">图像处理管线</a></li>
+      
+      <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
+      
+    </ul>
+  </aside>
+
+  <article class="docs-body prose">
+    <h1>模板内置函数与过滤器</h1>
+    <p class="muted" style="margin-top:-0.5rem;font-size:1.1rem;">host 注册的全局函数与过滤器完整参考</p>
+    <div class="post-body">
+      <p>除插件贡献的 dispatcher 外，host 在模板环境上注册了一批第一方全局函数与过滤器（对标 Zola 的 Tera）。<strong>不加载任何插件也始终可用。</strong></p>
+<blockquote>
+<p>约定：缺失 / 无法解析的输入返回输入本身或 <code>undefined</code> / 空串，<strong>绝不中断构建</strong>。</p>
+</blockquote>
+<h2 id="heading">全局函数</h2>
+<h3 id="now-format"><code>now(format?)</code></h3>
+<p>当前 UTC 时间字符串。</p>
+<ul>
+<li>无参：返回 RFC3339，如 <code>2026-06-21T13:45:00Z</code></li>
+<li>传参：使用 <code>time</code> crate 的<strong>格式描述语言</strong>（不是 strftime），如 <code>now("[year]-[month]-[day]")</code></li>
+</ul>
+<pre><code>{{ now() }}                          {# 2026-06-21T13:45:00Z #}
+{{ now("[year]-[month]-[day]") }}    {# 2026-06-21 #}
+</code></pre>
+<h3 id="get-url-path-hash-true"><code>get_url(path, hash=true?)</code></h3>
+<p>工程相对路径（如 <code>/static/app.css</code>）的输出 URL。<code>hash=true</code> 时追加 <code>?v=&lt;短哈希&gt;</code> 做缓存击穿（默认 <code>false</code>）。返回的 URL 在 <code>href</code> / <code>src</code> 中需 <code>| safe</code>。</p>
+<pre><code>&lt;link rel="stylesheet" href="{{ get_url("/static/app.css", hash=true) | safe }}"&gt;
+</code></pre>
+<h3 id="get-hash-path"><code>get_hash(path)</code></h3>
+<p>文件 SHA-256 的前 10 位十六进制。文件不可读时返回<strong>空串</strong>（不报错）。</p>
+<pre><code>{{ get_hash("/static/app.css") }}    {# a1b2c3d4e5 #}
+</code></pre>
+<h3 id="trans-key-lang"><code>trans(key, lang?)</code></h3>
+<p>从 <code>config.params.translations</code> 查翻译，缺失时<strong>回退到 <code>key</code> 本身</strong>（Zola 行为）。<code>lang</code> 缺省取 <code>default_language</code>。</p>
+<pre><code>{{ trans("greeting") }}              {# 缺失时输出 "greeting" 本身 #}
+{{ trans("greeting", "fr") }}
+</code></pre>
+<h3 id="get-taxonomy-kind-lang"><code>get_taxonomy(kind, lang?)</code></h3>
+<p>序列化指定分类法（如 <code>tags</code>）。未声明该分类法时返回 <code>undefined</code>。<code>lang</code> 目前接受但不过滤。</p>
+<pre><code>{% set tags = get_taxonomy("tags") %}
+{% for term in tags.terms %}{{ term.name }} {% endfor %}
+</code></pre>
+<h3 id="get-image-metadata-path"><code>get_image_metadata(path)</code></h3>
+<p>返回 <code>{ width, height, format }</code>。文件缺失 / 无法解码时返回 <code>undefined</code>。</p>
+<pre><code>{% set img = get_image_metadata("/static/cover.png") %}
+{% if img %}{{ img.width }}x{{ img.height }}{% endif %}
+</code></pre>
+<h3 id="get-page-url-get-section-url"><code>get_page(url)</code> / <code>get_section(url)</code></h3>
+<p>按 URL 查询任意页面 / section，返回 page view 或空。<code>get_section</code> 额外含 <code>.pages</code> 列表。用于跨 section 聚合（如文档侧边栏、相关页面），无需客户端脚本。</p>
+<pre><code>{% set docs = get_section("/docs/") %}
+{% for p in docs.pages %}&lt;a href="{{ p.url | safe }}"&gt;{{ p.title }}&lt;/a&gt;{% endfor %}
+</code></pre>
+<blockquote>
+<p>本站文档侧边栏就是用 <code>get_section("/docs/")</code> 自动生成的。</p>
+</blockquote>
+<h2 id="heading-2">过滤器</h2>
+<h3 id="base64-encode-base64-decode"><code>base64_encode</code> / <code>base64_decode</code></h3>
+<p>标准 base64（带 padding）编解码。<strong>非法输入解码为空串，不会 panic。</strong></p>
+<pre><code>{{ "hello" | base64_encode }}            {# aGVsbG8= #}
+{{ "aGVsbG8=" | base64_decode }}         {# hello #}
+{{ "!!!not-base64!!!" | base64_decode }} {# 空串，不报错 #}
+</code></pre>
+<h3 id="regex-replace-pattern-replacement"><code>regex_replace(pattern, replacement)</code></h3>
+<p>正则替换<strong>所有</strong>匹配。</p>
+<pre><code>{{ "abc123def456" | regex_replace("\\d+", "N") }}   {# abcNdefN #}
+</code></pre>
+<h3 id="markdown"><code>markdown</code></h3>
+<p>将 Markdown 字符串渲染为 HTML（无 summary / TOC）。输出是原始 HTML，需链 <code>| safe</code> 才不被转义。</p>
+<pre><code>{{ "**bold** and [link](/x/)" | markdown | safe }}
+{# &lt;strong&gt;bold&lt;/strong&gt; and &lt;a href="/x/"&gt;link&lt;/a&gt; #}
+</code></pre>
+<h2 id="safe"><code>| safe</code> 约定</h2>
+<p>MiniJinja 会把生成的 URL 中的 <code>/</code> 转义成 <code>&amp;#x2f;</code>。因此<strong>所有</strong> <code>get_url</code> / <code>page.url</code> / <code>term.permalink</code> 等 URL 在 <code>href</code> / <code>src</code> 中必须标 <code>| safe</code>，否则浏览器会请求到带转义字符的坏地址。</p>
+<pre><code>{# 正确 #}
+&lt;a href="{{ page.url | safe }}"&gt;
+&lt;link href="{{ get_url("/static/app.css") | safe }}"&gt;
+
+{# 错误 —— 会变成 &amp;#x2f; #}
+&lt;a href="{{ page.url }}"&gt;
+</code></pre>
+
+    </div>
+    <div class="doc-meta">
+      <span>用 <strong>AnyCMS</strong> 构建</span>
+      <a href="https://github.com/anycms/anycms-ssg">在 GitHub 上编辑 ↗</a>
+    </div>
+  </article>
+</div>
+
+  </main>
+
+  
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <span class="brand-mark">A</span>
+          <span>AnyCMS SSG</span>
+        </a>
+        <p>用 Rust 编写的插件驱动静态网站生成器。WASM 插件贯穿内容发现、Markdown 渲染、模板上下文、SEO 与资源处理的每一个阶段。</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>资源</h5>
+          <ul>
+            <li><a href="/docs/">文档</a></li>
+            <li><a href="/docs/getting-started/">快速开始</a></li>
+            <li><a href="/plugins/">插件</a></li>
+            <li><a href="/themes/">主题</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>社区</h5>
+          <ul>
+            <li><a href="https://github.com/anycms/anycms-ssg">GitHub</a></li>
+            <li><a href="/tags/">标签</a></li>
+            <li><a href="/atom.xml">Atom 订阅</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; AnyCMS · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+    </div>
+  </footer>
+
+  
+  
+</body>
+</html>

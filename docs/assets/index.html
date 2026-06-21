@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh"
+      data-theme="dark"
       >
 <head>
   <meta charset="utf-8">
@@ -10,13 +11,17 @@
       try {
         var t = localStorage.getItem("theme");
         if (t !== "light" && t !== "dark") {
+          // No saved choice: honor the server-rendered data-theme on <html>.
+          t = document.documentElement.getAttribute("data-theme");
+        }
+        if (t !== "light" && t !== "dark") {
           t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
         }
         document.documentElement.setAttribute("data-theme", t);
       } catch (e) {}
     })();
   </script>
-  <title>资源管线 · AnyCMS SSG 文档</title>
+  <title>资源管线 · AnyCMS 文档</title>
   <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
   <link rel="stylesheet" href="/main.css">
   <link rel="stylesheet" href="/highlight.css">
@@ -124,6 +129,20 @@
       
       <li><a href="/docs/deployment/">部署</a></li>
       
+      <li><a href="/docs/check/">链接检查器</a></li>
+      
+      <li><a href="/docs/devtools/">开发调试面板</a></li>
+      
+      <li><a href="/docs/search/">搜索索引</a></li>
+      
+      <li><a href="/docs/official-plugins/">官方插件指南</a></li>
+      
+      <li><a href="/docs/builtin-functions/">模板内置函数与过滤器</a></li>
+      
+      <li><a href="/docs/image-processing/">图像处理管线</a></li>
+      
+      <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
+      
     </ul>
   </aside>
 
@@ -135,6 +154,8 @@
 <table><thead><tr><th>输入</th><th>处理</th><th>输出</th></tr></thead><tbody>
 <tr><th><code>sass/main.scss</code></th><th>grass 编译 + 压缩</th><th><code>public/main.css</code></th></tr>
 <tr><th><code>ts/main.ts</code> / <code>*.tsx</code></th><th>oxc 转译 + minify（不做类型检查 / bundle）</th><th><code>public/*.js</code></th></tr>
+<tr><th>文章内 <code>&lt;img&gt;</code></th><th>响应式增强（官方插件 <a href="#%E5%93%8D%E5%BA%94%E5%BC%8F%E5%9B%BE%E5%83%8F">responsive-images</a>：srcset/sizes/lazy/decoding，仅改写 HTML）</th><th>增强后的 <code>public/**/*.html</code></th></tr>
+<tr><th>图像资源</th><th>图像处理管线（EXIF 方向 + 输出格式，见下文）</th><th>转码 / 矫正后的图像</th></tr>
 <tr><th>HTML 输出</th><th>minify-html 压缩</th><th>压缩后的 <code>public/**/*.html</code></th></tr>
 <tr><th><code>static/**</code></th><th>原样拷贝</th><th><code>public/**</code></th></tr>
 </tbody></table>
@@ -157,7 +178,24 @@ body {
 </ul>
 <h2 id="html">HTML 压缩</h2>
 <p>所有渲染出的 HTML 都会经过 minify-html 压缩（去注释、折叠空白、缩短布尔属性等）。</p>
-<h2 id="heading">设计参数</h2>
+<h2 id="heading">图像处理管线</h2>
+<p><code>site.kdl</code> 中的 <code>image {}</code> 块控制图像处理管线（默认 <code>enabled #false</code>，需显式开启）。它处理两件事：EXIF 方向自动矫正、输出格式转换。</p>
+<pre><code>image {
+    enabled #true                 // 默认 false
+    widths "640,1024,1920"        // 默认 [640, 1024, 1920]
+    quality 80                    // 默认 80（JPEG/WebP/AVIF）
+    auto_orient #true             // 默认 true — 读 EXIF Orientation(1–8) 在缩放前旋转
+    format "auto"                 // 默认 auto；可选 jpeg/png/webp/avif（大小写不敏感）
+}
+</code></pre>
+<ul>
+<li><strong>EXIF 自动方向矫正</strong>（<code>auto_orient</code>，默认 <code>true</code>）：读 EXIF <code>Orientation</code> 标签（1–8），在尺寸计算与变体生成前旋转成正立朝向，避免手机照片侧躺 / 倒置。EXIF 读取失败时回退到不旋转（orientation 1）并打印警告，不中断构建。</li>
+<li><strong>输出格式</strong>（<code>format</code>，默认 <code>auto</code>）：<code>auto</code> 保留源格式；也可统一转码为 <code>jpeg</code> / <code>png</code> / <code>webp</code> / <code>avif</code>。</li>
+<li><strong>AVIF 输出</strong>：选择 <code>avif</code> 需启用 cargo 特性 <code>cargo build --features avif</code>（默认关闭，保持默认构建精简）。编码器为纯 Rust 的 <code>ravif</code>（经 <code>image</code> crate 的 <code>avif</code> 特性引入），无需 C 工具链，可在任意平台编译。<strong>注意：仅支持 AVIF 编码，不支持 AVIF 解码</strong>（解码需 C 工具链的 dav1d，故有意排除）。启用后 release 二进制体积约增加 ~1.05 MB。</li>
+</ul>
+<h2 id="heading-2">响应式图像</h2>
+<p>官方插件 <strong>responsive-images</strong>（见<a href="/docs/plugins/">插件</a>）按命名约定为文章内的 <code>&lt;img&gt;</code> 添加 <code>srcset</code> / <code>sizes</code> / <code>loading="lazy"</code> / <code>decoding="async"</code>。它只改写 HTML 标记、不重新编码图像，与上面的图像处理管线互补。</p>
+<h2 id="heading-3">设计参数</h2>
 <p>主题通过 <code>params</code> 声明可调设计令牌，site 在 <code>params {}</code> 中覆盖，模板内联注入的 <code>:root</code> CSS 变量会覆盖主题默认值。本站就是用这种方式让 <code>--accent</code> / <code>--accent-2</code> 可在 <code>site.kdl</code> 里调整：</p>
 <pre><code>params {
     accent "#4f46e5"
@@ -167,7 +205,7 @@ body {
 
     </div>
     <div class="doc-meta">
-      <span>用 <strong>AnyCMS SSG</strong> 构建</span>
+      <span>用 <strong>AnyCMS</strong> 构建</span>
       <a href="https://github.com/anycms/anycms-ssg">在 GitHub 上编辑 ↗</a>
     </div>
   </article>
@@ -206,7 +244,7 @@ body {
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; AnyCMS SSG · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+      &copy; AnyCMS · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
     </div>
   </footer>
 

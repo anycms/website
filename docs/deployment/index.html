@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh"
+      data-theme="dark"
       >
 <head>
   <meta charset="utf-8">
@@ -10,13 +11,17 @@
       try {
         var t = localStorage.getItem("theme");
         if (t !== "light" && t !== "dark") {
+          // No saved choice: honor the server-rendered data-theme on <html>.
+          t = document.documentElement.getAttribute("data-theme");
+        }
+        if (t !== "light" && t !== "dark") {
           t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
         }
         document.documentElement.setAttribute("data-theme", t);
       } catch (e) {}
     })();
   </script>
-  <title>部署 · AnyCMS SSG 文档</title>
+  <title>部署 · AnyCMS 文档</title>
   <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
   <link rel="stylesheet" href="/main.css">
   <link rel="stylesheet" href="/highlight.css">
@@ -124,49 +129,83 @@
       
       <li><a href="/docs/deployment/" class="active">部署</a></li>
       
+      <li><a href="/docs/check/">链接检查器</a></li>
+      
+      <li><a href="/docs/devtools/">开发调试面板</a></li>
+      
+      <li><a href="/docs/search/">搜索索引</a></li>
+      
+      <li><a href="/docs/official-plugins/">官方插件指南</a></li>
+      
+      <li><a href="/docs/builtin-functions/">模板内置函数与过滤器</a></li>
+      
+      <li><a href="/docs/image-processing/">图像处理管线</a></li>
+      
+      <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
+      
     </ul>
   </aside>
 
   <article class="docs-body prose">
     <h1>部署</h1>
-    <p class="muted" style="margin-top:-0.5rem;font-size:1.1rem;">把构建产物 public&#x2f; 部署到任意静态托管</p>
+    <p class="muted" style="margin-top:-0.5rem;font-size:1.1rem;">anycms deploy 一等命令：git &#x2f; ssh-rsync 发布到任意静态托管</p>
     <div class="post-body">
-      <p>AnyCMS SSG 输出的是纯静态文件（默认 <code>public/</code>），可以部署到任何静态托管服务。</p>
-<h2 id="heading">构建生产产物</h2>
-<pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> build            <span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> 渲染 Markdown、编译 Sass、转译 TS、压缩 HTML</span><span class="comment line number-sign shell">
-</span></span></span></code></pre>
-<p>产物全部在 <code>output_dir</code>（默认 <code>public/</code>）下，包含：</p>
+      <p><code>anycms deploy</code> 把 <code>output_dir</code>（默认 <code>public/</code>）发布到配置好的目标。它是 anycms 的<strong>一等命令而非插件</strong>——因此可以 shell 出系统的 <code>git</code> 与 <code>rsync</code>（沙箱插件无法做到）。内置两个 provider：</p>
 <ul>
-<li><code>index.html</code> 及所有页面 HTML（已压缩）</li>
-<li><code>main.css</code> / <code>main.js</code></li>
-<li><code>rss.xml</code> / <code>atom.xml</code> / <code>sitemap.xml</code> / <code>robots.txt</code></li>
-<li><code>static/</code> 原样拷贝的文件</li>
+<li><strong><code>git</code></strong>：GitHub Pages 风格的 <code>git push</code>，推送到指定仓库的分支。</li>
+<li><strong><code>ssh-rsync</code></strong>：<code>rsync -avz --delete</code> over SSH，增量同步到远程目录。</li>
 </ul>
-<h2 id="heading-2">常见部署目标</h2>
-<table><thead><tr><th>平台</th><th>做法</th></tr></thead><tbody>
-<tr><th>GitHub Pages</th><th>把 <code>public/</code> 推送到 <code>gh-pages</code> 分支或用 Actions 上传 artifact</th></tr>
-<tr><th>Netlify / Vercel</th><th>构建命令 <code>anycms build</code>，发布目录 <code>public</code></th></tr>
-<tr><th>Cloudflare Pages</th><th>同上，构建命令指向 <code>anycms build</code></th></tr>
-<tr><th>自建 / Nginx</th><th>把 <code>public/</code> 拷贝到 web 根目录</th></tr>
-<tr><th>S3 + CloudFront</th><th><code>aws s3 sync public/ s3://&lt;bucket&gt; --delete</code></th></tr>
-</tbody></table>
+<h2 id="deploy">配置（<code>deploy {}</code>）</h2>
+<p>在 <code>site.kdl</code> 中声明一个或多个目标：</p>
+<pre><code>deploy {
+    target "gh-pages" {
+        provider "git"
+        repo     "git@github.com:user/user.github.io.git"
+        branch   "gh-pages"
+    }
+    target "prod" {
+        provider  "ssh-rsync"
+        dest      "user@host:/var/www/site/"
+        delete    #true              // 默认对齐 rsync --delete
+    }
+}
+</code></pre>
+<h2 id="cli">CLI</h2>
+<pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> build</span>
+<span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> deploy gh-pages            <span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> 发布指定目标</span><span class="comment line number-sign shell">
+</span></span><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> deploy<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>build             <span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> 先 build 再发布</span><span class="comment line number-sign shell">
+</span></span></span><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> deploy<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>dry-run           <span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> 仅打印将执行的命令，不产生副作用</span><span class="comment line number-sign shell">
+</span></span></span></span></code></pre>
+<ul>
+<li><code>[TARGET]</code> 指向 <code>deploy {}</code> 中声明的某个 target 名称；不传时取默认目标。</li>
+<li><code>--build</code> 在发布前自动跑一次 <code>anycms build</code>。</li>
+<li><code>--dry-run</code> 打印底层 <code>git</code> / <code>rsync</code> 命令，便于在 CI 调试，不执行真实推送。</li>
+</ul>
 <h2 id="base-url">base_url</h2>
 <p>部署前确认 <code>site.kdl</code> 的 <code>base_url</code> 指向最终域名——它影响绝对链接、feeds 与 sitemap 中的 URL。</p>
 <blockquote>
 <p>部署到子路径（如 <code>https://user.github.io/repo/</code>）时，需要相应调整 <code>base_url</code> 与资源路径策略。</p>
 </blockquote>
+<h2 id="heading">其他托管平台</h2>
+<p><code>anycms deploy</code> 覆盖最常见的 <code>git push</code> 与 <code>rsync</code> 场景；其余平台仍可用通用方式部署：</p>
+<table><thead><tr><th>平台</th><th>做法</th></tr></thead><tbody>
+<tr><th>Netlify / Vercel</th><th>构建命令 <code>anycms build</code>，发布目录 <code>public</code></th></tr>
+<tr><th>Cloudflare Pages</th><th>同上，构建命令指向 <code>anycms build</code></th></tr>
+<tr><th>S3 + CloudFront</th><th><code>aws s3 sync public/ s3://&lt;bucket&gt; --delete</code></th></tr>
+</tbody></table>
 <h2 id="ci">CI 建议</h2>
 <p>在 CI 中运行质量门后再部署：</p>
 <pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">cargo</span></span><span class="meta function-call arguments shell"> fmt<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>all</span><span class="keyword operator end-of-options shell"> --</span></span><span class="meta function-call arguments shell"> --check</span>
 <span class="meta function-call shell"><span class="variable function shell">cargo</span></span><span class="meta function-call arguments shell"> clippy<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>workspace</span><span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>all-targets</span><span class="keyword operator end-of-options shell"> --</span></span><span class="meta function-call arguments shell"> -D warnings</span>
 <span class="meta function-call shell"><span class="variable function shell">cargo</span></span><span class="meta function-call arguments shell"> build<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>workspace</span><span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>all-targets</span></span>
 <span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> build              <span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> 站点构建本身也应零错误退出</span><span class="comment line number-sign shell">
-</span></span></span></code></pre>
+</span></span><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> deploy<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>build     <span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> CI 里建议用 --build 确保产物新鲜</span><span class="comment line number-sign shell">
+</span></span></span></span></code></pre>
 <p>设置 <code>ANYCMS_PLUGIN_STRICT=1</code> 可让任何插件 hook 错误中止构建，避免静默发布坏页面。</p>
 
     </div>
     <div class="doc-meta">
-      <span>用 <strong>AnyCMS SSG</strong> 构建</span>
+      <span>用 <strong>AnyCMS</strong> 构建</span>
       <a href="https://github.com/anycms/anycms-ssg">在 GitHub 上编辑 ↗</a>
     </div>
   </article>
@@ -205,7 +244,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; AnyCMS SSG · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+      &copy; AnyCMS · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
     </div>
   </footer>
 

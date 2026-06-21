@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh"
+      data-theme="dark"
       >
 <head>
   <meta charset="utf-8">
@@ -10,13 +11,17 @@
       try {
         var t = localStorage.getItem("theme");
         if (t !== "light" && t !== "dark") {
+          // No saved choice: honor the server-rendered data-theme on <html>.
+          t = document.documentElement.getAttribute("data-theme");
+        }
+        if (t !== "light" && t !== "dark") {
           t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
         }
         document.documentElement.setAttribute("data-theme", t);
       } catch (e) {}
     })();
   </script>
-  <title>插件系统 · AnyCMS SSG 文档</title>
+  <title>插件系统 · AnyCMS 文档</title>
   <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
   <link rel="stylesheet" href="/main.css">
   <link rel="stylesheet" href="/highlight.css">
@@ -124,6 +129,20 @@
       
       <li><a href="/docs/deployment/">部署</a></li>
       
+      <li><a href="/docs/check/">链接检查器</a></li>
+      
+      <li><a href="/docs/devtools/">开发调试面板</a></li>
+      
+      <li><a href="/docs/search/">搜索索引</a></li>
+      
+      <li><a href="/docs/official-plugins/">官方插件指南</a></li>
+      
+      <li><a href="/docs/builtin-functions/">模板内置函数与过滤器</a></li>
+      
+      <li><a href="/docs/image-processing/">图像处理管线</a></li>
+      
+      <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
+      
     </ul>
   </aside>
 
@@ -131,12 +150,19 @@
     <h1>插件系统</h1>
     <p class="muted" style="margin-top:-0.5rem;font-size:1.1rem;">WASM 插件、两层扩展点、权限化 host 函数与贡献机制</p>
     <div class="post-body">
-      <p>插件是 WebAssembly 模块，构建时由 host 加载并按 <strong>priority 顺序</strong>（数字越小越先执行）调度。</p>
+      <p>插件是 WebAssembly 模块，构建时由 host 加载并按 <strong>priority 顺序</strong>（数字越小越先执行）调度。当前 API 契约版本为 <strong>v0.2</strong>。</p>
 <h2 id="heading">两层扩展点</h2>
 <ul>
 <li><strong>Layer 1 — 10 个通用管线 hook</strong>：<code>on_build_start</code> / <code>on_build_end</code> / <code>on_config</code> / <code>on_content_discover</code> / <code>on_page_parse</code> / <code>on_markdown</code> / <code>on_markdown_html</code> / <code>on_template_context</code> / <code>on_template_output</code> / <code>on_asset</code>。</li>
-<li><strong>Layer 2 — 5 个业务域</strong>：<code>on_seo</code> / <code>on_sitemap</code> / <code>on_search_document</code> / <code>on_feed_entry</code> / <code>on_head_inject</code>·<code>on_body_inject</code>。</li>
-<li><strong>贡献（contribute）</strong>：插件向模板引擎注册 <code>filter</code> / <code>global_function</code>。</li>
+<li><strong>Layer 2 — 8 个业务域 hook，覆盖 5 个域</strong>：<ul>
+<li>SEO：<code>on_seo</code></li>
+<li>Sitemap：<code>on_sitemap</code></li>
+<li>Search：<code>on_search_document</code>（逐页增强）、<code>on_search_index</code>（整站聚合）</li>
+<li>Feed：<code>on_feed_entry</code>（逐条增强）、<code>on_feed</code>（整站聚合）</li>
+<li>Inject：<code>on_head_inject</code> · <code>on_body_inject</code></li>
+</ul>
+</li>
+<li><strong>贡献（contribute）</strong>：插件向模板引擎注册 <code>filter</code>（含多参 <code>filter_args</code>）/ <code>global_function</code> / <code>shortcode</code>。</li>
 </ul>
 <h2 id="heading-2">写一个插件</h2>
 <pre><code class="language-rust"><span class="source rust"><span class="keyword other rust">use</span> <span class="meta path rust">anycms_ssg_plugin_sdk<span class="punctuation accessor rust">::</span></span><span class="meta block rust"><span class="punctuation section block begin rust">{</span>plugin_fn<span class="punctuation separator rust">,</span> FnResult<span class="punctuation separator rust">,</span> TemplateContext</span><span class="meta block rust"><span class="punctuation section block end rust">}</span></span><span class="punctuation terminator rust">;</span>
@@ -163,11 +189,15 @@ extism-pdk = "1"                             # #[plugin_fn] 宏的直接依赖
 <pre><code>plugin {
   name "reading-time"
   version "0.1.0"
-  api-version "0.1"                 // 必须为 "0.1"
+  api-version "0.2"                 // 当前 API 契约版本，必须为 "0.2"
   author "Liangdi"
 
   hooks {
     on-template-context priority=100
+  }
+
+  contributes {                     // 可选：向模板引擎贡献 filter/function/shortcode
+    filter "shout"
   }
 
   permissions {                     // 权限声明，host 每次调用强制校验
@@ -199,11 +229,37 @@ extism-pdk = "1"                             # #[plugin_fn] 宏的直接依赖
 <h2 id="strict">Strict 模式</h2>
 <p>设置环境变量 <code>ANYCMS_PLUGIN_STRICT=1</code>（任何非空非 <code>"0"</code> 值）后，任何插件的 hook 调度错误会<strong>中止整个构建</strong>（而非默认的 log + 跳过）。适用于 CI / 严格场景。</p>
 <h2 id="heading-3">示例插件</h2>
-<p><a href="https://github.com/anycms/anycms-ssg/tree/master/examples/plugins"><code>examples/plugins/</code></a> 下有十多个端到端可运行的示例，覆盖每个 hook 与 host 函数。完整开发指南见 <a href="https://github.com/anycms/anycms-ssg/blob/master/docs/plugins.md"><code>docs/plugins.md</code></a>。</p>
+<p><a href="https://github.com/anycms/anycms-ssg/tree/master/examples/plugins"><code>examples/plugins/</code></a> 下有 <strong>14 个端到端可运行</strong>的示例：</p>
+<table><thead><tr><th>示例</th><th>Hook / 贡献</th><th>演示</th></tr></thead><tbody>
+<tr><th><code>reading-time</code></th><th><code>on_template_context</code></th><th>注入 <code>reading_time</code> 模板变量</th></tr>
+<tr><th><code>site-title</code></th><th><code>on_template_context</code> + host fn</th><th>配置往返（config → wasm → 模板）</th></tr>
+<tr><th><code>uppercasify</code></th><th><code>on_markdown</code></th><th>渲染前改写原始 Markdown 源</th></tr>
+<tr><th><code>virtual-page</code></th><th><code>on_content_discover</code></th><th>合成虚拟页面</th></tr>
+<tr><th><code>state-demo</code></th><th><code>on_content_discover</code> + <code>on_template_context</code></th><th>插件私有跨 hook 状态</th></tr>
+<tr><th><code>taxonomy-demo</code></th><th><code>on_template_context</code></th><th>分类法数据访问</th></tr>
+<tr><th><code>now-demo</code></th><th><code>on_template_context</code></th><th><code>host::now()</code> 时间戳</th></tr>
+<tr><th><code>body-inject</code></th><th><code>on_body_inject</code></th><th>Inject 域：<code>&lt;/body&gt;</code> 前注入</th></tr>
+<tr><th><code>head-assets</code></th><th><code>on_head_inject</code></th><th>Inject 域：<code>&lt;head&gt;</code> 资源注入</th></tr>
+<tr><th><code>http-post-demo</code></th><th><code>on_build_start</code> + <code>on_template_context</code></th><th><code>host::http_post</code> 网络访问</th></tr>
+<tr><th><code>config-demo</code></th><th><code>on_template_context</code></th><th>manifest 配置被 site.kdl 覆盖</th></tr>
+<tr><th><code>shout</code></th><th>contribute <code>filter</code></th><th>贡献 MiniJinja filter（`{{ x</th></tr>
+<tr><th><code>multi-filter</code></th><th>contribute <code>filter</code>（<code>filter_args</code>）</th><th>多参 filter（`{{ s</th></tr>
+<tr><th><code>badge</code></th><th>contribute <code>shortcode</code></th><th>插件声明内联 shortcode（<code>{{&lt; badge &gt;}}</code>）</th></tr>
+</tbody></table>
+<h2 id="tier-1">官方插件（Tier 1）</h2>
+<p><a href="https://github.com/anycms/anycms-ssg/tree/master/plugins"><code>plugins/</code></a> 下提供 5 个开箱即用的官方插件（crate 名 <code>anycms-plugin-*</code>），只增强 host 内置 provider，不替换渲染管线：</p>
+<table><thead><tr><th>插件</th><th>Hook</th><th>作用</th></tr></thead><tbody>
+<tr><th><code>seo-suite</code></th><th><code>on_seo</code></th><th>OpenGraph / Twitter card / canonical / description 回退 / 去重 JSON-LD</th></tr>
+<tr><th><code>sitemap-robots</code></th><th><code>on_sitemap</code></th><th>按 URL 深度设 changefreq/priority、可选 draft/noindex 过滤、生成伴随 <code>robots.txt</code></th></tr>
+<tr><th><code>search-index</code></th><th><code>on_search_document</code></th><th>清洗正文 HTML、生成智能摘要与语言、设置 boost、附带分类法/日期字段</th></tr>
+<tr><th><code>feed-suite</code></th><th><code>on_feed_entry</code></th><th>增强每条 feed 条目（摘要、正文、作者、分类、URL）</th></tr>
+<tr><th><code>responsive-images</code></th><th><code>on_markdown_html</code></th><th>按命名约定为 <code>&lt;img&gt;</code> 加 srcset/sizes/lazy（仅改写 HTML 标记）</th></tr>
+</tbody></table>
+<p>每个插件的 <code>config {}</code> 默认值都可在 <code>site.kdl</code> 的 <code>plugins {}</code> 块中覆盖。完整开发指南见 <a href="https://github.com/anycms/anycms-ssg/blob/master/docs/plugins.md"><code>docs/plugins.md</code></a>。</p>
 
     </div>
     <div class="doc-meta">
-      <span>用 <strong>AnyCMS SSG</strong> 构建</span>
+      <span>用 <strong>AnyCMS</strong> 构建</span>
       <a href="https://github.com/anycms/anycms-ssg">在 GitHub 上编辑 ↗</a>
     </div>
   </article>
@@ -242,7 +298,7 @@ extism-pdk = "1"                             # #[plugin_fn] 宏的直接依赖
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; AnyCMS SSG · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+      &copy; AnyCMS · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
     </div>
   </footer>
 

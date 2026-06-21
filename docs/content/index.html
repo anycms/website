@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh"
+      data-theme="dark"
       >
 <head>
   <meta charset="utf-8">
@@ -10,13 +11,17 @@
       try {
         var t = localStorage.getItem("theme");
         if (t !== "light" && t !== "dark") {
+          // No saved choice: honor the server-rendered data-theme on <html>.
+          t = document.documentElement.getAttribute("data-theme");
+        }
+        if (t !== "light" && t !== "dark") {
           t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
         }
         document.documentElement.setAttribute("data-theme", t);
       } catch (e) {}
     })();
   </script>
-  <title>内容模型 · AnyCMS SSG 文档</title>
+  <title>内容模型 · AnyCMS 文档</title>
   <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
   <link rel="stylesheet" href="/main.css">
   <link rel="stylesheet" href="/highlight.css">
@@ -124,6 +129,20 @@
       
       <li><a href="/docs/deployment/">部署</a></li>
       
+      <li><a href="/docs/check/">链接检查器</a></li>
+      
+      <li><a href="/docs/devtools/">开发调试面板</a></li>
+      
+      <li><a href="/docs/search/">搜索索引</a></li>
+      
+      <li><a href="/docs/official-plugins/">官方插件指南</a></li>
+      
+      <li><a href="/docs/builtin-functions/">模板内置函数与过滤器</a></li>
+      
+      <li><a href="/docs/image-processing/">图像处理管线</a></li>
+      
+      <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
+      
     </ul>
   </aside>
 
@@ -144,7 +163,6 @@ date = 2025-06-01
 draft = false
 slug = &quot;hello&quot;
 template = &quot;page.html&quot;
-[taxonomies]
 tags = [&quot;rust&quot;, &quot;ssg&quot;]
 +++
 
@@ -164,18 +182,35 @@ tags = [&quot;rust&quot;, &quot;ssg&quot;]
 <tr><th><code>description</code></th><th>描述 / 摘要，用于 SEO 与列表页</th></tr>
 <tr><th><code>draft</code></th><th><code>true</code> 的页面在 <code>build</code> 时被排除</th></tr>
 <tr><th><code>slug</code></th><th>自定义 URL slug</th></tr>
-<tr><th><code>weight</code></th><th>排序权重（升序）</th></tr>
+<tr><th><code>weight</code></th><th>排序权重（整数，升序）</th></tr>
 <tr><th><code>template</code></th><th>覆盖默认模板（如 <code>template = "docs.html"</code>）</th></tr>
 <tr><th><code>taxonomies</code></th><th>分类法赋值（如 <code>tags = ["rust"]</code>）</th></tr>
+<tr><th><code>aliases</code></th><th>重定向别名 URL 数组（如 <code>["/old/path/"]</code>），构建时生成跳转</th></tr>
+<tr><th><code>expiry_date</code></th><th>过期日期字符串（如 <code>"2026-12-31"</code>），过期页在构建时被剔除</th></tr>
 </tbody></table>
-<h2 id="heading-2">摘要与目录</h2>
+<h3 id="heading-2">定时发布与过期</h3>
+<ul>
+<li><strong>定时（scheduled）</strong>：<code>date</code> 为<strong>未来日期</strong>的页面不会发布——构建时被剔除，直到日期到达。</li>
+<li><strong>过期</strong>：设置 <code>expiry_date</code> 到一个已过去的日期，该页同样在构建时被剔除。</li>
+</ul>
+<p>二者与 <code>draft</code> 一样作用于构建过滤，适合用于预告发布与限时内容下线，无需改动正文。</p>
+<pre><code># 定时发布：日期到达后自动出现
+date = 2099-01-01
+
+# 过期下线：日期过后自动消失
+expiry_date = "2026-12-31"
+
+# 重定向别名：旧 URL 跳转到本页
+aliases = ["/old/blog/hello/", "/legacy/hello.html"]
+</code></pre>
+<h2 id="heading-3">摘要与目录</h2>
 <ul>
 <li><strong>摘要</strong>：用 <code>&lt;!-- more --&gt;</code> 分割，前半段作为 <code>page.summary</code>。</li>
 <li><strong>目录（TOC）</strong>：由标题自动生成，通过 <code>page.toc</code> 暴露给模板。</li>
 </ul>
-<h2 id="heading-3">分类法页</h2>
+<h2 id="heading-4">分类法页</h2>
 <p>由 <code>taxonomies</code> 配置自动生成。例如声明 <code>taxonomy name="tags"</code> 后，带 <code>tags = ["rust"]</code> 的页面会出现在 <code>/tags/rust/</code>。</p>
-<h2 id="heading-4">代码高亮</h2>
+<h2 id="heading-5">代码高亮</h2>
 <p>用围栏代码块并声明语言，输出 class-based span，配合 <code>static/highlight.css</code> 着色：</p>
 <pre><code class="language-markdown"><span class="text html markdown"><span class="meta paragraph markdown"><span class="markup raw code-fence markdown"><span class="punctuation definition raw code-fence begin markdown">```</span><span class="constant other language-name markdown">rust</span>
 fn main() {
@@ -183,12 +218,23 @@ fn main() {
 }
 <span class="punctuation definition raw code-fence end markdown">```
 </span></span></span></span></code></pre>
-<h2 id="heading-5">内容互链</h2>
-<p>Markdown 中的相对链接会被解析为站点内链接，无需手写完整路径。</p>
+<h2 id="heading-6">内容互链</h2>
+<p>Markdown 中的相对链接会被解析为站点内链接，无需手写完整路径。另外支持 <code>@/</code> 前缀的<strong>内容互链语法</strong>——以工程内容根为基准指向目标页面，解析后输出目标页的最终 URL：</p>
+<pre><code class="language-markdown"><span class="text html markdown"><span class="meta paragraph markdown">详见 <span class="meta link inline markdown"><span class="punctuation definition link begin markdown">[</span></span><span class="meta link inline description markdown">部署文档</span><span class="meta link inline markdown"><span class="punctuation definition link end markdown">]</span></span><span class="meta link inline markdown"><span class="punctuation definition metadata begin markdown">(</span><span class="markup underline link markdown">@/docs/deployment.md</span><span class="punctuation definition metadata end markdown">)</span></span>。
+</span></span></code></pre>
+<p><code>@/docs/deployment.md</code> 会被解析为该内容文件对应的站点 URL（如 <code>/docs/deployment/</code>），重命名或调整 permalink 时链接自动跟随，无需手改路径。</p>
+<h2 id="permalinks">永久链接（permalinks）</h2>
+<p>在 <code>site.kdl</code> 中用 <code>permalink {}</code> 块自定义页面 / section 的 URL 模板，支持 <code>:year</code> / <code>:month</code> / <code>:day</code> / <code>:slug</code> 等占位符：</p>
+<pre><code>permalink {
+    page "/:year/:slug/"
+    section "/:section/"
+}
+</code></pre>
+<p>未声明 permalink 时沿用默认 URL 规则（目录 + slug）。</p>
 
     </div>
     <div class="doc-meta">
-      <span>用 <strong>AnyCMS SSG</strong> 构建</span>
+      <span>用 <strong>AnyCMS</strong> 构建</span>
       <a href="https://github.com/anycms/anycms-ssg">在 GitHub 上编辑 ↗</a>
     </div>
   </article>
@@ -227,7 +273,7 @@ fn main() {
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; AnyCMS SSG · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+      &copy; AnyCMS · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
     </div>
   </footer>
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh"
+      data-theme="dark"
       >
 <head>
   <meta charset="utf-8">
@@ -10,13 +11,17 @@
       try {
         var t = localStorage.getItem("theme");
         if (t !== "light" && t !== "dark") {
+          // No saved choice: honor the server-rendered data-theme on <html>.
+          t = document.documentElement.getAttribute("data-theme");
+        }
+        if (t !== "light" && t !== "dark") {
           t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
         }
         document.documentElement.setAttribute("data-theme", t);
       } catch (e) {}
     })();
   </script>
-  <title>文档 · AnyCMS SSG</title>
+  <title>文档 · AnyCMS</title>
   <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
   <link rel="stylesheet" href="/main.css">
   <link rel="stylesheet" href="/highlight.css">
@@ -164,7 +169,42 @@
     
     <li>
       <a class="title" href="/docs/deployment/">部署</a>
-      <p class="desc">把构建产物 public&#x2f; 部署到任意静态托管</p>
+      <p class="desc">anycms deploy 一等命令：git &#x2f; ssh-rsync 发布到任意静态托管</p>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/check/">链接检查器</a>
+      <p class="desc">anycms check 校验内部链接、锚点与可选外链，CI 友好</p>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/devtools/">开发调试面板</a>
+      <p class="desc">serve 自带的 DevTools 面板：切换主题、启停插件、可视化 params</p>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/search/">搜索索引</a>
+      <p class="desc">search 配置：四种索引格式与字段裁剪</p>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/official-plugins/">官方插件指南</a>
+      <p class="desc">五个 Tier-1 官方插件的作用、hook 与典型场景</p>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/builtin-functions/">模板内置函数与过滤器</a>
+      <p class="desc">host 注册的全局函数与过滤器完整参考</p>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/image-processing/">图像处理管线</a>
+      <p class="desc">EXIF 方向矫正、输出格式与 AVIF 编码</p>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/permalinks/">URL 规则与重定向</a>
+      <p class="desc">permalink 模板、内容互链与 aliases 重定向</p>
     </li>
     
   </ul>
@@ -204,7 +244,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; AnyCMS SSG · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+      &copy; AnyCMS · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
     </div>
   </footer>
 

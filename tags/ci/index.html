@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh"
+      data-theme="dark"
+      >
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("theme");
+        if (t !== "light" && t !== "dark") {
+          // No saved choice: honor the server-rendered data-theme on <html>.
+          t = document.documentElement.getAttribute("data-theme");
+        }
+        if (t !== "light" && t !== "dark") {
+          t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+  <title>tags: ci · AnyCMS</title>
+  <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
+  <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/highlight.css">
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3YQ0W814W"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Y3YQ0W814W');
+  </script>
+  <script src="/main.js" defer></script>
+  <style>
+    :root{
+      --accent: #2563eb;
+    }
+  </style>
+  
+  
+  
+  
+  
+  
+</head>
+<body>
+  
+  <header class="site-header">
+    <div class="site-header-inner wrap">
+      <a class="brand" href="/">
+        <span class="brand-mark">A</span>
+        <span>AnyCMS SSG</span>
+      </a>
+      <div class="site-header-right">
+        <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true">
+        <nav class="site-nav">
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <a href="/" class="active">首页</a>
+        
+        
+        
+        <a href="/docs/">文档</a>
+        
+        
+        
+        <a href="/plugins/">插件</a>
+        
+        
+        
+        <a href="/themes/">主题</a>
+        
+        <a class="nav-cta" href="https://github.com/anycms/anycms-ssg">GitHub</a>
+      </nav>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="切换主题">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <label for="nav-toggle" class="nav-burger" aria-label="切换菜单" role="button">
+        <span></span><span></span><span></span>
+      </label>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+<header class="page-head">
+  <div class="page-head-inner">
+    <span class="eyebrow">tags</span>
+    <h1>ci</h1>
+  </div>
+</header>
+<section class="listing">
+  <ul class="post-list">
+    
+    <li>
+      <a class="title" href="/docs/deployment/">部署</a>
+      <p class="desc">anycms deploy 一等命令：git &#x2f; ssh-rsync 发布到任意静态托管</p>
+    </li>
+    
+  </ul>
+</section>
+
+  </main>
+
+  
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <span class="brand-mark">A</span>
+          <span>AnyCMS SSG</span>
+        </a>
+        <p>用 Rust 编写的插件驱动静态网站生成器。WASM 插件贯穿内容发现、Markdown 渲染、模板上下文、SEO 与资源处理的每一个阶段。</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>资源</h5>
+          <ul>
+            <li><a href="/docs/">文档</a></li>
+            <li><a href="/docs/getting-started/">快速开始</a></li>
+            <li><a href="/plugins/">插件</a></li>
+            <li><a href="/themes/">主题</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>社区</h5>
+          <ul>
+            <li><a href="https://github.com/anycms/anycms-ssg">GitHub</a></li>
+            <li><a href="/tags/">标签</a></li>
+            <li><a href="/atom.xml">Atom 订阅</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; AnyCMS · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+    </div>
+  </footer>
+
+  
+  
+</body>
+</html>

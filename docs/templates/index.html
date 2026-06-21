@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh"
+      data-theme="dark"
       >
 <head>
   <meta charset="utf-8">
@@ -10,13 +11,17 @@
       try {
         var t = localStorage.getItem("theme");
         if (t !== "light" && t !== "dark") {
+          // No saved choice: honor the server-rendered data-theme on <html>.
+          t = document.documentElement.getAttribute("data-theme");
+        }
+        if (t !== "light" && t !== "dark") {
           t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
         }
         document.documentElement.setAttribute("data-theme", t);
       } catch (e) {}
     })();
   </script>
-  <title>模板 · AnyCMS SSG 文档</title>
+  <title>模板 · AnyCMS 文档</title>
   <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
   <link rel="stylesheet" href="/main.css">
   <link rel="stylesheet" href="/highlight.css">
@@ -124,6 +129,20 @@
       
       <li><a href="/docs/deployment/">部署</a></li>
       
+      <li><a href="/docs/check/">链接检查器</a></li>
+      
+      <li><a href="/docs/devtools/">开发调试面板</a></li>
+      
+      <li><a href="/docs/search/">搜索索引</a></li>
+      
+      <li><a href="/docs/official-plugins/">官方插件指南</a></li>
+      
+      <li><a href="/docs/builtin-functions/">模板内置函数与过滤器</a></li>
+      
+      <li><a href="/docs/image-processing/">图像处理管线</a></li>
+      
+      <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
+      
     </ul>
   </aside>
 
@@ -169,12 +188,38 @@
 <table><thead><tr><th>函数</th><th>说明</th></tr></thead><tbody>
 <tr><th><code>get_page(url)</code></th><th>按 URL 查询任意页面，返回 page view 或空</th></tr>
 <tr><th><code>get_section(url)</code></th><th>按 URL 查询任意 section，含 <code>.pages</code> 列表</th></tr>
+<tr><th><code>now(format?)</code></th><th>当前 UTC 时间字符串。无参返回 RFC3339；传参用 <code>time</code> crate 格式描述语言（非 strftime）</th></tr>
+<tr><th><code>get_url(path, hash=true?)</code></th><th>工程相对路径的输出 URL；<code>hash=true</code> 追加 <code>?v=&lt;短哈希&gt;</code> 做缓存击穿（默认 <code>false</code>）</th></tr>
+<tr><th><code>get_hash(path)</code></th><th>文件 SHA-256 的前 10 位十六进制（文件不可读返回空串）</th></tr>
+<tr><th><code>trans(key, lang?)</code></th><th>从 <code>config.params.translations</code> 查翻译，缺失回退到 <code>key</code> 本身</th></tr>
+<tr><th><code>get_taxonomy(kind, lang?)</code></th><th>序列化指定分类法（如 <code>tags</code>）；未声明返回 <code>undefined</code></th></tr>
+<tr><th><code>get_image_metadata(path)</code></th><th>返回 <code>{ width, height, format }</code>；文件缺失 / 无法解码返回 <code>undefined</code></th></tr>
 </tbody></table>
 <p>这两个全局函数让模板能在服务端做跨 section 的内容聚合（如文档侧边栏、相关页面），无需客户端脚本。本站的文档侧边栏就是用 <code>get_section("/docs/")</code> 自动生成的。</p>
-<h2 id="heading-4">导航菜单</h2>
+<p>函数示例：</p>
+<pre><code>{{ now("[year]-[month]-[day]") }}              {# 2026-06-20（time crate 格式语言，非 strftime） #}
+&lt;link rel="stylesheet" href="{{ get_url("/static/app.css", hash=true) | safe }}"&gt;
+{{ trans("greeting") }}                        {# 缺失时回退到 "greeting" 本身 #}
+{{ get_image_metadata("/static/cover.png").width }}
+</code></pre>
+<h2 id="heading-4">模板过滤器</h2>
+<p>除插件贡献的 dispatcher 外，host 还注册了一批第一方过滤器（不加载插件也始终可用）：</p>
+<table><thead><tr><th>过滤器</th><th>说明</th></tr></thead><tbody>
+<tr><th><code>base64_encode</code> / <code>base64_decode</code></th><th>标准 base64（带 padding）编解码；非法输入解码为空串，不会 panic</th></tr>
+<tr><th><code>regex_replace(pattern, replacement)</code></th><th>正则替换所有匹配</th></tr>
+<tr><th><code>markdown</code></th><th>将 Markdown 字符串渲染为 HTML（无 summary/TOC）；输出需 `</th></tr>
+</tbody></table>
+<pre><code>{{ content | base64_encode }}
+{{ s | regex_replace("\\d+", "N") }}           {# 所有数字替换为 N #}
+{{ "**bold**" | markdown | safe }}             {# 渲染为 &lt;strong&gt;bold&lt;/strong&gt; #}
+</code></pre>
+<blockquote>
+<p>约定：缺失 / 无法解析的输入返回输入本身或 <code>undefined</code> / 空串，绝不中断构建。</p>
+</blockquote>
+<h2 id="heading-5">导航菜单</h2>
 <p><code>config.menu</code> 是一个「语言代码 → 菜单项数组」的映射。渲染当前语言的菜单，缺失时回退到默认语言：</p>
-<pre><code>{% set ml = current_lang | default(value=config.default_language) %}
-{% set items = config.menu[ml] | default(value=config.menu[config.default_language]) %}
+<pre><code>{% set ml = current_lang | default(config.default_language) %}
+{% set items = config.menu[ml] | default(config.menu[config.default_language]) %}
 {% for item in items %}
   &lt;a href="{{ item.url | safe }}"&gt;{{ item.label }}&lt;/a&gt;
 {% endfor %}
@@ -183,7 +228,7 @@
 
     </div>
     <div class="doc-meta">
-      <span>用 <strong>AnyCMS SSG</strong> 构建</span>
+      <span>用 <strong>AnyCMS</strong> 构建</span>
       <a href="https://github.com/anycms/anycms-ssg">在 GitHub 上编辑 ↗</a>
     </div>
   </article>
@@ -222,7 +267,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; AnyCMS SSG · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+      &copy; AnyCMS · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
     </div>
   </footer>
 

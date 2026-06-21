@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh"
+      data-theme="dark"
       >
 <head>
   <meta charset="utf-8">
@@ -10,13 +11,17 @@
       try {
         var t = localStorage.getItem("theme");
         if (t !== "light" && t !== "dark") {
+          // No saved choice: honor the server-rendered data-theme on <html>.
+          t = document.documentElement.getAttribute("data-theme");
+        }
+        if (t !== "light" && t !== "dark") {
           t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
         }
         document.documentElement.setAttribute("data-theme", t);
       } catch (e) {}
     })();
   </script>
-  <title>tags · AnyCMS SSG</title>
+  <title>tags · AnyCMS</title>
   <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
   <link rel="stylesheet" href="/main.css">
   <link rel="stylesheet" href="/highlight.css">
@@ -99,6 +104,140 @@
 <section class="listing">
   <ul class="term-list">
     
+    <li><a href="/tags/assets/">assets</a> <span class="count">2</span></li>
+    
+    <li><a href="/tags/avif/">avif</a> <span class="count">2</span></li>
+    
+    <li><a href="/tags/check/">check</a> <span class="count">2</span></li>
+    
+    <li><a href="/tags/ci/">ci</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/cli/">cli</a> <span class="count">3</span></li>
+    
+    <li><a href="/tags/comparison/">comparison</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/config/">config</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/content/">content</a> <span class="count">2</span></li>
+    
+    <li><a href="/tags/contribute/">contribute</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/debugging/">debugging</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/deploy/">deploy</a> <span class="count">2</span></li>
+    
+    <li><a href="/tags/design/">design</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/development/">development</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/devtools/">devtools</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/distribution/">distribution</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/exif/">exif</a> <span class="count">2</span></li>
+    
+    <li><a href="/tags/extism/">extism</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/feed/">feed</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/filesystem/">filesystem</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/filters/">filters</a> <span class="count">2</span></li>
+    
+    <li><a href="/tags/frontmatter/">frontmatter</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/functions/">functions</a> <span class="count">2</span></li>
+    
+    <li><a href="/tags/fundamentals/">fundamentals</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/fuse/">fuse</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/getting-started/">getting-started</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/git/">git</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/github-pages/">github-pages</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/hooks/">hooks</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/i18n/">i18n</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/image/">image</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/images/">images</a> <span class="count">2</span></li>
+    
+    <li><a href="/tags/indexing/">indexing</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/install/">install</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/internal-links/">internal-links</a> <span class="count">2</span></li>
+    
+    <li><a href="/tags/jinja2/">jinja2</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/kdl/">kdl</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/languages/">languages</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/links/">links</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/localization/">localization</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/markdown/">markdown</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/minijinja/">minijinja</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/multilingual/">multilingual</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/overlay/">overlay</a> <span class="count">2</span></li>
+    
+    <li><a href="/tags/overview/">overview</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/packages/">packages</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/permalinks/">permalinks</a> <span class="count">2</span></li>
+    
+    <li><a href="/tags/plugins/">plugins</a> <span class="count">3</span></li>
+    
+    <li><a href="/tags/project/">project</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/publishing/">publishing</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/quickstart/">quickstart</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/reference/">reference</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/registry/">registry</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/responsive/">responsive</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/sass/">sass</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/search/">search</a> <span class="count">3</span></li>
+    
+    <li><a href="/tags/seo/">seo</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/sitemap/">sitemap</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/ssg/">ssg</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/ssh-rsync/">ssh-rsync</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/structure/">structure</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/templates/">templates</a> <span class="count">2</span></li>
+    
+    <li><a href="/tags/themes/">themes</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/typescript/">typescript</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/ui/">ui</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/urls/">urls</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/validation/">validation</a> <span class="count">1</span></li>
+    
+    <li><a href="/tags/wasm/">wasm</a> <span class="count">1</span></li>
+    
   </ul>
 </section>
 
@@ -135,7 +274,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; AnyCMS SSG · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+      &copy; AnyCMS · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
     </div>
   </footer>
 

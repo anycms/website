@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh"
+      data-theme="dark"
+      >
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("theme");
+        if (t !== "light" && t !== "dark") {
+          // No saved choice: honor the server-rendered data-theme on <html>.
+          t = document.documentElement.getAttribute("data-theme");
+        }
+        if (t !== "light" && t !== "dark") {
+          t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+  <title>链接检查器 · AnyCMS 文档</title>
+  <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
+  <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/highlight.css">
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3YQ0W814W"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Y3YQ0W814W');
+  </script>
+  <script src="/main.js" defer></script>
+  <style>
+    :root{
+      --accent: #2563eb;
+    }
+  </style>
+  
+  
+  <link rel="alternate" hreflang="zh" href="https://anycms.org/docs/check/">
+  
+  
+  
+  
+  
+  
+</head>
+<body>
+  
+  <header class="site-header">
+    <div class="site-header-inner wrap">
+      <a class="brand" href="/">
+        <span class="brand-mark">A</span>
+        <span>AnyCMS SSG</span>
+      </a>
+      <div class="site-header-right">
+        <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true">
+        <nav class="site-nav">
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <a href="/" class="active">首页</a>
+        
+        
+        
+        <a href="/docs/" class="active">文档</a>
+        
+        
+        
+        <a href="/plugins/">插件</a>
+        
+        
+        
+        <a href="/themes/">主题</a>
+        
+        <a class="nav-cta" href="https://github.com/anycms/anycms-ssg">GitHub</a>
+      </nav>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="切换主题">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <label for="nav-toggle" class="nav-burger" aria-label="切换菜单" role="button">
+        <span></span><span></span><span></span>
+      </label>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+<div class="docs">
+  
+  <aside class="docs-sidebar">
+    <h5>文档</h5>
+    <ul>
+      
+      
+      <li><a href="/docs/introduction/">介绍</a></li>
+      
+      <li><a href="/docs/getting-started/">快速开始</a></li>
+      
+      <li><a href="/docs/site-structure/">站点结构</a></li>
+      
+      <li><a href="/docs/configuration/">配置（site.kdl）</a></li>
+      
+      <li><a href="/docs/content/">内容模型</a></li>
+      
+      <li><a href="/docs/templates/">模板</a></li>
+      
+      <li><a href="/docs/assets/">资源管线</a></li>
+      
+      <li><a href="/docs/themes/">主题</a></li>
+      
+      <li><a href="/docs/plugins/">插件系统</a></li>
+      
+      <li><a href="/docs/i18n/">多语言</a></li>
+      
+      <li><a href="/docs/registry/">分发：静态注册中心</a></li>
+      
+      <li><a href="/docs/deployment/">部署</a></li>
+      
+      <li><a href="/docs/check/" class="active">链接检查器</a></li>
+      
+      <li><a href="/docs/devtools/">开发调试面板</a></li>
+      
+      <li><a href="/docs/search/">搜索索引</a></li>
+      
+      <li><a href="/docs/official-plugins/">官方插件指南</a></li>
+      
+      <li><a href="/docs/builtin-functions/">模板内置函数与过滤器</a></li>
+      
+      <li><a href="/docs/image-processing/">图像处理管线</a></li>
+      
+      <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
+      
+    </ul>
+  </aside>
+
+  <article class="docs-body prose">
+    <h1>链接检查器</h1>
+    <p class="muted" style="margin-top:-0.5rem;font-size:1.1rem;">anycms check 校验内部链接、锚点与可选外链，CI 友好</p>
+    <div class="post-body">
+      <p><code>anycms check</code> 在不写出任何输出的前提下校验内容与链接，<strong>错误返回非零退出码、警告不会</strong>——非常适合挂进 CI 流水线。</p>
+<pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> check <span class="keyword control regexp set begin shell">[</span>-<span class="keyword operator word shell">-</span>root ROOT<span class="keyword control regexp set end shell">]</span> <span class="keyword control regexp set begin shell">[</span>-<span class="keyword operator word shell">-</span>skip<span class="keyword operator word shell">-</span>external<span class="keyword operator word shell">-</span>links<span class="keyword control regexp set end shell">]</span></span>
+</span></code></pre>
+<h2 id="heading">校验范围</h2>
+<p>按以下顺序逐项校验：</p>
+<h3 id="heading-2">内部链接</h3>
+<p>识别两种写法：</p>
+<ul>
+<li>标准 Markdown 链接：<code>[文本](./path.md)</code> / <code>[文本](/blog/hello/)</code></li>
+<li>裸 HTML 链接：<code>&lt;a href="/blog/hello/"&gt;</code></li>
+</ul>
+<p>链接形式都支持：</p>
+<ul>
+<li>相对链接：<code>./foo.md</code>、<code>../bar.md</code>、<code>baz.md</code></li>
+<li>根相对链接：<code>/blog/hello/</code></li>
+</ul>
+<p>全部解析到构建出的 URL 索引。悬空链接（指向不存在的页面）报为错误。</p>
+<p>不在检查范围的 scheme：<code>mailto:</code>、<code>tel:</code>、<code>ftp:</code>、<code>data:</code> 等非 <code>http(s)</code> 协议被跳过；<strong>围栏代码块</strong>中的链接也被忽略。</p>
+<h3 id="fragment">锚点 <code>#fragment</code></h3>
+<p>链接中带 <code>#fragment</code> 时，该 fragment 必须指向目标页<strong>真实存在的标题 id</strong>。标题 id 由渲染器 slugify + 去重生成，与渲染端一致——你写 <code>[用法](/docs/#usage)</code>，就要求目标页确实有 <code>## 用法</code> 这个标题。</p>
+<h3 id="heading-3">外链（可选，默认关）</h3>
+<p>仅当 <code>site.kdl</code> 中显式开启时才校验外部 <code>http(s)</code> 链接：</p>
+<pre><code>check {
+    external_links #true      // 默认 #false
+}
+</code></pre>
+<p>开启后用 <code>reqwest</code> 做 <code>HEAD</code> → <code>GET</code> 回退校验，<code>2xx</code> / <code>3xx</code> 视为可达，有界并发（8）与 10s 超时。</p>
+<p>CLI 标志 <code>--skip-external-links</code> 可以<strong>强制关闭</strong>外链检查——即便配置里开了也跳过，用于离线或受限网络环境下的快速校验：</p>
+<pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> check<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>skip-external-links</span></span>
+</span></code></pre>
+<h2 id="heading-4">与内部链接语法配合</h2>
+<p><code>@/</code> 内容互链语法（见 <a href="./content/#%E5%86%85%E5%AE%B9%E4%BA%92%E9%93%BE">内容模型 · 内容互链</a>）解析后同样进入 URL 索引，若指向的源文件不存在，<code>check</code> 会报告悬空链。</p>
+<h2 id="ci">典型 CI 用法</h2>
+<pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> build</span> <span class="keyword operator logical and shell">&amp;&amp;</span> <span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> check</span> <span class="keyword operator logical and shell">&amp;&amp;</span> <span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> deploy</span>
+</span></code></pre>
+<p><code>check</code> 失败（非零退出）会中断流水线，保证带坏链的站点不会被发布。</p>
+
+    </div>
+    <div class="doc-meta">
+      <span>用 <strong>AnyCMS</strong> 构建</span>
+      <a href="https://github.com/anycms/anycms-ssg">在 GitHub 上编辑 ↗</a>
+    </div>
+  </article>
+</div>
+
+  </main>
+
+  
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <span class="brand-mark">A</span>
+          <span>AnyCMS SSG</span>
+        </a>
+        <p>用 Rust 编写的插件驱动静态网站生成器。WASM 插件贯穿内容发现、Markdown 渲染、模板上下文、SEO 与资源处理的每一个阶段。</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>资源</h5>
+          <ul>
+            <li><a href="/docs/">文档</a></li>
+            <li><a href="/docs/getting-started/">快速开始</a></li>
+            <li><a href="/plugins/">插件</a></li>
+            <li><a href="/themes/">主题</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>社区</h5>
+          <ul>
+            <li><a href="https://github.com/anycms/anycms-ssg">GitHub</a></li>
+            <li><a href="/tags/">标签</a></li>
+            <li><a href="/atom.xml">Atom 订阅</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; AnyCMS · 用 AnyCMS SSG 构建 · <a href="https://github.com/anycms/anycms-ssg">源代码</a>
+    </div>
+  </footer>
+
+  
+  
+</body>
+</html>
