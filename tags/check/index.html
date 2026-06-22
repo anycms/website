@@ -80,8 +80,20 @@
         
         <a href="/themes/">主题</a>
         
+        
+        
+        <a href="/authors/">作者</a>
+        
+        
+        
+        <a href="/archive/">归档</a>
+        
         <a class="nav-cta" href="https://github.com/anycms/anycms-ssg">GitHub</a>
       </nav>
+      <div class="site-search">
+        <input id="site-search" type="search" placeholder="搜索文档…" autocomplete="off" aria-label="搜索">
+        <ul id="search-results" class="search-results" role="listbox" hidden></ul>
+      </div>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="切换主题">
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
         <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -154,6 +166,57 @@
     </div>
   </footer>
 
+  
+  <script>
+  (function () {
+    var box = document.getElementById('site-search');
+    var out = document.getElementById('search-results');
+    if (!box || !out) return;
+    var cache = null;
+    function load(fn) {
+      if (cache) return fn(cache);
+      fetch('/search.json').then(function (r) { return r.json(); }).then(function (d) {
+        cache = d || []; fn(cache);
+      }).catch(function () { cache = []; fn([]); });
+    }
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+      });
+    }
+    function render(q, docs) {
+      if (!q) { out.hidden = true; return; }
+      var ql = q.toLowerCase(), hits = [];
+      for (var i = 0; i < docs.length && hits.length < 8; i++) {
+        var d = docs[i];
+        var hay = ((d.title || '') + ' ' + (d.body || '') + ' ' + (d.excerpt || '')).toLowerCase();
+        if (hay.indexOf(ql) !== -1) hits.push(d);
+      }
+      out.innerHTML = '';
+      if (!hits.length) {
+        out.innerHTML = '<li class="search-empty">无匹配结果</li>';
+      } else {
+        hits.forEach(function (d) {
+          var li = document.createElement('li');
+          li.innerHTML = '<a href="' + esc(d.url) + '"><span class="search-title">' + esc(d.title) + '</span>' +
+            (d.excerpt ? '<span class="search-excerpt">' + esc(d.excerpt) + '</span>' : '') + '</a>';
+          out.appendChild(li);
+        });
+      }
+      out.hidden = false;
+    }
+    box.addEventListener('input', function () {
+      if (!box.value) { out.hidden = true; return; }
+      load(function (d) { render(box.value, d); });
+    });
+    document.addEventListener('click', function (e) {
+      if (!box.contains(e.target) && !out.contains(e.target)) out.hidden = true;
+    });
+    box.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { out.hidden = true; box.blur(); }
+    });
+  })();
+  </script>
   
   
 </body>

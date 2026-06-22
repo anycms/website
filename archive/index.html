@@ -21,7 +21,7 @@
       } catch (e) {}
     })();
   </script>
-  <title>开发调试面板 · AnyCMS 文档</title>
+  <title>归档 · AnyCMS</title>
   <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
   <link rel="stylesheet" href="/main.css">
   <link rel="stylesheet" href="/highlight.css">
@@ -39,9 +39,6 @@
       --accent: #2563eb;
     }
   </style>
-  
-  
-  <link rel="alternate" hreflang="zh" href="https://anycms.org/docs/devtools/">
   
   
   
@@ -73,7 +70,7 @@
         
         
         
-        <a href="/docs/" class="active">文档</a>
+        <a href="/docs/">文档</a>
         
         
         
@@ -110,96 +107,120 @@
 
   <main>
     
-<div class="docs">
+<header class="page-head">
+  <div class="page-head-inner">
+    <span class="eyebrow">Archive</span>
+    <h1>归档</h1>
+  </div>
+</header>
+<section class="listing">
   
-  <aside class="docs-sidebar">
-    <h5>文档</h5>
-    <ul>
-      
-      
-      <li><a href="/docs/introduction/">介绍</a></li>
-      
-      <li><a href="/docs/getting-started/">快速开始</a></li>
-      
-      <li><a href="/docs/site-structure/">站点结构</a></li>
-      
-      <li><a href="/docs/configuration/">配置（site.kdl）</a></li>
-      
-      <li><a href="/docs/content/">内容模型</a></li>
-      
-      <li><a href="/docs/templates/">模板</a></li>
-      
-      <li><a href="/docs/assets/">资源管线</a></li>
-      
-      <li><a href="/docs/themes/">主题</a></li>
-      
-      <li><a href="/docs/plugins/">插件系统</a></li>
-      
-      <li><a href="/docs/i18n/">多语言</a></li>
-      
-      <li><a href="/docs/registry/">分发：静态注册中心</a></li>
-      
-      <li><a href="/docs/deployment/">部署</a></li>
-      
-      <li><a href="/docs/check/">链接检查器</a></li>
-      
-      <li><a href="/docs/devtools/" class="active">开发调试面板</a></li>
-      
-      <li><a href="/docs/search/">搜索索引</a></li>
-      
-      <li><a href="/docs/official-plugins/">官方插件指南</a></li>
-      
-      <li><a href="/docs/builtin-functions/">模板内置函数与过滤器</a></li>
-      
-      <li><a href="/docs/image-processing/">图像处理管线</a></li>
-      
-      <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
-      
-    </ul>
-  </aside>
-
-  <article class="docs-body prose">
-    <h1>开发调试面板</h1>
-    <p class="muted" style="margin-top:-0.5rem;font-size:1.1rem;">serve 自带的 DevTools 面板：切换主题、启停插件、可视化 params</p>
+  <h2 class="archive-year">2026</h2>
+  <ul class="post-list">
     
+    <li>
+      <a class="title" href="/docs/mcp/">MCP 端点（AI agent 接入）</a>
+      <span class="muted date">2026-06-22</span>
+    </li>
     
-    <p class="muted" style="margin-top:-0.3rem;font-size:0.92rem;">作者：<a href="/authors/liangdi/">Liangdi</a></p>
+    <li>
+      <a class="title" href="/docs/image-processing/">图像处理管线</a>
+      <span class="muted date">2026-06-21</span>
+    </li>
     
-    <div class="post-body">
-      <p><code>anycms serve</code> 在本地开发服务器上自动注入一个<strong>调试面板</strong>（DevTools），仅在 localhost 下生效，帮助你在写内容时快速切换配置、观察构建状态。</p>
-<h2 id="heading">打开面板</h2>
-<p>启动 serve 后，浏览器右下角会出现一个浮动按钮，点击即在 <code>/__anycms_dev</code> 打开面板（SPA 路由）。也可以直接访问：</p>
-<pre><code>http://127.0.0.1:1111/__anycms_dev/
-</code></pre>
-<h2 id="heading-2">面板能力</h2>
-<ul>
-<li><strong>切换主题（theme）</strong>：在已安装主题之间快速切换，无需改 <code>site.kdl</code> 再重启。</li>
-<li><strong>启停插件（plugin）</strong>：勾选 / 取消勾选插件，即时看到带或不带某个插件的效果（等价于 <code>anycms plugin enable/disable</code>，但无需离开浏览器）。</li>
-<li><strong>可视化 params</strong>：浏览当前合并后的 <code>config.params</code>，确认主题默认值与 site 覆盖值如何叠加。</li>
-<li><strong>构建状态与路由表</strong>：查看上次构建是否成功，以及当前的路由表（哪些 URL 被生成）。</li>
-<li><strong>show drafts toggle</strong>：临时显示 / 隐藏草稿页面，对比发布前后的差异。</li>
-</ul>
-<h2 id="heading-3">关闭面板</h2>
-<pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> serve<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>no-devtools</span></span>
-</span></code></pre>
-<p>启用后调试路由（<code>/__anycms_dev/*</code>）返回 404，页面不再注入浮动按钮——适合做最终演示或录屏。</p>
-<h2 id="heading-4">增量重建</h2>
-<p>serve 的热重载不是「全量重建」——它会根据<strong>变更类型</strong>选择重建范围：</p>
-<table><thead><tr><th>变更</th><th>重建范围</th></tr></thead><tbody>
-<tr><th>单个内容页</th><th>仅重建受影响页面（跳过未变动的页面）</th></tr>
-<tr><th>模板 / <code>site.kdl</code> / asset / 插件</th><th>自动全量重建</th></tr>
-</tbody></table>
-<p>所以改一篇文章能秒级刷新，而改模板或配置会触发整站重建。WebSocket 连接在构建完成后推送刷新指令，浏览器自动重载。</p>
-<h2 id="heading-5">安全</h2>
-<p>DevTools 仅在 localhost 下注入，<strong>不会</strong>出现在 <code>anycms build</code> 的产物中——它是开发期工具，不进入 <code>public/</code>。</p>
-
-    </div>
-    <div class="doc-meta">
-      <span>用 <strong>AnyCMS</strong> 构建</span>
-      <a href="https://github.com/anycms/anycms-ssg">在 GitHub 上编辑 ↗</a>
-    </div>
-  </article>
-</div>
+    <li>
+      <a class="title" href="/docs/search/">搜索索引</a>
+      <span class="muted date">2026-06-21</span>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/permalinks/">URL 规则与重定向</a>
+      <span class="muted date">2026-06-21</span>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/devtools/">开发调试面板</a>
+      <span class="muted date">2026-06-21</span>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/builtin-functions/">模板内置函数与过滤器</a>
+      <span class="muted date">2026-06-21</span>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/check/">链接检查器</a>
+      <span class="muted date">2026-06-21</span>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/official-plugins/">官方插件指南</a>
+      <span class="muted date">2026-06-21</span>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/introduction/">介绍</a>
+      <span class="muted date">2026-06-01</span>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/assets/">资源管线</a>
+      <span class="muted date">2026-06-01</span>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/themes/">主题</a>
+      <span class="muted date">2026-06-01</span>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/deployment/">部署</a>
+      <span class="muted date">2026-06-01</span>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/plugins/">插件系统</a>
+      <span class="muted date">2026-06-01</span>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/configuration/">配置（site.kdl）</a>
+      <span class="muted date">2026-06-01</span>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/site-structure/">站点结构</a>
+      <span class="muted date">2026-06-01</span>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/i18n/">多语言</a>
+      <span class="muted date">2026-06-01</span>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/templates/">模板</a>
+      <span class="muted date">2026-06-01</span>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/content/">内容模型</a>
+      <span class="muted date">2026-06-01</span>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/getting-started/">快速开始</a>
+      <span class="muted date">2026-06-01</span>
+    </li>
+    
+    <li>
+      <a class="title" href="/docs/registry/">分发：静态注册中心</a>
+      <span class="muted date">2026-06-01</span>
+    </li>
+    
+  </ul>
+  
+</section>
 
   </main>
 

@@ -83,8 +83,20 @@
         
         <a href="/themes/">主题</a>
         
+        
+        
+        <a href="/authors/">作者</a>
+        
+        
+        
+        <a href="/archive/">归档</a>
+        
         <a class="nav-cta" href="https://github.com/anycms/anycms-ssg">GitHub</a>
       </nav>
+      <div class="site-search">
+        <input id="site-search" type="search" placeholder="搜索文档…" autocomplete="off" aria-label="搜索">
+        <ul id="search-results" class="search-results" role="listbox" hidden></ul>
+      </div>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="切换主题">
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
         <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -148,12 +160,17 @@
 
   <article class="docs-body prose">
     <h1>部署</h1>
-    <p class="muted" style="margin-top:-0.5rem;font-size:1.1rem;">anycms deploy 一等命令：git &#x2f; ssh-rsync 发布到任意静态托管</p>
+    <p class="muted" style="margin-top:-0.5rem;font-size:1.1rem;">anycms deploy 一等命令：git &#x2f; ssh-rsync &#x2f; s3 发布到任意静态托管</p>
+    
+    
+    <p class="muted" style="margin-top:-0.3rem;font-size:0.92rem;">作者：<a href="/authors/liangdi/">Liangdi</a></p>
+    
     <div class="post-body">
-      <p><code>anycms deploy</code> 把 <code>output_dir</code>（默认 <code>public/</code>）发布到配置好的目标。它是 anycms 的<strong>一等命令而非插件</strong>——因此可以 shell 出系统的 <code>git</code> 与 <code>rsync</code>（沙箱插件无法做到）。内置两个 provider：</p>
+      <p><code>anycms deploy</code> 把 <code>output_dir</code>（默认 <code>public/</code>）发布到配置好的目标。它是 anycms 的<strong>一等命令而非插件</strong>——因此可以 shell 出系统的 <code>git</code> 与 <code>rsync</code>，或直接链接 AWS SDK 走 S3（沙箱插件无法做到）。内置三个 provider：</p>
 <ul>
 <li><strong><code>git</code></strong>：GitHub Pages 风格的 <code>git push</code>，推送到指定仓库的分支。</li>
 <li><strong><code>ssh-rsync</code></strong>：<code>rsync -avz --delete</code> over SSH，增量同步到远程目录。</li>
+<li><strong><code>s3</code></strong>：原生镜像同步到任意 S3 兼容存储（MinIO / Cloudflare R2 / Backblaze B2 / 阿里 OSS / AWS S3），无需安装 <code>aws</code> CLI。需启用 cargo 特性 <code>--features s3</code>（默认关闭，保持构建精简）。</li>
 </ul>
 <h2 id="deploy">配置（<code>deploy {}</code>）</h2>
 <p>在 <code>site.kdl</code> 中声明一个或多个目标：</p>
@@ -168,6 +185,14 @@
         dest      "user@host:/var/www/site/"
         delete    #true              // 默认对齐 rsync --delete
     }
+    target "cdn" {
+        provider  "s3"               // 需 cargo build --features s3
+        endpoint  "https://s3.minio.local:9000"
+        bucket    "my-site"
+        prefix    "blog/"            // 可选，桶内子前缀
+        delete    #true              // 默认 true，镜像删除远端多余对象
+        // 凭据省略 → 走 AWS_* env / ~/.aws/credentials；或显式 key_id + secret_key
+    }
 }
 </code></pre>
 <h2 id="cli">CLI</h2>
@@ -179,7 +204,7 @@
 <ul>
 <li><code>[TARGET]</code> 指向 <code>deploy {}</code> 中声明的某个 target 名称；不传时取默认目标。</li>
 <li><code>--build</code> 在发布前自动跑一次 <code>anycms build</code>。</li>
-<li><code>--dry-run</code> 打印底层 <code>git</code> / <code>rsync</code> 命令，便于在 CI 调试，不执行真实推送。</li>
+<li><code>--dry-run</code> 打印底层 <code>git</code> / <code>rsync</code> 命令（<code>s3</code> 则列出将上传/将删除的对象，需联网 list），便于在 CI 调试，不执行真实推送。</li>
 </ul>
 <h2 id="base-url">base_url</h2>
 <p>部署前确认 <code>site.kdl</code> 的 <code>base_url</code> 指向最终域名——它影响绝对链接、feeds 与 sitemap 中的 URL。</p>
@@ -191,7 +216,7 @@
 <table><thead><tr><th>平台</th><th>做法</th></tr></thead><tbody>
 <tr><th>Netlify / Vercel</th><th>构建命令 <code>anycms build</code>，发布目录 <code>public</code></th></tr>
 <tr><th>Cloudflare Pages</th><th>同上，构建命令指向 <code>anycms build</code></th></tr>
-<tr><th>S3 + CloudFront</th><th><code>aws s3 sync public/ s3://&lt;bucket&gt; --delete</code></th></tr>
+<tr><th>S3 + CloudFront</th><th>用内置 <code>s3</code> provider（见上方，需 <code>--features s3</code>）；或手动 <code>aws s3 sync public/ s3://&lt;bucket&gt; --delete</code></th></tr>
 </tbody></table>
 <h2 id="ci">CI 建议</h2>
 <p>在 CI 中运行质量门后再部署：</p>
@@ -248,6 +273,57 @@
     </div>
   </footer>
 
+  
+  <script>
+  (function () {
+    var box = document.getElementById('site-search');
+    var out = document.getElementById('search-results');
+    if (!box || !out) return;
+    var cache = null;
+    function load(fn) {
+      if (cache) return fn(cache);
+      fetch('/search.json').then(function (r) { return r.json(); }).then(function (d) {
+        cache = d || []; fn(cache);
+      }).catch(function () { cache = []; fn([]); });
+    }
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+      });
+    }
+    function render(q, docs) {
+      if (!q) { out.hidden = true; return; }
+      var ql = q.toLowerCase(), hits = [];
+      for (var i = 0; i < docs.length && hits.length < 8; i++) {
+        var d = docs[i];
+        var hay = ((d.title || '') + ' ' + (d.body || '') + ' ' + (d.excerpt || '')).toLowerCase();
+        if (hay.indexOf(ql) !== -1) hits.push(d);
+      }
+      out.innerHTML = '';
+      if (!hits.length) {
+        out.innerHTML = '<li class="search-empty">无匹配结果</li>';
+      } else {
+        hits.forEach(function (d) {
+          var li = document.createElement('li');
+          li.innerHTML = '<a href="' + esc(d.url) + '"><span class="search-title">' + esc(d.title) + '</span>' +
+            (d.excerpt ? '<span class="search-excerpt">' + esc(d.excerpt) + '</span>' : '') + '</a>';
+          out.appendChild(li);
+        });
+      }
+      out.hidden = false;
+    }
+    box.addEventListener('input', function () {
+      if (!box.value) { out.hidden = true; return; }
+      load(function (d) { render(box.value, d); });
+    });
+    document.addEventListener('click', function (e) {
+      if (!box.contains(e.target) && !out.contains(e.target)) out.hidden = true;
+    });
+    box.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { out.hidden = true; box.blur(); }
+    });
+  })();
+  </script>
   
   
 </body>

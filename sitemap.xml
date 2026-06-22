@@ -4,51 +4,57 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
 
-  <url><loc>https://anycms.org/docs/builtin-functions/</loc><lastmod>2026-06-21</lastmod></url>
+  <url><loc>https://anycms.org/docs/introduction/</loc><lastmod>2026-06-01</lastmod></url>
 
-  <url><loc>https://anycms.org/docs/</loc></url>
+  <url><loc>https://anycms.org/plugins/</loc><lastmod>2026-06-01</lastmod></url>
 
-  <url><loc>https://anycms.org/docs/getting-started/</loc><lastmod>2026-06-01</lastmod></url>
+  <url><loc>https://anycms.org/docs/image-processing/</loc><lastmod>2026-06-21</lastmod></url>
 
-  <url><loc>https://anycms.org/</loc></url>
+  <url><loc>https://anycms.org/docs/search/</loc><lastmod>2026-06-21</lastmod></url>
+
+  <url><loc>https://anycms.org/docs/assets/</loc><lastmod>2026-06-01</lastmod></url>
+
+  <url><loc>https://anycms.org/docs/themes/</loc><lastmod>2026-06-01</lastmod></url>
+
+  <url><loc>https://anycms.org/docs/permalinks/</loc><lastmod>2026-06-21</lastmod></url>
+
+  <url><loc>https://anycms.org/docs/deployment/</loc><lastmod>2026-06-01</lastmod></url>
+
+  <url><loc>https://anycms.org/docs/plugins/</loc><lastmod>2026-06-01</lastmod></url>
+
+  <url><loc>https://anycms.org/authors/</loc></url>
+
+  <url><loc>https://anycms.org/docs/configuration/</loc><lastmod>2026-06-01</lastmod></url>
 
   <url><loc>https://anycms.org/docs/devtools/</loc><lastmod>2026-06-21</lastmod></url>
 
-  <url><loc>https://anycms.org/docs/i18n/</loc><lastmod>2026-06-01</lastmod></url>
+  <url><loc>https://anycms.org/docs/builtin-functions/</loc><lastmod>2026-06-21</lastmod></url>
 
-  <url><loc>https://anycms.org/docs/introduction/</loc><lastmod>2026-06-01</lastmod></url>
+  <url><loc>https://anycms.org/docs/site-structure/</loc><lastmod>2026-06-01</lastmod></url>
 
   <url><loc>https://anycms.org/docs/check/</loc><lastmod>2026-06-21</lastmod></url>
 
-  <url><loc>https://anycms.org/plugins/</loc><lastmod>2026-06-01</lastmod></url>
+  <url><loc>https://anycms.org/docs/i18n/</loc><lastmod>2026-06-01</lastmod></url>
 
   <url><loc>https://anycms.org/docs/templates/</loc><lastmod>2026-06-01</lastmod></url>
 
   <url><loc>https://anycms.org/docs/content/</loc><lastmod>2026-06-01</lastmod></url>
 
-  <url><loc>https://anycms.org/docs/permalinks/</loc><lastmod>2026-06-21</lastmod></url>
+  <url><loc>https://anycms.org/docs/mcp/</loc><lastmod>2026-06-22</lastmod></url>
 
-  <url><loc>https://anycms.org/docs/image-processing/</loc><lastmod>2026-06-21</lastmod></url>
+  <url><loc>https://anycms.org/docs/getting-started/</loc><lastmod>2026-06-01</lastmod></url>
 
-  <url><loc>https://anycms.org/themes/</loc><lastmod>2026-06-01</lastmod></url>
-
-  <url><loc>https://anycms.org/docs/search/</loc><lastmod>2026-06-21</lastmod></url>
+  <url><loc>https://anycms.org/docs/</loc></url>
 
   <url><loc>https://anycms.org/docs/official-plugins/</loc><lastmod>2026-06-21</lastmod></url>
 
+  <url><loc>https://anycms.org/themes/</loc><lastmod>2026-06-01</lastmod></url>
+
+  <url><loc>https://anycms.org/</loc></url>
+
+  <url><loc>https://anycms.org/authors/liangdi/</loc></url>
+
   <url><loc>https://anycms.org/docs/registry/</loc><lastmod>2026-06-01</lastmod></url>
-
-  <url><loc>https://anycms.org/docs/assets/</loc><lastmod>2026-06-01</lastmod></url>
-
-  <url><loc>https://anycms.org/docs/site-structure/</loc><lastmod>2026-06-01</lastmod></url>
-
-  <url><loc>https://anycms.org/docs/deployment/</loc><lastmod>2026-06-01</lastmod></url>
-
-  <url><loc>https://anycms.org/docs/configuration/</loc><lastmod>2026-06-01</lastmod></url>
-
-  <url><loc>https://anycms.org/docs/themes/</loc><lastmod>2026-06-01</lastmod></url>
-
-  <url><loc>https://anycms.org/docs/plugins/</loc><lastmod>2026-06-01</lastmod></url>
 
   <url><loc>https://anycms.org/tags/</loc></url>
 
@@ -158,6 +164,8 @@
 
   <url><loc>https://anycms.org/tags/responsive/</loc></url>
 
+  <url><loc>https://anycms.org/tags/s3/</loc></url>
+
   <url><loc>https://anycms.org/tags/sass/</loc></url>
 
   <url><loc>https://anycms.org/tags/search/</loc></url>
@@ -185,5 +193,7 @@
   <url><loc>https://anycms.org/tags/validation/</loc></url>
 
   <url><loc>https://anycms.org/tags/wasm/</loc></url>
+
+  <url><loc>https://anycms.org/archive/</loc></url>
 
 </urlset>

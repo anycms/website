@@ -1,82 +1,10 @@
 [
   {
-    "url": "/docs/builtin-functions/",
-    "title": "模板内置函数与过滤器",
-    "body": "除插件贡献的 dispatcher 外，host 在模板环境上注册了一批第一方全局函数与过滤器（对标 Zola 的 Tera）。不加载任何插件也始终可用。 约定：缺失 / 无法解析的输入返回输入本身或 undefined / 空串，绝不中断构建。 全局函数 now(format?) 当前 UTC 时间字符串。 无参：返回 RFC3339，如 2026-06-21T13:45:00Z 传参：使用 time crate 的格式描述语言（不是 strftime），如 now(\"[year]-[month]-[day]\") {{ now() }} {# 2026-06-21T13:45:00Z #} {{ now(\"[year]-[month]-[day]\") }} {# 2026-06-21 #} get_url(path, hash=true?) 工程相对路径（如 /static/app.css）的输出 URL。hash=true 时追加 ?v=<短哈希> 做缓存击穿（默认 false）。返回的 URL 在 href / src 中需 | safe。 <link rel=\"stylesheet\" href=\"{{ get_url(\"/static/app.css\", hash=true) | safe }}\"> get_hash(path) 文件 SHA-256 的前 10 位十六进制。文件不可读时返回空串（不报错）。 {{ get_hash(\"/static/app.css\") }} {# a1b2c3d4e5 #} trans(key, lang?) 从 config.params.translations 查翻译，缺失时回退到 key 本身（Zola 行为）。lang 缺省取 default_language。 {{ trans(\"greeting\") }} {# 缺失时输出 \"greeting\" 本身 #} {{ trans(\"greeting\", \"fr\") }} get_taxonomy(kind, lang?) 序列化指定分类法（如 tags）。未声明该分类法时返回 undefined。lang 目前接受但不过滤。 {% set tags = get_taxonomy(\"tags\") %} {% for term in tags.terms %}{{ term.name }} {% endfor %} get_image_metadata(path) 返回 { width, height, format }。文件缺失 / 无法解码时返回 undefined。 {% set img = get_image_metadata(\"/static/cover.png\") %} {% if img %}{{ img.width }}x{{ img.height }}{% endif %} get_page(url) / get_section(url) 按 URL 查询任意页面 / section，返回 page view 或空。get_section 额外含 .pages 列表。用于跨 section 聚合（如文档侧边栏、相关页面），无需客户端脚本。 {% set docs = get_section(\"/docs/\") %} {% for p in docs.pages %}<a href=\"{{ p.url | safe }}\">{{ p.title }}</a>{% endfor %} 本站文档侧边栏就是用 get_section(\"/docs/\") 自动生成的。 过滤器 base64_encode / base64_decode 标准 base64（带 padding）编解码。非法输入解码为空串，不会 panic。 {{ \"hello\" | base64_encode }} {# aGVsbG8= #} {{ \"aGVsbG8=\" | base64_decode }} {# hello #} {{ \"!!!not-base64!!!\" | base64_decode }} {# 空串，不报错 #} regex_replace(pattern, replacement) 正则替换所有匹配。 {{ \"abc123def456\" | regex_replace(\"\\\\d+\", \"N\") }} {# abcNdefN #} markdown 将 Markdown 字符串渲染为 HTML（无 summary / TOC）。输出是原始 HTML，需链 | safe 才不被转义。 {{ \"**bold** and [link](/x/)\" | markdown | safe }} {# <strong>bold</strong> and <a href=\"/x/\">link</a> #} | safe 约定 MiniJinja 会把生成的 URL 中的 / 转义成 &#x2f;。因此所有 get_url / page.url / term.permalink 等 URL 在 href / src 中必须标 | safe，否则浏览器会请求到带转义字符的坏地址。 {# 正确 #} <a href=\"{{ page.url | safe }}\"> <link href=\"{{ get_url(\"/static/app.css\") | safe }}\"> {# 错误 —— 会变成 &#x2f; #} <a href=\"{{ page.url }}\">",
-    "lang": "zh",
-    "excerpt": "host 注册的全局函数与过滤器完整参考",
-    "fields": {},
-    "boost": 1.0
-  },
-  {
-    "url": "/docs/getting-started/",
-    "title": "快速开始",
-    "body": "前置要求 Rust 1.85+（edition 2024，stable 工具链） 编写插件还需添加 wasm 编译目标：rustup target add wasm32-unknown-unknown 安装 git clone <repo-url> anycms-ssg cd anycms-ssg cargo install --path . # 安装 `anycms` 二进制到 ~/.cargo/bin 也可直接用 cargo run -- 代替已安装的 anycms。 三步生成你的第一个站点 anycms init my-site # 生成站点骨架（site.kdl + content + templates + sass + ts） cd my-site anycms build # → public/（渲染 Markdown、编译 Sass、转译 TS、压缩 HTML） anycms serve # → http://127.0.0.1:1111 实时热重载 编辑 content/ 下的 Markdown，保存后浏览器自动刷新。 使用主题 anycms init my-site cd my-site anycms theme install ../themes/ink # 安装内置主题到 ./themes/ink # 在 site.kdl 中设置 theme \"ink\"，并删除 site 自带的 templates/ 和 sass/ 让主题生效： rm -rf templates sass anycms build && anycms serve overlay 优先级：site 的 templates/*.html 与 sass/main.scss 会覆盖主题同名文件。 全新 init 会同时生成这两者，要让已安装主题接管布局与样式，需先删除它们。详见主题。 安装一个插件 # 从内置示例构建并安装一个插件 cd examples/plugins/reading-time anycms plugin build --install ../../sites/demo-ink --release # 构建站点，插件自动加载 anycms build --root ../../sites/demo-ink 下一步 了解站点结构 配置你的 site.kdl 编写你的第一个插件",
-    "lang": "zh",
-    "excerpt": "三步生成你的第一个 AnyCMS SSG 站点",
-    "fields": {},
-    "boost": 1.0
-  },
-  {
-    "url": "/docs/devtools/",
-    "title": "开发调试面板",
-    "body": "anycms serve 在本地开发服务器上自动注入一个调试面板（DevTools），仅在 localhost 下生效，帮助你在写内容时快速切换配置、观察构建状态。 打开面板 启动 serve 后，浏览器右下角会出现一个浮动按钮，点击即在 /__anycms_dev 打开面板（SPA 路由）。也可以直接访问： http://127.0.0.1:1111/__anycms_dev/ 面板能力 切换主题（theme）：在已安装主题之间快速切换，无需改 site.kdl 再重启。 启停插件（plugin）：勾选 / 取消勾选插件，即时看到带或不带某个插件的效果（等价于 anycms plugin enable/disable，但无需离开浏览器）。 可视化 params：浏览当前合并后的 config.params，确认主题默认值与 site 覆盖值如何叠加。 构建状态与路由表：查看上次构建是否成功，以及当前的路由表（哪些 URL 被生成）。 show drafts toggle：临时显示 / 隐藏草稿页面，对比发布前后的差异。 关闭面板 anycms serve --no-devtools 启用后调试路由（/__anycms_dev/*）返回 404，页面不再注入浮动按钮——适合做最终演示或录屏。 增量重建 serve 的热重载不是「全量重建」——它会根据变更类型选择重建范围： 变更重建范围 单个内容页仅重建受影响页面（跳过未变动的页面） 模板 / site.kdl / asset / 插件自动全量重建 所以改一篇文章能秒级刷新，而改模板或配置会触发整站重建。WebSocket 连接在构建完成后推送刷新指令，浏览器自动重载。 安全 DevTools 仅在 localhost 下注入，不会出现在 anycms build 的产物中——它是开发期工具，不进入 public/。",
-    "lang": "zh",
-    "excerpt": "serve 自带的 DevTools 面板：切换主题、启停插件、可视化 params",
-    "fields": {},
-    "boost": 1.0
-  },
-  {
-    "url": "/docs/i18n/",
-    "title": "多语言",
-    "body": "AnyCMS SSG 的多语言指内容多语言（不包含工具自身 UI 的系统本地化）。采用文件名后缀组织（Zola 模式，最少侵入）。 文件名约定 hello-world.md（默认语言）+ hello-world.fr.md（法语）： content/ ├── hello-world.md # 默认语言（en） └── hello-world.fr.md # 法语翻译 翻译自动关联，生成 per-language URL、hreflang 互链、per-language feeds / sitemap。 声明支持的语言 在 site.kdl 中声明额外支持的语言： default_language \"en\" languages { language code=\"fr\" language code=\"zh\" } 默认语言无需在 languages 中重复声明。 per-language 菜单 menu {} 块支持按语言覆盖。默认语言的裸 item 节点之外，用 lang \"<code>\" {} 子块提供翻译： menu { item \"Home\" url=\"/\" item \"Docs\" url=\"/docs/\" weight=10 lang \"fr\" { item \"Accueil\" url=\"/fr/\" item \"Docs\" url=\"/fr/docs/\" weight=10 } } 自动生成的产物 per-language URL 前缀（如 /fr/...） 页面间的 <link rel=\"alternate\" hreflang> 互链 per-language 的 rss.xml / atom.xml / sitemap.xml 演示站点 demo-ink 就是中英双语，可以参考它的 content/ 与 site.kdl。",
-    "lang": "zh",
-    "excerpt": "内容多语言：文件名后缀组织、per-language URL 与 hreflang",
-    "fields": {},
-    "boost": 1.0
-  },
-  {
     "url": "/docs/introduction/",
     "title": "介绍",
     "body": "AnyCMS SSG 是 anycms 生态中的静态站点生成器（Static Site Generator），用 Rust 编写。 输入：Markdown + KDL 配置 + 主题；输出：可直接部署的静态 HTML 站点。 它解决了什么 与 Hugo / Zola 等「常规 SSG」相比，AnyCMS SSG 的根本差异在于： WASM 插件扩展机制 + 插件 / 主题市场。 插件在这里不是附加功能，而是贯穿整个构建管线的主轴——内容发现、Markdown 渲染、模板上下文、SEO、sitemap、feed、资源处理，每一个阶段都可以被插件 hook。 技术栈 模板引擎：MiniJinja（Jinja2 的 Rust 实现） Markdown：pulldown-cmark（GFM 扩展） 样式：grass（纯 Rust Sass 编译 + 压缩） HTML 压缩：minify-html TypeScript：oxc（纯 Rust 转译 + minify，无外部依赖） 代码高亮：syntect（Sublime 语法，class-based） 配置：站点 / 主题用 KDL，front matter 兼容 TOML / YAML 插件运行时：extism wasm 沙箱（host SDK + PDK） 开发服务器：axum + notify + WebSocket 实时热重载 适用场景 个人博客、技术文档、作品集 需要在构建期对内容做程序化加工的站点（阅读时长、聚合页、外部数据拉取、SEO 增强……） 希望用代码而非配置扩展 SSG 能力的开发者 准备好之后，前往快速开始生成你的第一个站点。",
     "lang": "zh",
     "excerpt": "AnyCMS SSG 是什么，以及它和 Hugo / Zola 的根本差异",
-    "fields": {},
-    "boost": 1.0
-  },
-  {
-    "url": "/docs/check/",
-    "title": "链接检查器",
-    "body": "anycms check 在不写出任何输出的前提下校验内容与链接，错误返回非零退出码、警告不会——非常适合挂进 CI 流水线。 anycms check [--root ROOT] [--skip-external-links] 校验范围 按以下顺序逐项校验： 内部链接 识别两种写法： 标准 Markdown 链接：[文本](./path.md) / [文本](/blog/hello/) 裸 HTML 链接：<a href=\"/blog/hello/\"> 链接形式都支持： 相对链接：./foo.md、../bar.md、baz.md 根相对链接：/blog/hello/ 全部解析到构建出的 URL 索引。悬空链接（指向不存在的页面）报为错误。 不在检查范围的 scheme：mailto:、tel:、ftp:、data: 等非 http(s) 协议被跳过；围栏代码块中的链接也被忽略。 锚点 #fragment 链接中带 #fragment 时，该 fragment 必须指向目标页真实存在的标题 id。标题 id 由渲染器 slugify + 去重生成，与渲染端一致——你写 [用法](/docs/#usage)，就要求目标页确实有 ## 用法 这个标题。 外链（可选，默认关） 仅当 site.kdl 中显式开启时才校验外部 http(s) 链接： check { external_links #true // 默认 #false } 开启后用 reqwest 做 HEAD → GET 回退校验，2xx / 3xx 视为可达，有界并发（8）与 10s 超时。 CLI 标志 --skip-external-links 可以强制关闭外链检查——即便配置里开了也跳过，用于离线或受限网络环境下的快速校验： anycms check --skip-external-links 与内部链接语法配合 @/ 内容互链语法（见 内容模型 · 内容互链）解析后同样进入 URL 索引，若指向的源文件不存在，check 会报告悬空链。 典型 CI 用法 anycms build && anycms check && anycms deploy check 失败（非零退出）会中断流水线，保证带坏链的站点不会被发布。",
-    "lang": "zh",
-    "excerpt": "anycms check 校验内部链接、锚点与可选外链，CI 友好",
-    "fields": {},
-    "boost": 1.0
-  },
-  {
-    "url": "/docs/templates/",
-    "title": "模板",
-    "body": "模板引擎是 MiniJinja（Jinja2 语法）。 {{ … }} 输出 {% … %} 控制流 {% extends %} / {% block %} 继承 overlay 解析（三级回退） 模板按 site → theme → 内置技术模板 的顺序解析。内置的 sitemap / rss / robots 模板可以被 site 或主题的同名文件覆盖。 契约变量 base.html 必须用 | safe 渲染三个接缝变量——插件注入和 SEO 才有落点： <head> {{ seo_head | safe }} {# SEO meta/canonical/OG/JSON-LD，由 host 生成 #} {{ head_inject | safe }} {# 插件 on_head_inject 注入的 <head> 标签 #} </head> <body> {{ body_inject | safe }} {# 插件 on_body_inject，在 </body> 之前 #} </body> ⚠️ MiniJinja 会把生成 URL 中的 / 转义成 &#x2f;，因此所有生成的链接在 href / src 中须标记 | safe。 可用变量 页面模板（page.html）上下文： 变量说明 page.title / page.content标题与渲染后的 HTML page.date / page.description元数据 page.url / page.langURL 与语言 page.summary / page.toc摘要与目录 page.translations其它语言翻译（[{lang, url}]） page.older / page.newer前后页 page.taxonomies分类法赋值 Section 模板（section.html）额外有 section.title、section.content、section.pages、section.translations。 全局变量：config（站点配置）、current_lang、taxonomy、term。 模板全局函数 函数说明 get_page(url)按 URL 查询任意页面，返回 page view 或空 get_section(url)按 URL 查询任意 section，含 .pages 列表 now(format?)当前 UTC 时间字符串。无参返回 RFC3339；传参用 time crate 格式描述语言（非 strftime） get_url(path, hash=true?)工程相对路径的输出 URL；hash=true 追加 ?v=<短哈希> 做缓存击穿（默认 false） get_hash(path)文件 SHA-256 的前 10 位十六进制（文件不可读返回空串） trans(key, lang?)从 config.params.translations 查翻译，缺失回退到 key 本身 get_taxonomy(kind, lang?)序列化指定分类法（如 tags）；未声明返回 undefined get_image_metadata(path)返回 { width, height, format }；文件缺失 / 无法解码返回 undefined 这两个全局函数让模板能在服务端做跨 section 的内容聚合（如文档侧边栏、相关页面），无需客户端脚本。本站的文档侧边栏就是用 get_section(\"/docs/\") 自动生成的。 函数示例： {{ now(\"[year]-[month]-[day]\") }} {# 2026-06-20（time crate 格式语言，非 strftime） #} <link rel=\"stylesheet\" href=\"{{ get_url(\"/static/app.css\", hash=true) | safe }}\"> {{ trans(\"greeting\") }} {# 缺失时回退到 \"greeting\" 本身 #} {{ get_image_metadata(\"/static/cover.png\").width }} 模板过滤器 除插件贡献的 dispatcher 外，host 还注册了一批第一方过滤器（不加载插件也始终可用）： 过滤器说明 base64_encode / base64_decode标准 base64（带 padding）编解码；非法输入解码为空串，不会 panic regex_replace(pattern, replacement)正则替换所有匹配 markdown将 Markdown 字符串渲染为 HTML（无 summary/TOC）；输出需 ` {{ content | base64_encode }} {{ s | regex_replace(\"\\\\d+\", \"N\") }} {# 所有数字替换为 N #} {{ \"**bold**\" | markdown | safe }} {# 渲染为 <strong>bold</strong> #} 约定：缺失 / 无法解析的输入返回输入本身或 undefined / 空串，绝不中断构建。 导航菜单 config.menu 是一个「语言代码 → 菜单项数组」的映射。渲染当前语言的菜单，缺失时回退到默认语言： {% set ml = current_lang | default(config.default_language) %} {% set items = config.menu[ml] | default(config.menu[config.default_language]) %} {% for item in items %} <a href=\"{{ item.url | safe }}\">{{ item.label }}</a> {% endfor %} 每个菜单项有 label、url、weight 三个字段。",
-    "lang": "zh",
-    "excerpt": "MiniJinja 模板语法、overlay 解析与契约变量",
-    "fields": {},
-    "boost": 1.0
-  },
-  {
-    "url": "/docs/content/",
-    "title": "内容模型",
-    "body": "Page 与 Section Page：单个 Markdown 文件，对应一个 URL。 Section：一个目录，_index.md 是该 section 的列表页。 Front matter 正文开头的元数据，支持 +++ … +++（TOML）或 --- … ---（YAML）两种格式： +++ title = \"Hello World\" date = 2025-06-01 draft = false slug = \"hello\" template = \"page.html\" tags = [\"rust\", \"ssg\"] +++ 正文内容，支持 ` ` 分割摘要。 <!-- more --> 摘要之后的内容。 排序 Section 中的页面按 weight 升序排序；weight 相同或缺失时按 date 降序。文档类内容建议显式设置 weight 控制顺序。 常用 front matter 字段 字段作用 title页面标题（必需） date发布日期，影响排序与 feeds description描述 / 摘要，用于 SEO 与列表页 drafttrue 的页面在 build 时被排除 slug自定义 URL slug weight排序权重（整数，升序） template覆盖默认模板（如 template = \"docs.html\"） taxonomies分类法赋值（如 tags = [\"rust\"]） aliases重定向别名 URL 数组（如 [\"/old/path/\"]），构建时生成跳转 expiry_date过期日期字符串（如 \"2026-12-31\"），过期页在构建时被剔除 定时发布与过期 定时（scheduled）：date 为未来日期的页面不会发布——构建时被剔除，直到日期到达。 过期：设置 expiry_date 到一个已过去的日期，该页同样在构建时被剔除。 二者与 draft 一样作用于构建过滤，适合用于预告发布与限时内容下线，无需改动正文。 # 定时发布：日期到达后自动出现 date = 2099-01-01 # 过期下线：日期过后自动消失 expiry_date = \"2026-12-31\" # 重定向别名：旧 URL 跳转到本页 aliases = [\"/old/blog/hello/\", \"/legacy/hello.html\"] 摘要与目录 摘要：用 <!-- more --> 分割，前半段作为 page.summary。 目录（TOC）：由标题自动生成，通过 page.toc 暴露给模板。 分类法页 由 taxonomies 配置自动生成。例如声明 taxonomy name=\"tags\" 后，带 tags = [\"rust\"] 的页面会出现在 /tags/rust/。 代码高亮 用围栏代码块并声明语言，输出 class-based span，配合 static/highlight.css 着色： ```rust fn main() { println!(\"Hello, AnyCMS!\"); } ``` 内容互链 Markdown 中的相对链接会被解析为站点内链接，无需手写完整路径。另外支持 @/ 前缀的内容互链语法——以工程内容根为基准指向目标页面，解析后输出目标页的最终 URL： 详见 [部署文档](@/docs/deployment.md)。 @/docs/deployment.md 会被解析为该内容文件对应的站点 URL（如 /docs/deployment/），重命名或调整 permalink 时链接自动跟随，无需手改路径。 永久链接（permalinks） 在 site.kdl 中用 permalink {} 块自定义页面 / section 的 URL 模板，支持 :year / :month / :day / :slug 等占位符： permalink { page \"/:year/:slug/\" section \"/:section/\" } 未声明 permalink 时沿用默认 URL 规则（目录 + slug）。",
-    "lang": "zh",
-    "excerpt": "Page、Section、front matter、分类法、摘要与代码高亮",
-    "fields": {},
-    "boost": 1.0
-  },
-  {
-    "url": "/docs/permalinks/",
-    "title": "URL 规则与重定向",
-    "body": "默认 URL 规则 未配置 permalink 时，URL 由「目录 + slug」构成： content/blog/hello-world.md → /blog/hello-world/ content/blog/_index.md → /blog/ slug 默认取文件名（去扩展名），可在 front matter 覆盖：slug = \"hello\"。 自定义 permalink site.kdl 的 permalink {} 块为页面 / section 定义 URL 模板，支持占位符变量： permalink { page \"/:year/:slug/\" section \"/:section/\" } 变量含义 :yearfront matter date 的年份 :month月份（两位） :day日（两位） :slug页面 slug :section所在 section 名 典型用法：博客用 /:year/:month/:slug/ 归档式 URL，文档用 /:section/:slug/。 改 permalink 后，老链接会失效——配合下面的 aliases 做重定向。 内容互链 @/ Markdown 中用 @/ 前缀做内容互链，以工程内容根为基准指向目标页面，解析后输出目标页的最终 URL（含 permalink 规则应用结果）： 详见 [部署文档](@/docs/deployment.md)。 @/docs/deployment.md 解析为该内容文件对应的站点 URL（如 /docs/deployment/）。好处： 写的是源文件路径，可读、IDE 能跳转 重命名文件或调整 permalink 时，链接自动跟随，无需手改路径 目标页不存在时，链接检查器 会报告悬空链 重定向 aliases 页面迁移或改 URL 后，老链接可能已被外链 / 收藏。front matter 的 aliases 声明重定向别名 URL： +++ title = \"Hello World\" aliases = [\"/old/blog/hello/\", \"/legacy/hello.html\"] +++ 系统已支持 aliases——构建时为每个别名生成跳转（让访问老 URL 的用户 / 爬虫到达新页面）。 与排序字段的关系 weight、date 同时影响 URL（:year / :month / :day 来自 date）和 section 内排序（weight 升序、date 降序）。详见 内容模型。",
-    "lang": "zh",
-    "excerpt": "permalink 模板、内容互链与 aliases 重定向",
     "fields": {},
     "boost": 1.0
   },
@@ -99,56 +27,11 @@
     "boost": 1.0
   },
   {
-    "url": "/docs/official-plugins/",
-    "title": "官方插件指南",
-    "body": "plugins/ 下提供 5 个开箱即用的官方插件（crate 名 anycms-plugin-*，author AnyCMS），覆盖最常见的「增强」场景。它们只增强 host 已有的内置 provider，不替换渲染管线——卸载后站点仍能正常构建，只是少了那部分增强。 每个插件的 config {} 默认值都能在 site.kdl 的 plugins {} 块中覆盖。 seo-suite 作用：配置驱动的 SEO 增强。 hook：on_seo 能力：OpenGraph / Twitter card / canonical / description 回退 / 去重 JSON-LD（WebSite、Organization、BreadcrumbList、Article）。 典型场景：想让分享到社交平台的链接带预览卡片、被搜索引擎正确收录。 配置要点：在 site.kdl 声明站点级 OG/Twitter 默认值，页面 front matter 可逐页覆盖。 sitemap-robots 作用：增强 sitemap.xml 并生成伴随的 robots.txt。 hook：on_sitemap 能力：按 URL 深度设 changefreq / priority、可选过滤 draft / noindex 页面、lastmod 回填。 典型场景：想给爬虫更精确的更新频率与优先级提示，同时自动产出 robots.txt。 search-index 作用：增强逐页搜索文档。 hook：on_search_document 能力：清洗正文 HTML、生成智能摘要与语言、设置 boost、附带分类法/日期/类型字段、应用排除规则。 典型场景：配合 搜索索引 的 fuse_* / elasticlunr_json 格式，让前端搜索结果更准（标题 boost 高、正文截断干净）。 配置要点：default_boost 调整默认权重；exclude_patterns 按 URL 前缀排除某些页面进索引。装上它即取代 host 的内置默认 enhancer。 feed-suite 作用：增强每条 RSS / Atom feed 条目。 hook：on_feed_entry 能力：补全摘要、正文、作者、分类、URL。 典型场景：feed 条目缺作者或摘要时，按 page.author → page.extra.author → 配置的 default_author 回退填齐。 配置要点：default_author 设站点默认作者。 responsive-images 作用：为 <img> 添加响应式属性。 hook：on_markdown_html 能力：按命名约定生成 srcset / sizes / loading=\"lazy\" / decoding，仅改写 HTML 标记，不重新编码图像。 典型场景：想让文章里的图片按视口自适应、懒加载。 与图像管线的关系：本插件只改 HTML 标记；真正的多分辨率变体生成由 图像处理管线 负责。两者协同：管线产出变体文件，插件把它们写进 srcset。 统一覆盖方式 plugins { plugin \"search-index\" { default_boost 2.0 exclude_patterns { pattern \"/draft/\" pattern \"/private/\" } } plugin \"feed-suite\" { default_author \"AnyCMS Team\" } }",
-    "lang": "zh",
-    "excerpt": "五个 Tier-1 官方插件的作用、hook 与典型场景",
-    "fields": {},
-    "boost": 1.0
-  },
-  {
-    "url": "/docs/registry/",
-    "title": "分发：静态注册中心",
-    "body": "插件与主题可从静态注册中心分发——一个带 index.json 索引的目录，托管在任何静态服务上（GitHub Pages、S3、本地目录）。无需动态服务器、鉴权或数据库。 维护者：构建注册中心 # 把制品放入版本化目录后重建索引 anycms-registry build /path/to/registry-root # 扫描 + 打包 theme tar.gz + 算 sha256 + 写 index.json anycms-registry serve /path/to/registry-root --port 1111 # 本地静态服务（用于测试） anycms-registry 是一个独立二进制。 用户：从注册中心安装 anycms plugin install shout --registry https://example.com/registry --root ./my-site anycms theme install ink --registry https://example.com/registry --root ./my-site --version 0.1.0 anycms plugin install shout --registry /srv/registry --root ./my-site # 本地路径也行 每个可下载制品在索引中带 sha256，下载时校验。 安装源自动判别 install 的 SOURCE 自动判别： http(s):// / git@ / ssh:// 开头 → git 仓库 否则 → 本地目录 配合 --registry → 注册中心包名 完整流程 打包 → 发布到注册中心 → 用户安装。详见 docs/publishing.md 与 docs/registry.md。",
-    "lang": "zh",
-    "excerpt": "从一个带 index.json 的静态目录分发插件与主题",
-    "fields": {},
-    "boost": 1.0
-  },
-  {
     "url": "/docs/assets/",
     "title": "资源管线",
     "body": "构建时，AnyCMS SSG 自动处理以下资源： 输入处理输出 sass/main.scssgrass 编译 + 压缩public/main.css ts/main.ts / *.tsxoxc 转译 + minify（不做类型检查 / bundle）public/*.js 文章内 <img>响应式增强（官方插件 responsive-images：srcset/sizes/lazy/decoding，仅改写 HTML）增强后的 public/**/*.html 图像资源图像处理管线（EXIF 方向 + 输出格式，见下文）转码 / 矫正后的图像 HTML 输出minify-html 压缩压缩后的 public/**/*.html static/**原样拷贝public/** Sass sass/main.scss 是入口。主题的 sass/ 会被加入 Sass include path，因此可以直接 @use 主题的 partial。Sass 输出经过压缩。 @use \"tokens\"; body { background: var(--bg); color: var(--fg); } 主题的 static/ 与 site 的 static/ 做 overlay 合并（site 胜出）。 TypeScript / TSX ts/ 下的 .ts / .tsx 由 oxc 转译为 JS 并 minify。特点： 纯 Rust 实现，无外部依赖、无 Node.js 仅转译，不做 bundle，也不做类型检查 适合写少量交互脚本，而非完整前端应用 HTML 压缩 所有渲染出的 HTML 都会经过 minify-html 压缩（去注释、折叠空白、缩短布尔属性等）。 图像处理管线 site.kdl 中的 image {} 块控制图像处理管线（默认 enabled #false，需显式开启）。它处理两件事：EXIF 方向自动矫正、输出格式转换。 image { enabled #true // 默认 false widths \"640,1024,1920\" // 默认 [640, 1024, 1920] quality 80 // 默认 80（JPEG/WebP/AVIF） auto_orient #true // 默认 true — 读 EXIF Orientation(1–8) 在缩放前旋转 format \"auto\" // 默认 auto；可选 jpeg/png/webp/avif（大小写不敏感） } EXIF 自动方向矫正（auto_orient，默认 true）：读 EXIF Orientation 标签（1–8），在尺寸计算与变体生成前旋转成正立朝向，避免手机照片侧躺 / 倒置。EXIF 读取失败时回退到不旋转（orientation 1）并打印警告，不中断构建。 输出格式（format，默认 auto）：auto 保留源格式；也可统一转码为 jpeg / png / webp / avif。 AVIF 输出：选择 avif 需启用 cargo 特性 cargo build --features avif（默认关闭，保持默认构建精简）。编码器为纯 Rust 的 ravif（经 image crate 的 avif 特性引入），无需 C 工具链，可在任意平台编译。注意：仅支持 AVIF 编码，不支持 AVIF 解码（解码需 C 工具链的 dav1d，故有意排除）。启用后 release 二进制体积约增加 ~1.05 MB。 响应式图像 官方插件 responsive-images（见插件）按命名约定为文章内的 <img> 添加 srcset / sizes / loading=\"lazy\" / decoding=\"async\"。它只改写 HTML 标记、不重新编码图像，与上面的图像处理管线互补。 设计参数 主题通过 params 声明可调设计令牌，site 在 params {} 中覆盖，模板内联注入的 :root CSS 变量会覆盖主题默认值。本站就是用这种方式让 --accent / --accent-2 可在 site.kdl 里调整： params { accent \"#4f46e5\" accent_secondary \"#7c3aed\" }",
     "lang": "zh",
     "excerpt": "Sass 编译、TypeScript 转译、HTML 压缩与静态资源拷贝",
-    "fields": {},
-    "boost": 1.0
-  },
-  {
-    "url": "/docs/site-structure/",
-    "title": "站点结构",
-    "body": "一个 anycms 站点的标准目录布局： my-site/ ├── site.kdl # 站点配置（KDL） ├── content/ # Markdown 内容 │ ├── _index.md # 首页内容 │ ├── _index.fr.md # 首页法语翻译 │ └── blog/ │ ├── _index.md # blog section 列表页 │ └── hello-world.md ├── templates/ # MiniJinja 模板（覆盖主题同名模板） │ ├── base.html │ ├── index.html │ └── page.html ├── sass/ # Sass 源（编译为 public/main.css） │ └── main.scss ├── ts/ # TypeScript 源（转译为 public/main.js） │ └── main.ts ├── static/ # 原样拷贝到 public/ ├── themes/ # 已安装主题（overlay 来源） │ └── ink/ ├── plugins/ # 已安装插件（<name>.wasm + <name>.kdl） │ └── reading-time.{wasm,kdl} └── public/ # 构建输出（生成物，勿提交） 关键目录 目录 / 文件作用 site.kdl站点配置，唯一必需的入口文件（至少要有 title） content/所有 Markdown 内容，目录结构映射为 URL templates/MiniJinja 模板，overlay 优先级最高 sass/main.scss 会被编译为 public/main.css ts/TypeScript 会被转译 + minify 为 public/*.js static/原样拷贝到输出目录 themes/通过 theme install 安装的主题 plugins/通过 plugin install 安装的插件 public/构建产物，应当加入 .gitignore overlay 三级回退 模板与静态资源按 site → theme → 内置 的顺序回退： site 的 templates/*.html、sass/main.scss、static/** 优先级最高； 其次是已启用的主题； 最后是 host 的内置技术模板（sitemap / rss / robots，可被覆盖）。 本官方网站就是完全自包含的站点：它自带 templates/ 与 sass/，不依赖任何主题——这同样是一种合法的用法。 最小化站点 一个最小可构建的站点只需要： my-site/ ├── site.kdl # title \"Hello\" └── content/ └── _index.md # # Hello world 其余目录都是可选的。",
-    "lang": "zh",
-    "excerpt": "一个 anycms 站点的标准目录布局",
-    "fields": {},
-    "boost": 1.0
-  },
-  {
-    "url": "/docs/deployment/",
-    "title": "部署",
-    "body": "anycms deploy 把 output_dir（默认 public/）发布到配置好的目标。它是 anycms 的一等命令而非插件——因此可以 shell 出系统的 git 与 rsync（沙箱插件无法做到）。内置两个 provider： git：GitHub Pages 风格的 git push，推送到指定仓库的分支。 ssh-rsync：rsync -avz --delete over SSH，增量同步到远程目录。 配置（deploy {}） 在 site.kdl 中声明一个或多个目标： deploy { target \"gh-pages\" { provider \"git\" repo \"git@github.com:user/user.github.io.git\" branch \"gh-pages\" } target \"prod\" { provider \"ssh-rsync\" dest \"user@host:/var/www/site/\" delete #true // 默认对齐 rsync --delete } } CLI anycms build anycms deploy gh-pages # 发布指定目标 anycms deploy --build # 先 build 再发布 anycms deploy --dry-run # 仅打印将执行的命令，不产生副作用 [TARGET] 指向 deploy {} 中声明的某个 target 名称；不传时取默认目标。 --build 在发布前自动跑一次 anycms build。 --dry-run 打印底层 git / rsync 命令，便于在 CI 调试，不执行真实推送。 base_url 部署前确认 site.kdl 的 base_url 指向最终域名——它影响绝对链接、feeds 与 sitemap 中的 URL。 部署到子路径（如 https://user.github.io/repo/）时，需要相应调整 base_url 与资源路径策略。 其他托管平台 anycms deploy 覆盖最常见的 git push 与 rsync 场景；其余平台仍可用通用方式部署： 平台做法 Netlify / Vercel构建命令 anycms build，发布目录 public Cloudflare Pages同上，构建命令指向 anycms build S3 + CloudFrontaws s3 sync public/ s3://<bucket> --delete CI 建议 在 CI 中运行质量门后再部署： cargo fmt --all -- --check cargo clippy --workspace --all-targets -- -D warnings cargo build --workspace --all-targets anycms build # 站点构建本身也应零错误退出 anycms deploy --build # CI 里建议用 --build 确保产物新鲜 设置 ANYCMS_PLUGIN_STRICT=1 可让任何插件 hook 错误中止构建，避免静默发布坏页面。",
-    "lang": "zh",
-    "excerpt": "anycms deploy 一等命令：git / ssh-rsync 发布到任意静态托管",
-    "fields": {},
-    "boost": 1.0
-  },
-  {
-    "url": "/docs/configuration/",
-    "title": "配置（site.kdl）",
-    "body": "站点与主题配置使用 KDL。anycms init 生成的最小配置： title \"My AnyCMS Site\" base_url \"https://example.com\" default_language \"en\" output_dir \"public\" taxonomies { taxonomy name=\"tags\" } languages { language code=\"fr\" } theme \"ink\" // 启用主题 overlay（可选） // 插件级配置覆盖：覆盖各插件 manifest 中的 config {} 默认值（site 胜出） plugins { plugin \"reading-time\" { wpm 250 } } 字段说明 字段说明 title / base_url站点标题与基准 URL（用于绝对链接、feeds、sitemap） default_language默认语言代码 output_dir构建输出目录（默认 public） theme启用的主题名（对应 themes/<name>/） taxonomies自定义分类法（tags / categories …） languages额外支持的语言代码 params自由参数表，主题默认值会被合并进来，模板中通过 config.params.<key> 读取 plugins各插件的配置覆盖（递归合并，site 覆盖 manifest 默认值） menu声明式、按语言组织的导航菜单 image图像处理管线（EXIF 方向矫正、输出格式；见下文） check链接检查选项（external_links，默认关闭） search搜索索引格式与字段裁剪（json / fuse_json / fuse_javascript / elasticlunr_json） deploy部署目标声明（见部署） 声明式导航菜单 用 menu {} 块声明导航，模板中通过 config.menu 读取。裸 item 节点构成默认语言菜单，lang \"<code>\" {} 子块提供按语言的覆盖： menu { item \"Home\" url=\"/\" item \"Docs\" url=\"/docs/\" weight=10 item \"GitHub\" url=\"https://github.com/anycms/anycms-ssg\" weight=90 lang \"fr\" { item \"Accueil\" url=\"/fr/\" item \"Docs\" url=\"/fr/docs/\" weight=10 } } 菜单按 weight 升序排序；绝对 URL（http(s)://）视为外链。 KDL 注释是 //，不是 #——# 在 KDL 里是布尔字面量前缀，写成注释会导致解析失败。 图像处理管线（image {}） 控制构建时的图像处理管线（默认 enabled #false，需显式开启）： image { enabled #true // 默认 false widths \"640,1024,1920\" // 默认 [640, 1024, 1920] quality 80 // 默认 80（JPEG/WebP/AVIF） auto_orient #true // 默认 true — 读 EXIF Orientation(1–8) 在缩放前旋转 format \"auto\" // 默认 auto；可选 jpeg/png/webp/avif（大小写不敏感） } EXIF 自动方向矫正（auto_orient，默认 true）：读 EXIF Orientation 标签（1–8），在尺寸计算与变体生成前旋转成正立朝向，避免手机照片侧躺 / 倒置。EXIF 读取失败时回退到不旋转并打印警告，不中断构建。 输出格式（format，默认 auto）：auto 保留源格式；也可统一转码为 jpeg / png / webp / avif。 AVIF 输出：选择 avif 需启用 cargo 特性 cargo build --features avif（默认关闭）。编码器是纯 Rust 的 ravif，无需 C 工具链。注意仅支持 AVIF 编码、不支持解码。 链接检查（check {}） anycms check 命令的链接检查选项。默认关闭外链 HTTP 校验，开启后用 HEAD→GET 回退校验（8 并发、10s 超时）： check { external_links #true // 默认 false — 启用外链 HTTP 校验 } CLI 标志 --skip-external-links 可强制关闭外链检查（即便配置里开了）。详见 CLI check。 搜索索引（search {}） 控制内置搜索索引（DefaultSearch provider）的输出格式与字段裁剪。缺省该块时使用默认值（json 格式、含 title + content）。插件可通过 on_search_index 整站聚合 hook 接管索引输出。 search { format \"fuse_json\" // 默认 json；可选 fuse_json / fuse_javascript / elasticlunr_json include_title #true // 默认 true include_content #true // 默认 true include_description #false // 默认 false include_date #false // 默认 false include_path #false // 默认 false truncate_content_length 1000 // 可选；正文字符截断长度 } json 输出单一 search.json（语言无关）；fuse_json / fuse_javascript / elasticlunr_json 按语言分文件 search_index.<lang>.json / .js（fuse_javascript 包裹为 window.searchIndex = …，便于 <script> 直接引入）。 elasticlunr_json 需 cargo build --features elasticlunr（默认关闭）；未启用时选择该格式返回明确错误而非静默生成坏索引。 部署（deploy {}） 声明一个或多个部署目标，供 anycms deploy 发布。内置两个 provider：git（GitHub Pages 风格 git push）与 ssh-rsync（rsync -avz --delete over SSH）。详见部署。 deploy { target \"gh-pages\" { provider \"git\" repo \"git@github.com:user/user.github.io.git\" branch \"gh-pages\" } target \"prod\" { provider \"ssh-rsync\" dest \"user@host:/var/www/site/\" delete #true } }",
-    "lang": "zh",
-    "excerpt": "站点与主题配置使用 KDL，字段说明与示例",
     "fields": {},
     "boost": 1.0
   },
@@ -162,11 +45,146 @@
     "boost": 1.0
   },
   {
+    "url": "/docs/permalinks/",
+    "title": "URL 规则与重定向",
+    "body": "默认 URL 规则 未配置 permalink 时，URL 由「目录 + slug」构成： content/blog/hello-world.md → /blog/hello-world/ content/blog/_index.md → /blog/ slug 默认取文件名（去扩展名），可在 front matter 覆盖：slug = \"hello\"。 自定义 permalink site.kdl 的 permalink {} 块为页面 / section 定义 URL 模板，支持占位符变量： permalink { page \"/:year/:slug/\" section \"/:section/\" } 变量含义 :yearfront matter date 的年份 :month月份（两位） :day日（两位） :slug页面 slug :section所在 section 名 典型用法：博客用 /:year/:month/:slug/ 归档式 URL，文档用 /:section/:slug/。 改 permalink 后，老链接会失效——配合下面的 aliases 做重定向。 内容互链 @/ Markdown 中用 @/ 前缀做内容互链，以工程内容根为基准指向目标页面，解析后输出目标页的最终 URL（含 permalink 规则应用结果）： 详见 [部署文档](@/docs/deployment.md)。 @/docs/deployment.md 解析为该内容文件对应的站点 URL（如 /docs/deployment/）。好处： 写的是源文件路径，可读、IDE 能跳转 重命名文件或调整 permalink 时，链接自动跟随，无需手改路径 目标页不存在时，链接检查器 会报告悬空链 重定向 aliases 页面迁移或改 URL 后，老链接可能已被外链 / 收藏。front matter 的 aliases 声明重定向别名 URL： +++ title = \"Hello World\" aliases = [\"/old/blog/hello/\", \"/legacy/hello.html\"] +++ 系统已支持 aliases——构建时为每个别名生成跳转（让访问老 URL 的用户 / 爬虫到达新页面）。 与排序字段的关系 weight、date 同时影响 URL（:year / :month / :day 来自 date）和 section 内排序（weight 升序、date 降序）。详见 内容模型。",
+    "lang": "zh",
+    "excerpt": "permalink 模板、内容互链与 aliases 重定向",
+    "fields": {},
+    "boost": 1.0
+  },
+  {
+    "url": "/docs/deployment/",
+    "title": "部署",
+    "body": "anycms deploy 把 output_dir（默认 public/）发布到配置好的目标。它是 anycms 的一等命令而非插件——因此可以 shell 出系统的 git 与 rsync，或直接链接 AWS SDK 走 S3（沙箱插件无法做到）。内置三个 provider： git：GitHub Pages 风格的 git push，推送到指定仓库的分支。 ssh-rsync：rsync -avz --delete over SSH，增量同步到远程目录。 s3：原生镜像同步到任意 S3 兼容存储（MinIO / Cloudflare R2 / Backblaze B2 / 阿里 OSS / AWS S3），无需安装 aws CLI。需启用 cargo 特性 --features s3（默认关闭，保持构建精简）。 配置（deploy {}） 在 site.kdl 中声明一个或多个目标： deploy { target \"gh-pages\" { provider \"git\" repo \"git@github.com:user/user.github.io.git\" branch \"gh-pages\" } target \"prod\" { provider \"ssh-rsync\" dest \"user@host:/var/www/site/\" delete #true // 默认对齐 rsync --delete } target \"cdn\" { provider \"s3\" // 需 cargo build --features s3 endpoint \"https://s3.minio.local:9000\" bucket \"my-site\" prefix \"blog/\" // 可选，桶内子前缀 delete #true // 默认 true，镜像删除远端多余对象 // 凭据省略 → 走 AWS_* env / ~/.aws/credentials；或显式 key_id + secret_key } } CLI anycms build anycms deploy gh-pages # 发布指定目标 anycms deploy --build # 先 build 再发布 anycms deploy --dry-run # 仅打印将执行的命令，不产生副作用 [TARGET] 指向 deploy {} 中声明的某个 target 名称；不传时取默认目标。 --build 在发布前自动跑一次 anycms build。 --dry-run 打印底层 git / rsync 命令（s3 则列出将上传/将删除的对象，需联网 list），便于在 CI 调试，不执行真实推送。 base_url 部署前确认 site.kdl 的 base_url 指向最终域名——它影响绝对链接、feeds 与 sitemap 中的 URL。 部署到子路径（如 https://user.github.io/repo/）时，需要相应调整 base_url 与资源路径策略。 其他托管平台 anycms deploy 覆盖最常见的 git push 与 rsync 场景；其余平台仍可用通用方式部署： 平台做法 Netlify / Vercel构建命令 anycms build，发布目录 public Cloudflare Pages同上，构建命令指向 anycms build S3 + CloudFront用内置 s3 provider（见上方，需 --features s3）；或手动 aws s3 sync public/ s3://<bucket> --delete CI 建议 在 CI 中运行质量门后再部署： cargo fmt --all -- --check cargo clippy --workspace --all-targets -- -D warnings cargo build --workspace --all-targets anycms build # 站点构建本身也应零错误退出 anycms deploy --build # CI 里建议用 --build 确保产物新鲜 设置 ANYCMS_PLUGIN_STRICT=1 可让任何插件 hook 错误中止构建，避免静默发布坏页面。",
+    "lang": "zh",
+    "excerpt": "anycms deploy 一等命令：git / ssh-rsync / s3 发布到任意静态托管",
+    "fields": {},
+    "boost": 1.0
+  },
+  {
     "url": "/docs/plugins/",
     "title": "插件系统",
     "body": "插件是 WebAssembly 模块，构建时由 host 加载并按 priority 顺序（数字越小越先执行）调度。当前 API 契约版本为 v0.2。 两层扩展点 Layer 1 — 10 个通用管线 hook：on_build_start / on_build_end / on_config / on_content_discover / on_page_parse / on_markdown / on_markdown_html / on_template_context / on_template_output / on_asset。 Layer 2 — 8 个业务域 hook，覆盖 5 个域： SEO：on_seo Sitemap：on_sitemap Search：on_search_document（逐页增强）、on_search_index（整站聚合） Feed：on_feed_entry（逐条增强）、on_feed（整站聚合） Inject：on_head_inject · on_body_inject 贡献（contribute）：插件向模板引擎注册 filter（含多参 filter_args）/ global_function / shortcode。 写一个插件 use anycms_ssg_plugin_sdk::{plugin_fn, FnResult, TemplateContext}; /// 注入 reading_time 模板变量 #[plugin_fn] pub fn on_template_context(mut ctx: TemplateContext) -> FnResult<TemplateContext> { let words = ctx.page.content.split_whitespace().count(); let minutes = (words as f64 / 200.0).ceil() as u64; ctx.vars.insert(\"reading_time\".to_string(), minutes.into()); Ok(ctx) } Cargo.toml： [lib] crate-type = [\"cdylib\"] # 产出 .wasm [dependencies] anycms-ssg-plugin-sdk = \"0.1\" # 唯一需要引入的包 extism-pdk = \"1\" # #[plugin_fn] 宏的直接依赖 构建目标必须是 wasm32-unknown-unknown（不是 wasm32-wasip2）。 manifest（<name>.kdl） plugin { name \"reading-time\" version \"0.1.0\" api-version \"0.2\" // 当前 API 契约版本，必须为 \"0.2\" author \"Liangdi\" hooks { on-template-context priority=100 } contributes { // 可选：向模板引擎贡献 filter/function/shortcode filter \"shout\" } permissions { // 权限声明，host 每次调用强制校验 net \"https://api.example.com/**\" fs-read \"./data/**\" fs-write \"./generated/**\" } config { // 默认值，可被 site.kdl 覆盖 wpm 200 } } Host Functions（权限化） Host 函数所需权限说明 host::get_config()无当前 SiteConfig 视图 host::get_plugin_config()无本插件合并后的配置 host::get_page(url)无内容库中的页面（Option） host::get_taxonomy(name)无指定分类法的 term 列表 host::now()无当前 unix 时间戳 host::get_state / set_state无插件私有跨 hook 键值状态 host::log(level, msg)无日志 host::http_get(url)netHTTP GET（host 精确匹配 + path 前缀） host::http_post(url, body)netHTTP POST host::read_file(path)fs-read读站点根下文件（拒绝 .. 穿越） host::write_output(path, bytes)fs-write写输出目录 未声明权限的插件只能观察 / 转换 host 交给它的数据，无法触达文件系统或网络。host 用 extism::Plugin::new 加载插件且不传递 Manifest / allowed_paths，WASI 文件系统访问完全禁用，所有 FS / 网络访问都收敛到受权限保护的 host function。 Strict 模式 设置环境变量 ANYCMS_PLUGIN_STRICT=1（任何非空非 \"0\" 值）后，任何插件的 hook 调度错误会中止整个构建（而非默认的 log + 跳过）。适用于 CI / 严格场景。 示例插件 examples/plugins/ 下有 14 个端到端可运行的示例： 示例Hook / 贡献演示 reading-timeon_template_context注入 reading_time 模板变量 site-titleon_template_context + host fn配置往返（config → wasm → 模板） uppercasifyon_markdown渲染前改写原始 Markdown 源 virtual-pageon_content_discover合成虚拟页面 state-demoon_content_discover + on_template_context插件私有跨 hook 状态 taxonomy-demoon_template_context分类法数据访问 now-demoon_template_contexthost::now() 时间戳 body-injecton_body_injectInject 域：</body> 前注入 head-assetson_head_injectInject 域：<head> 资源注入 http-post-demoon_build_start + on_template_contexthost::http_post 网络访问 config-demoon_template_contextmanifest 配置被 site.kdl 覆盖 shoutcontribute filter贡献 MiniJinja filter（`{{ x multi-filtercontribute filter（filter_args）多参 filter（`{{ s badgecontribute shortcode插件声明内联 shortcode（{{< badge >}}） 官方插件（Tier 1） plugins/ 下提供 5 个开箱即用的官方插件（crate 名 anycms-plugin-*），只增强 host 内置 provider，不替换渲染管线： 插件Hook作用 seo-suiteon_seoOpenGraph / Twitter card / canonical / description 回退 / 去重 JSON-LD sitemap-robotson_sitemap按 URL 深度设 changefreq/priority、可选 draft/noindex 过滤、生成伴随 robots.txt search-indexon_search_document清洗正文 HTML、生成智能摘要与语言、设置 boost、附带分类法/日期字段 feed-suiteon_feed_entry增强每条 feed 条目（摘要、正文、作者、分类、URL） responsive-imageson_markdown_html按命名约定为 <img> 加 srcset/sizes/lazy（仅改写 HTML 标记） 每个插件的 config {} 默认值都可在 site.kdl 的 plugins {} 块中覆盖。完整开发指南见 docs/plugins.md。",
     "lang": "zh",
     "excerpt": "WASM 插件、两层扩展点、权限化 host 函数与贡献机制",
+    "fields": {},
+    "boost": 1.0
+  },
+  {
+    "url": "/docs/configuration/",
+    "title": "配置（site.kdl）",
+    "body": "站点与主题配置使用 KDL。anycms init 生成的最小配置： title \"My AnyCMS Site\" base_url \"https://example.com\" default_language \"en\" output_dir \"public\" taxonomies { taxonomy name=\"tags\" } languages { language code=\"fr\" } theme \"ink\" // 启用主题 overlay（可选） // 插件级配置覆盖：覆盖各插件 manifest 中的 config {} 默认值（site 胜出） plugins { plugin \"reading-time\" { wpm 250 } } 字段说明 字段说明 title / base_url站点标题与基准 URL（用于绝对链接、feeds、sitemap） default_language默认语言代码 output_dir构建输出目录（默认 public） theme启用的主题名（对应 themes/<name>/） taxonomies自定义分类法（tags / categories …） languages额外支持的语言代码 params自由参数表，主题默认值会被合并进来，模板中通过 config.params.<key> 读取 plugins各插件的配置覆盖（递归合并，site 覆盖 manifest 默认值） menu声明式、按语言组织的导航菜单 image图像处理管线（EXIF 方向矫正、输出格式；见下文） check链接检查选项（external_links，默认关闭） search搜索索引格式与字段裁剪（json / fuse_json / fuse_javascript / elasticlunr_json） deploy部署目标声明（见部署） 声明式导航菜单 用 menu {} 块声明导航，模板中通过 config.menu 读取。裸 item 节点构成默认语言菜单，lang \"<code>\" {} 子块提供按语言的覆盖： menu { item \"Home\" url=\"/\" item \"Docs\" url=\"/docs/\" weight=10 item \"GitHub\" url=\"https://github.com/anycms/anycms-ssg\" weight=90 lang \"fr\" { item \"Accueil\" url=\"/fr/\" item \"Docs\" url=\"/fr/docs/\" weight=10 } } 菜单按 weight 升序排序；绝对 URL（http(s)://）视为外链。 KDL 注释是 //，不是 #——# 在 KDL 里是布尔字面量前缀，写成注释会导致解析失败。 图像处理管线（image {}） 控制构建时的图像处理管线（默认 enabled #false，需显式开启）： image { enabled #true // 默认 false widths \"640,1024,1920\" // 默认 [640, 1024, 1920] quality 80 // 默认 80（JPEG/WebP/AVIF） auto_orient #true // 默认 true — 读 EXIF Orientation(1–8) 在缩放前旋转 format \"auto\" // 默认 auto；可选 jpeg/png/webp/avif（大小写不敏感） } EXIF 自动方向矫正（auto_orient，默认 true）：读 EXIF Orientation 标签（1–8），在尺寸计算与变体生成前旋转成正立朝向，避免手机照片侧躺 / 倒置。EXIF 读取失败时回退到不旋转并打印警告，不中断构建。 输出格式（format，默认 auto）：auto 保留源格式；也可统一转码为 jpeg / png / webp / avif。 AVIF 输出：选择 avif 需启用 cargo 特性 cargo build --features avif（默认关闭）。编码器是纯 Rust 的 ravif，无需 C 工具链。注意仅支持 AVIF 编码、不支持解码。 链接检查（check {}） anycms check 命令的链接检查选项。默认关闭外链 HTTP 校验，开启后用 HEAD→GET 回退校验（8 并发、10s 超时）： check { external_links #true // 默认 false — 启用外链 HTTP 校验 } CLI 标志 --skip-external-links 可强制关闭外链检查（即便配置里开了）。详见 CLI check。 搜索索引（search {}） 控制内置搜索索引（DefaultSearch provider）的输出格式与字段裁剪。缺省该块时使用默认值（json 格式、含 title + content）。插件可通过 on_search_index 整站聚合 hook 接管索引输出。 search { format \"fuse_json\" // 默认 json；可选 fuse_json / fuse_javascript / elasticlunr_json include_title #true // 默认 true include_content #true // 默认 true include_description #false // 默认 false include_date #false // 默认 false include_path #false // 默认 false truncate_content_length 1000 // 可选；正文字符截断长度 } json 输出单一 search.json（语言无关）；fuse_json / fuse_javascript / elasticlunr_json 按语言分文件 search_index.<lang>.json / .js（fuse_javascript 包裹为 window.searchIndex = …，便于 <script> 直接引入）。 elasticlunr_json 需 cargo build --features elasticlunr（默认关闭）；未启用时选择该格式返回明确错误而非静默生成坏索引。 部署（deploy {}） 声明一个或多个部署目标，供 anycms deploy 发布。内置三个 provider：git（GitHub Pages 风格 git push）、ssh-rsync（rsync -avz --delete over SSH），以及 s3（原生镜像同步到 S3 兼容存储，需 --features s3）。详见部署。 deploy { target \"gh-pages\" { provider \"git\" repo \"git@github.com:user/user.github.io.git\" branch \"gh-pages\" } target \"prod\" { provider \"ssh-rsync\" dest \"user@host:/var/www/site/\" delete #true } }",
+    "lang": "zh",
+    "excerpt": "站点与主题配置使用 KDL，字段说明与示例",
+    "fields": {},
+    "boost": 1.0
+  },
+  {
+    "url": "/docs/devtools/",
+    "title": "开发调试面板",
+    "body": "anycms serve 在本地开发服务器上自动注入一个调试面板（DevTools），仅在 localhost 下生效，帮助你在写内容时快速切换配置、观察构建状态。 打开面板 启动 serve 后，浏览器右下角会出现一个浮动按钮，点击即在 /__anycms_dev 打开面板（SPA 路由）。也可以直接访问： http://127.0.0.1:1111/__anycms_dev/ 面板能力 切换主题（theme）：在已安装主题之间快速切换，无需改 site.kdl 再重启。 启停插件（plugin）：勾选 / 取消勾选插件，即时看到带或不带某个插件的效果（等价于 anycms plugin enable/disable，但无需离开浏览器）。 可视化 params：浏览当前合并后的 config.params，确认主题默认值与 site 覆盖值如何叠加。 构建状态与路由表：查看上次构建是否成功，以及当前的路由表（哪些 URL 被生成）。 show drafts toggle：临时显示 / 隐藏草稿页面，对比发布前后的差异。 关闭面板 anycms serve --no-devtools 启用后调试路由（/__anycms_dev/*）返回 404，页面不再注入浮动按钮——适合做最终演示或录屏。 增量重建 serve 的热重载不是「全量重建」——它会根据变更类型选择重建范围： 变更重建范围 单个内容页仅重建受影响页面（跳过未变动的页面） 模板 / site.kdl / asset / 插件自动全量重建 所以改一篇文章能秒级刷新，而改模板或配置会触发整站重建。WebSocket 连接在构建完成后推送刷新指令，浏览器自动重载。 安全 DevTools 仅在 localhost 下注入，不会出现在 anycms build 的产物中——它是开发期工具，不进入 public/。",
+    "lang": "zh",
+    "excerpt": "serve 自带的 DevTools 面板：切换主题、启停插件、可视化 params",
+    "fields": {},
+    "boost": 1.0
+  },
+  {
+    "url": "/docs/builtin-functions/",
+    "title": "模板内置函数与过滤器",
+    "body": "除插件贡献的 dispatcher 外，host 在模板环境上注册了一批第一方全局函数与过滤器（对标 Zola 的 Tera）。不加载任何插件也始终可用。 约定：缺失 / 无法解析的输入返回输入本身或 undefined / 空串，绝不中断构建。 全局函数 now(format?) 当前 UTC 时间字符串。 无参：返回 RFC3339，如 2026-06-21T13:45:00Z 传参：使用 time crate 的格式描述语言（不是 strftime），如 now(\"[year]-[month]-[day]\") {{ now() }} {# 2026-06-21T13:45:00Z #} {{ now(\"[year]-[month]-[day]\") }} {# 2026-06-21 #} get_url(path, hash=true?) 工程相对路径（如 /static/app.css）的输出 URL。hash=true 时追加 ?v=<短哈希> 做缓存击穿（默认 false）。返回的 URL 在 href / src 中需 | safe。 <link rel=\"stylesheet\" href=\"{{ get_url(\"/static/app.css\", hash=true) | safe }}\"> get_hash(path) 文件 SHA-256 的前 10 位十六进制。文件不可读时返回空串（不报错）。 {{ get_hash(\"/static/app.css\") }} {# a1b2c3d4e5 #} trans(key, lang?) 从 config.params.translations 查翻译，缺失时回退到 key 本身（Zola 行为）。lang 缺省取 default_language。 {{ trans(\"greeting\") }} {# 缺失时输出 \"greeting\" 本身 #} {{ trans(\"greeting\", \"fr\") }} get_taxonomy(kind, lang?) 序列化指定分类法（如 tags）。未声明该分类法时返回 undefined。lang 目前接受但不过滤。 {% set tags = get_taxonomy(\"tags\") %} {% for term in tags.terms %}{{ term.name }} {% endfor %} get_image_metadata(path) 返回 { width, height, format }。文件缺失 / 无法解码时返回 undefined。 {% set img = get_image_metadata(\"/static/cover.png\") %} {% if img %}{{ img.width }}x{{ img.height }}{% endif %} get_page(url) / get_section(url) 按 URL 查询任意页面 / section，返回 page view 或空。get_section 额外含 .pages 列表。用于跨 section 聚合（如文档侧边栏、相关页面），无需客户端脚本。 {% set docs = get_section(\"/docs/\") %} {% for p in docs.pages %}<a href=\"{{ p.url | safe }}\">{{ p.title }}</a>{% endfor %} 本站文档侧边栏就是用 get_section(\"/docs/\") 自动生成的。 过滤器 base64_encode / base64_decode 标准 base64（带 padding）编解码。非法输入解码为空串，不会 panic。 {{ \"hello\" | base64_encode }} {# aGVsbG8= #} {{ \"aGVsbG8=\" | base64_decode }} {# hello #} {{ \"!!!not-base64!!!\" | base64_decode }} {# 空串，不报错 #} regex_replace(pattern, replacement) 正则替换所有匹配。 {{ \"abc123def456\" | regex_replace(\"\\\\d+\", \"N\") }} {# abcNdefN #} markdown 将 Markdown 字符串渲染为 HTML（无 summary / TOC）。输出是原始 HTML，需链 | safe 才不被转义。 {{ \"**bold** and [link](/x/)\" | markdown | safe }} {# <strong>bold</strong> and <a href=\"/x/\">link</a> #} | safe 约定 MiniJinja 会把生成的 URL 中的 / 转义成 &#x2f;。因此所有 get_url / page.url / term.permalink 等 URL 在 href / src 中必须标 | safe，否则浏览器会请求到带转义字符的坏地址。 {# 正确 #} <a href=\"{{ page.url | safe }}\"> <link href=\"{{ get_url(\"/static/app.css\") | safe }}\"> {# 错误 —— 会变成 &#x2f; #} <a href=\"{{ page.url }}\">",
+    "lang": "zh",
+    "excerpt": "host 注册的全局函数与过滤器完整参考",
+    "fields": {},
+    "boost": 1.0
+  },
+  {
+    "url": "/docs/site-structure/",
+    "title": "站点结构",
+    "body": "一个 anycms 站点的标准目录布局： my-site/ ├── site.kdl # 站点配置（KDL） ├── content/ # Markdown 内容 │ ├── _index.md # 首页内容 │ ├── _index.fr.md # 首页法语翻译 │ └── blog/ │ ├── _index.md # blog section 列表页 │ └── hello-world.md ├── templates/ # MiniJinja 模板（覆盖主题同名模板） │ ├── base.html │ ├── index.html │ └── page.html ├── sass/ # Sass 源（编译为 public/main.css） │ └── main.scss ├── ts/ # TypeScript 源（转译为 public/main.js） │ └── main.ts ├── static/ # 原样拷贝到 public/ ├── themes/ # 已安装主题（overlay 来源） │ └── ink/ ├── plugins/ # 已安装插件（<name>.wasm + <name>.kdl） │ └── reading-time.{wasm,kdl} └── public/ # 构建输出（生成物，勿提交） 关键目录 目录 / 文件作用 site.kdl站点配置，唯一必需的入口文件（至少要有 title） content/所有 Markdown 内容，目录结构映射为 URL templates/MiniJinja 模板，overlay 优先级最高 sass/main.scss 会被编译为 public/main.css ts/TypeScript 会被转译 + minify 为 public/*.js static/原样拷贝到输出目录 themes/通过 theme install 安装的主题 plugins/通过 plugin install 安装的插件 public/构建产物，应当加入 .gitignore overlay 三级回退 模板与静态资源按 site → theme → 内置 的顺序回退： site 的 templates/*.html、sass/main.scss、static/** 优先级最高； 其次是已启用的主题； 最后是 host 的内置技术模板（sitemap / rss / robots，可被覆盖）。 本官方网站就是完全自包含的站点：它自带 templates/ 与 sass/，不依赖任何主题——这同样是一种合法的用法。 最小化站点 一个最小可构建的站点只需要： my-site/ ├── site.kdl # title \"Hello\" └── content/ └── _index.md # # Hello world 其余目录都是可选的。",
+    "lang": "zh",
+    "excerpt": "一个 anycms 站点的标准目录布局",
+    "fields": {},
+    "boost": 1.0
+  },
+  {
+    "url": "/docs/check/",
+    "title": "链接检查器",
+    "body": "anycms check 在不写出任何输出的前提下校验内容与链接，错误返回非零退出码、警告不会——非常适合挂进 CI 流水线。 anycms check [--root ROOT] [--skip-external-links] 校验范围 按以下顺序逐项校验： 内部链接 识别两种写法： 标准 Markdown 链接：[文本](./path.md) / [文本](/blog/hello/) 裸 HTML 链接：<a href=\"/blog/hello/\"> 链接形式都支持： 相对链接：./foo.md、../bar.md、baz.md 根相对链接：/blog/hello/ 全部解析到构建出的 URL 索引。悬空链接（指向不存在的页面）报为错误。 不在检查范围的 scheme：mailto:、tel:、ftp:、data: 等非 http(s) 协议被跳过；围栏代码块中的链接也被忽略。 锚点 #fragment 链接中带 #fragment 时，该 fragment 必须指向目标页真实存在的标题 id。标题 id 由渲染器 slugify + 去重生成，与渲染端一致——你写 [用法](/docs/#usage)，就要求目标页确实有 ## 用法 这个标题。 外链（可选，默认关） 仅当 site.kdl 中显式开启时才校验外部 http(s) 链接： check { external_links #true // 默认 #false } 开启后用 reqwest 做 HEAD → GET 回退校验，2xx / 3xx 视为可达，有界并发（8）与 10s 超时。 CLI 标志 --skip-external-links 可以强制关闭外链检查——即便配置里开了也跳过，用于离线或受限网络环境下的快速校验： anycms check --skip-external-links 与内部链接语法配合 @/ 内容互链语法（见 内容模型 · 内容互链）解析后同样进入 URL 索引，若指向的源文件不存在，check 会报告悬空链。 典型 CI 用法 anycms build && anycms check && anycms deploy check 失败（非零退出）会中断流水线，保证带坏链的站点不会被发布。",
+    "lang": "zh",
+    "excerpt": "anycms check 校验内部链接、锚点与可选外链，CI 友好",
+    "fields": {},
+    "boost": 1.0
+  },
+  {
+    "url": "/docs/i18n/",
+    "title": "多语言",
+    "body": "AnyCMS SSG 的多语言指内容多语言（不包含工具自身 UI 的系统本地化）。采用文件名后缀组织（Zola 模式，最少侵入）。 文件名约定 hello-world.md（默认语言）+ hello-world.fr.md（法语）： content/ ├── hello-world.md # 默认语言（en） └── hello-world.fr.md # 法语翻译 翻译自动关联，生成 per-language URL、hreflang 互链、per-language feeds / sitemap。 声明支持的语言 在 site.kdl 中声明额外支持的语言： default_language \"en\" languages { language code=\"fr\" language code=\"zh\" } 默认语言无需在 languages 中重复声明。 per-language 菜单 menu {} 块支持按语言覆盖。默认语言的裸 item 节点之外，用 lang \"<code>\" {} 子块提供翻译： menu { item \"Home\" url=\"/\" item \"Docs\" url=\"/docs/\" weight=10 lang \"fr\" { item \"Accueil\" url=\"/fr/\" item \"Docs\" url=\"/fr/docs/\" weight=10 } } 自动生成的产物 per-language URL 前缀（如 /fr/...） 页面间的 <link rel=\"alternate\" hreflang> 互链 per-language 的 rss.xml / atom.xml / sitemap.xml 演示站点 demo-ink 就是中英双语，可以参考它的 content/ 与 site.kdl。",
+    "lang": "zh",
+    "excerpt": "内容多语言：文件名后缀组织、per-language URL 与 hreflang",
+    "fields": {},
+    "boost": 1.0
+  },
+  {
+    "url": "/docs/templates/",
+    "title": "模板",
+    "body": "模板引擎是 MiniJinja（Jinja2 语法）。 {{ … }} 输出 {% … %} 控制流 {% extends %} / {% block %} 继承 overlay 解析（三级回退） 模板按 site → theme → 内置技术模板 的顺序解析。内置的 sitemap / rss / robots 模板可以被 site 或主题的同名文件覆盖。 契约变量 base.html 必须用 | safe 渲染三个接缝变量——插件注入和 SEO 才有落点： <head> {{ seo_head | safe }} {# SEO meta/canonical/OG/JSON-LD，由 host 生成 #} {{ head_inject | safe }} {# 插件 on_head_inject 注入的 <head> 标签 #} </head> <body> {{ body_inject | safe }} {# 插件 on_body_inject，在 </body> 之前 #} </body> ⚠️ MiniJinja 会把生成 URL 中的 / 转义成 &#x2f;，因此所有生成的链接在 href / src 中须标记 | safe。 可用变量 页面模板（page.html）上下文： 变量说明 page.title / page.content标题与渲染后的 HTML page.date / page.description元数据 page.url / page.langURL 与语言 page.summary / page.toc摘要与目录 page.translations其它语言翻译（[{lang, url}]） page.older / page.newer前后页 page.taxonomies分类法赋值 Section 模板（section.html）额外有 section.title、section.content、section.pages、section.translations。 全局变量：config（站点配置）、current_lang、taxonomy、term。 模板全局函数 函数说明 get_page(url)按 URL 查询任意页面，返回 page view 或空 get_section(url)按 URL 查询任意 section，含 .pages 列表 now(format?)当前 UTC 时间字符串。无参返回 RFC3339；传参用 time crate 格式描述语言（非 strftime） get_url(path, hash=true?)工程相对路径的输出 URL；hash=true 追加 ?v=<短哈希> 做缓存击穿（默认 false） get_hash(path)文件 SHA-256 的前 10 位十六进制（文件不可读返回空串） trans(key, lang?)从 config.params.translations 查翻译，缺失回退到 key 本身 get_taxonomy(kind, lang?)序列化指定分类法（如 tags）；未声明返回 undefined get_image_metadata(path)返回 { width, height, format }；文件缺失 / 无法解码返回 undefined 这两个全局函数让模板能在服务端做跨 section 的内容聚合（如文档侧边栏、相关页面），无需客户端脚本。本站的文档侧边栏就是用 get_section(\"/docs/\") 自动生成的。 函数示例： {{ now(\"[year]-[month]-[day]\") }} {# 2026-06-20（time crate 格式语言，非 strftime） #} <link rel=\"stylesheet\" href=\"{{ get_url(\"/static/app.css\", hash=true) | safe }}\"> {{ trans(\"greeting\") }} {# 缺失时回退到 \"greeting\" 本身 #} {{ get_image_metadata(\"/static/cover.png\").width }} 模板过滤器 除插件贡献的 dispatcher 外，host 还注册了一批第一方过滤器（不加载插件也始终可用）： 过滤器说明 base64_encode / base64_decode标准 base64（带 padding）编解码；非法输入解码为空串，不会 panic regex_replace(pattern, replacement)正则替换所有匹配 markdown将 Markdown 字符串渲染为 HTML（无 summary/TOC）；输出需 ` {{ content | base64_encode }} {{ s | regex_replace(\"\\\\d+\", \"N\") }} {# 所有数字替换为 N #} {{ \"**bold**\" | markdown | safe }} {# 渲染为 <strong>bold</strong> #} 约定：缺失 / 无法解析的输入返回输入本身或 undefined / 空串，绝不中断构建。 导航菜单 config.menu 是一个「语言代码 → 菜单项数组」的映射。渲染当前语言的菜单，缺失时回退到默认语言： {% set ml = current_lang | default(config.default_language) %} {% set items = config.menu[ml] | default(config.menu[config.default_language]) %} {% for item in items %} <a href=\"{{ item.url | safe }}\">{{ item.label }}</a> {% endfor %} 每个菜单项有 label、url、weight 三个字段。",
+    "lang": "zh",
+    "excerpt": "MiniJinja 模板语法、overlay 解析与契约变量",
+    "fields": {},
+    "boost": 1.0
+  },
+  {
+    "url": "/docs/content/",
+    "title": "内容模型",
+    "body": "Page 与 Section Page：单个 Markdown 文件，对应一个 URL。 Section：一个目录，_index.md 是该 section 的列表页。 Front matter 正文开头的元数据，支持 +++ … +++（TOML）或 --- … ---（YAML）两种格式： +++ title = \"Hello World\" date = 2025-06-01 author = \"liangdi\" draft = false slug = \"hello\" template = \"page.html\" tags = [\"rust\", \"ssg\"] +++ 正文内容，支持 ` ` 分割摘要。 <!-- more --> 摘要之后的内容。 排序 Section 中的页面按 weight 升序排序；weight 相同或缺失时按 date 降序。文档类内容建议显式设置 weight 控制顺序。 常用 front matter 字段 字段作用 title页面标题（必需） date发布日期，影响排序与 feeds description描述 / 摘要，用于 SEO 与列表页 drafttrue 的页面在 build 时被排除 slug自定义 URL slug weight排序权重（整数，升序） template覆盖默认模板（如 template = \"docs.html\"） taxonomies分类法赋值（如 tags = [\"rust\"]） aliases重定向别名 URL 数组（如 [\"/old/path/\"]），构建时生成跳转 expiry_date过期日期字符串（如 \"2026-12-31\"），过期页在构建时被剔除 定时发布与过期 定时（scheduled）：date 为未来日期的页面不会发布——构建时被剔除，直到日期到达。 过期：设置 expiry_date 到一个已过去的日期，该页同样在构建时被剔除。 二者与 draft 一样作用于构建过滤，适合用于预告发布与限时内容下线，无需改动正文。 # 定时发布：日期到达后自动出现 date = 2099-01-01 author = \"liangdi\" # 过期下线：日期过后自动消失 expiry_date = \"2026-12-31\" # 重定向别名：旧 URL 跳转到本页 aliases = [\"/old/blog/hello/\", \"/legacy/hello.html\"] 摘要与目录 摘要：用 <!-- more --> 分割，前半段作为 page.summary。 目录（TOC）：由标题自动生成，通过 page.toc 暴露给模板。 分类法页 由 taxonomies 配置自动生成。例如声明 taxonomy name=\"tags\" 后，带 tags = [\"rust\"] 的页面会出现在 /tags/rust/。 代码高亮 用围栏代码块并声明语言，输出 class-based span，配合 static/highlight.css 着色： ```rust fn main() { println!(\"Hello, AnyCMS!\"); } ``` 内容互链 Markdown 中的相对链接会被解析为站点内链接，无需手写完整路径。另外支持 @/ 前缀的内容互链语法——以工程内容根为基准指向目标页面，解析后输出目标页的最终 URL： 详见 [部署文档](@/docs/deployment.md)。 @/docs/deployment.md 会被解析为该内容文件对应的站点 URL（如 /docs/deployment/），重命名或调整 permalink 时链接自动跟随，无需手改路径。 永久链接（permalinks） 在 site.kdl 中用 permalink {} 块自定义页面 / section 的 URL 模板，支持 :year / :month / :day / :slug 等占位符： permalink { page \"/:year/:slug/\" section \"/:section/\" } 未声明 permalink 时沿用默认 URL 规则（目录 + slug）。",
+    "lang": "zh",
+    "excerpt": "Page、Section、front matter、分类法、摘要与代码高亮",
+    "fields": {},
+    "boost": 1.0
+  },
+  {
+    "url": "/docs/mcp/",
+    "title": "MCP 端点（AI agent 接入）",
+    "body": "anycms admin（内容编辑后台）除了浏览器 SPA,还内置一个 MCP（Model Context Protocol）端点,让外部 AI agent 直接编写内容、发布、构建、部署——无需走 cookie 登录。基于 anycms-mcp 0.3（axum 传输,支持 profile 过滤）。 适合自动化场景:让 Claude / 其它 agent 读你的内容库、起草新文章、一键发布上线。 端点路径 挂载在 admin 服务的根上（默认 http://127.0.0.1:3333）: 路径说明 /mcpMCP streamable HTTP 端点（暴露所有工具） /mcp-profilesprofile 管理 REST（/list、/info、/{id}、POST、PUT、DELETE）；/info 列出当前可用工具 启用（fail-closed） MCP 端点能发布 / 部署,权限很大,因此默认不挂载。两种方式配置 bearer token,任一非空即启用（site.kdl 优先,都为空则 /mcp 返回 404）: // site.kdl mcp { token \"a-long-random-secret\" } 或环境变量兜底: ANYCMS_MCP_TOKEN=secret anycms admin --root my-site 启动后会看到: ▶ MCP on http://127.0.0.1:3333/mcp (profiles: /mcp-profiles) — send `Authorization: Bearer <token>` 鉴权 每个请求带 bearer header: Authorization: Bearer <token> Accept: application/json, text/event-stream 缺失 / 错误 token → 401；端点未挂载（token 未配）→ 404。 工具 8 个工具,复用 editor 现有业务逻辑（与浏览器 SPA 走同一套代码,HTTP API 不变）: 工具作用 list_content列出全部内容页（source 路径 / URL / 标题 / 草稿标记 / 日期） get_draft读取草稿（无 DB 行则从磁盘种子,不写库） upsert_draft新建 / 更新草稿 + 追加版本快照（不落盘 content/） list_draft_revisions列出某草稿的版本历史 publish发布:写 content/*.md → rebuild → 可选 deploy build_site触发整站重建 deploy_site部署 output_dir/ 到配置的 target render_previewMarkdown → HTML（与编辑器实时预览同一渲染器） 典型流程:list_content → get_draft → upsert_draft → publish。 试一下 # 探测:列出全部工具 curl http://127.0.0.1:3333/mcp-profiles/info -H \"Authorization: Bearer <token>\" 完整 MCP 调用走 streamable HTTP 握手（initialize → notifications/initialized → tools/call）,用任意 MCP 客户端（如 mcp-inspector）指向 http://127.0.0.1:3333/mcp 并带上 bearer header 即可。 安全说明 fail-closed:token 未配则端点不挂载,绝不暴露无认证的 MCP。 mutate 工具（publish / build_site / deploy_site / upsert_draft）以 mcp-agent 系统身份执行（无 session cookie）；启动时幂等插入一行 backing users（空密码、永远登不进 HTTP 登录）以满足 drafts.updated_by 等 FK 约束。 token 是明文比较（服务端密钥,非用户密码）,建议用 openssl rand -hex 32 生成；生产环境配合 HTTPS / 反代使用。 profile 过滤:可通过 /mcp-profiles REST 创建 profile 限定某 agent 只能用部分工具,请求时带 X-MCP-Profile: <name> header 或 ?profile=<name> 即生效。",
+    "lang": "zh",
+    "excerpt": "anycms admin 内置的 MCP 端点：让 AI agent 直接编写内容、发布、构建、部署",
+    "fields": {},
+    "boost": 1.0
+  },
+  {
+    "url": "/docs/getting-started/",
+    "title": "快速开始",
+    "body": "前置要求 Rust 1.85+（edition 2024，stable 工具链） 编写插件还需添加 wasm 编译目标：rustup target add wasm32-unknown-unknown 安装 git clone <repo-url> anycms-ssg cd anycms-ssg cargo install --path . # 安装 `anycms` 二进制到 ~/.cargo/bin 也可直接用 cargo run -- 代替已安装的 anycms。 三步生成你的第一个站点 anycms init my-site # 生成站点骨架（site.kdl + content + templates + sass + ts） cd my-site anycms build # → public/（渲染 Markdown、编译 Sass、转译 TS、压缩 HTML） anycms serve # → http://127.0.0.1:1111 实时热重载 编辑 content/ 下的 Markdown，保存后浏览器自动刷新。 使用主题 anycms init my-site cd my-site anycms theme install ../themes/ink # 安装内置主题到 ./themes/ink # 在 site.kdl 中设置 theme \"ink\"，并删除 site 自带的 templates/ 和 sass/ 让主题生效： rm -rf templates sass anycms build && anycms serve overlay 优先级：site 的 templates/*.html 与 sass/main.scss 会覆盖主题同名文件。 全新 init 会同时生成这两者，要让已安装主题接管布局与样式，需先删除它们。详见主题。 安装一个插件 # 从内置示例构建并安装一个插件 cd examples/plugins/reading-time anycms plugin build --install ../../sites/demo-ink --release # 构建站点，插件自动加载 anycms build --root ../../sites/demo-ink 下一步 了解站点结构 配置你的 site.kdl 编写你的第一个插件",
+    "lang": "zh",
+    "excerpt": "三步生成你的第一个 AnyCMS SSG 站点",
+    "fields": {},
+    "boost": 1.0
+  },
+  {
+    "url": "/docs/official-plugins/",
+    "title": "官方插件指南",
+    "body": "plugins/ 下提供 5 个开箱即用的官方插件（crate 名 anycms-plugin-*，author AnyCMS），覆盖最常见的「增强」场景。它们只增强 host 已有的内置 provider，不替换渲染管线——卸载后站点仍能正常构建，只是少了那部分增强。 每个插件的 config {} 默认值都能在 site.kdl 的 plugins {} 块中覆盖。 seo-suite 作用：配置驱动的 SEO 增强。 hook：on_seo 能力：OpenGraph / Twitter card / canonical / description 回退 / 去重 JSON-LD（WebSite、Organization、BreadcrumbList、Article）。 典型场景：想让分享到社交平台的链接带预览卡片、被搜索引擎正确收录。 配置要点：在 site.kdl 声明站点级 OG/Twitter 默认值，页面 front matter 可逐页覆盖。 sitemap-robots 作用：增强 sitemap.xml 并生成伴随的 robots.txt。 hook：on_sitemap 能力：按 URL 深度设 changefreq / priority、可选过滤 draft / noindex 页面、lastmod 回填。 典型场景：想给爬虫更精确的更新频率与优先级提示，同时自动产出 robots.txt。 search-index 作用：增强逐页搜索文档。 hook：on_search_document 能力：清洗正文 HTML、生成智能摘要与语言、设置 boost、附带分类法/日期/类型字段、应用排除规则。 典型场景：配合 搜索索引 的 fuse_* / elasticlunr_json 格式，让前端搜索结果更准（标题 boost 高、正文截断干净）。 配置要点：default_boost 调整默认权重；exclude_patterns 按 URL 前缀排除某些页面进索引。装上它即取代 host 的内置默认 enhancer。 feed-suite 作用：增强每条 RSS / Atom feed 条目。 hook：on_feed_entry 能力：补全摘要、正文、作者、分类、URL。 典型场景：feed 条目缺作者或摘要时，按 page.author → page.extra.author → 配置的 default_author 回退填齐。 配置要点：default_author 设站点默认作者。 responsive-images 作用：为 <img> 添加响应式属性。 hook：on_markdown_html 能力：按命名约定生成 srcset / sizes / loading=\"lazy\" / decoding，仅改写 HTML 标记，不重新编码图像。 典型场景：想让文章里的图片按视口自适应、懒加载。 与图像管线的关系：本插件只改 HTML 标记；真正的多分辨率变体生成由 图像处理管线 负责。两者协同：管线产出变体文件，插件把它们写进 srcset。 统一覆盖方式 plugins { plugin \"search-index\" { default_boost 2.0 exclude_patterns { pattern \"/draft/\" pattern \"/private/\" } } plugin \"feed-suite\" { default_author \"AnyCMS Team\" } }",
+    "lang": "zh",
+    "excerpt": "五个 Tier-1 官方插件的作用、hook 与典型场景",
+    "fields": {},
+    "boost": 1.0
+  },
+  {
+    "url": "/authors/liangdi/",
+    "title": "Liangdi",
+    "body": "AnyCMS SSG 的设计与实现者。专注 Rust、静态站点生成与开发者工具, 相信好的构建管线应该既快又可扩展。",
+    "lang": "zh",
+    "excerpt": "AnyCMS SSG 的设计与实现者。专注 Rust、静态站点生成与开发者工具, 相信好的构建管线应该既快又可扩展。",
+    "fields": {},
+    "boost": 1.0
+  },
+  {
+    "url": "/docs/registry/",
+    "title": "分发：静态注册中心",
+    "body": "插件与主题可从静态注册中心分发——一个带 index.json 索引的目录，托管在任何静态服务上（GitHub Pages、S3、本地目录）。无需动态服务器、鉴权或数据库。 维护者：构建注册中心 # 把制品放入版本化目录后重建索引 anycms-registry build /path/to/registry-root # 扫描 + 打包 theme tar.gz + 算 sha256 + 写 index.json anycms-registry serve /path/to/registry-root --port 1111 # 本地静态服务（用于测试） anycms-registry 是一个独立二进制。 用户：从注册中心安装 anycms plugin install shout --registry https://example.com/registry --root ./my-site anycms theme install ink --registry https://example.com/registry --root ./my-site --version 0.1.0 anycms plugin install shout --registry /srv/registry --root ./my-site # 本地路径也行 每个可下载制品在索引中带 sha256，下载时校验。 安装源自动判别 install 的 SOURCE 自动判别： http(s):// / git@ / ssh:// 开头 → git 仓库 否则 → 本地目录 配合 --registry → 注册中心包名 完整流程 打包 → 发布到注册中心 → 用户安装。详见 docs/publishing.md 与 docs/registry.md。",
+    "lang": "zh",
+    "excerpt": "从一个带 index.json 的静态目录分发插件与主题",
     "fields": {},
     "boost": 1.0
   }

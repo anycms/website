@@ -5,45 +5,20 @@
 <link rel="self" href="https://anycms.org/zh/rss.xml"/>
 
 <entry>
-<title>模板内置函数与过滤器</title>
-<link href="https://anycms.org/docs/builtin-functions/"/>
-<id>https://anycms.org/docs/builtin-functions/</id>
-<published>2026-06-21</published>
-<updated>2026-06-21</updated>
-<summary>host 注册的全局函数与过滤器完整参考</summary>
-</entry>
-
-<entry>
-<title>开发调试面板</title>
-<link href="https://anycms.org/docs/devtools/"/>
-<id>https://anycms.org/docs/devtools/</id>
-<published>2026-06-21</published>
-<updated>2026-06-21</updated>
-<summary>serve 自带的 DevTools 面板：切换主题、启停插件、可视化 params</summary>
-</entry>
-
-<entry>
-<title>链接检查器</title>
-<link href="https://anycms.org/docs/check/"/>
-<id>https://anycms.org/docs/check/</id>
-<published>2026-06-21</published>
-<updated>2026-06-21</updated>
-<summary>anycms check 校验内部链接、锚点与可选外链，CI 友好</summary>
-</entry>
-
-<entry>
-<title>URL 规则与重定向</title>
-<link href="https://anycms.org/docs/permalinks/"/>
-<id>https://anycms.org/docs/permalinks/</id>
-<published>2026-06-21</published>
-<updated>2026-06-21</updated>
-<summary>permalink 模板、内容互链与 aliases 重定向</summary>
+<title>MCP 端点（AI agent 接入）</title>
+<link href="https://anycms.org/docs/mcp/"/>
+<id>https://anycms.org/docs/mcp/</id>
+<author><name>liangdi</name></author>
+<published>2026-06-22</published>
+<updated>2026-06-22</updated>
+<summary>anycms admin 内置的 MCP 端点：让 AI agent 直接编写内容、发布、构建、部署</summary>
 </entry>
 
 <entry>
 <title>图像处理管线</title>
 <link href="https://anycms.org/docs/image-processing/"/>
 <id>https://anycms.org/docs/image-processing/</id>
+<author><name>liangdi</name></author>
 <published>2026-06-21</published>
 <updated>2026-06-21</updated>
 <summary>EXIF 方向矫正、输出格式与 AVIF 编码</summary>
@@ -53,51 +28,147 @@
 <title>搜索索引</title>
 <link href="https://anycms.org/docs/search/"/>
 <id>https://anycms.org/docs/search/</id>
+<author><name>liangdi</name></author>
 <published>2026-06-21</published>
 <updated>2026-06-21</updated>
 <summary>search 配置：四种索引格式与字段裁剪</summary>
 </entry>
 
 <entry>
+<title>URL 规则与重定向</title>
+<link href="https://anycms.org/docs/permalinks/"/>
+<id>https://anycms.org/docs/permalinks/</id>
+<author><name>liangdi</name></author>
+<published>2026-06-21</published>
+<updated>2026-06-21</updated>
+<summary>permalink 模板、内容互链与 aliases 重定向</summary>
+</entry>
+
+<entry>
+<title>开发调试面板</title>
+<link href="https://anycms.org/docs/devtools/"/>
+<id>https://anycms.org/docs/devtools/</id>
+<author><name>liangdi</name></author>
+<published>2026-06-21</published>
+<updated>2026-06-21</updated>
+<summary>serve 自带的 DevTools 面板：切换主题、启停插件、可视化 params</summary>
+</entry>
+
+<entry>
+<title>模板内置函数与过滤器</title>
+<link href="https://anycms.org/docs/builtin-functions/"/>
+<id>https://anycms.org/docs/builtin-functions/</id>
+<author><name>liangdi</name></author>
+<published>2026-06-21</published>
+<updated>2026-06-21</updated>
+<summary>host 注册的全局函数与过滤器完整参考</summary>
+</entry>
+
+<entry>
+<title>链接检查器</title>
+<link href="https://anycms.org/docs/check/"/>
+<id>https://anycms.org/docs/check/</id>
+<author><name>liangdi</name></author>
+<published>2026-06-21</published>
+<updated>2026-06-21</updated>
+<summary>anycms check 校验内部链接、锚点与可选外链，CI 友好</summary>
+</entry>
+
+<entry>
 <title>官方插件指南</title>
 <link href="https://anycms.org/docs/official-plugins/"/>
 <id>https://anycms.org/docs/official-plugins/</id>
+<author><name>liangdi</name></author>
 <published>2026-06-21</published>
 <updated>2026-06-21</updated>
 <summary>五个 Tier-1 官方插件的作用、hook 与典型场景</summary>
 </entry>
 
 <entry>
-<title>快速开始</title>
-<link href="https://anycms.org/docs/getting-started/"/>
-<id>https://anycms.org/docs/getting-started/</id>
-<published>2026-06-01</published>
-<updated>2026-06-01</updated>
-<summary>三步生成你的第一个 AnyCMS SSG 站点</summary>
-</entry>
-
-<entry>
-<title>多语言</title>
-<link href="https://anycms.org/docs/i18n/"/>
-<id>https://anycms.org/docs/i18n/</id>
-<published>2026-06-01</published>
-<updated>2026-06-01</updated>
-<summary>内容多语言：文件名后缀组织、per-language URL 与 hreflang</summary>
-</entry>
-
-<entry>
 <title>介绍</title>
 <link href="https://anycms.org/docs/introduction/"/>
 <id>https://anycms.org/docs/introduction/</id>
+<author><name>liangdi</name></author>
 <published>2026-06-01</published>
 <updated>2026-06-01</updated>
 <summary>AnyCMS SSG 是什么，以及它和 Hugo &#x2f; Zola 的根本差异</summary>
 </entry>
 
 <entry>
+<title>资源管线</title>
+<link href="https://anycms.org/docs/assets/"/>
+<id>https://anycms.org/docs/assets/</id>
+<author><name>liangdi</name></author>
+<published>2026-06-01</published>
+<updated>2026-06-01</updated>
+<summary>Sass 编译、TypeScript 转译、HTML 压缩与静态资源拷贝</summary>
+</entry>
+
+<entry>
+<title>主题</title>
+<link href="https://anycms.org/docs/themes/"/>
+<id>https://anycms.org/docs/themes/</id>
+<author><name>liangdi</name></author>
+<published>2026-06-01</published>
+<updated>2026-06-01</updated>
+<summary>主题是可分发的 bundle，含 manifest、模板与可选静态资源</summary>
+</entry>
+
+<entry>
+<title>部署</title>
+<link href="https://anycms.org/docs/deployment/"/>
+<id>https://anycms.org/docs/deployment/</id>
+<author><name>liangdi</name></author>
+<published>2026-06-01</published>
+<updated>2026-06-01</updated>
+<summary>anycms deploy 一等命令：git &#x2f; ssh-rsync &#x2f; s3 发布到任意静态托管</summary>
+</entry>
+
+<entry>
+<title>插件系统</title>
+<link href="https://anycms.org/docs/plugins/"/>
+<id>https://anycms.org/docs/plugins/</id>
+<author><name>liangdi</name></author>
+<published>2026-06-01</published>
+<updated>2026-06-01</updated>
+<summary>WASM 插件、两层扩展点、权限化 host 函数与贡献机制</summary>
+</entry>
+
+<entry>
+<title>配置（site.kdl）</title>
+<link href="https://anycms.org/docs/configuration/"/>
+<id>https://anycms.org/docs/configuration/</id>
+<author><name>liangdi</name></author>
+<published>2026-06-01</published>
+<updated>2026-06-01</updated>
+<summary>站点与主题配置使用 KDL，字段说明与示例</summary>
+</entry>
+
+<entry>
+<title>站点结构</title>
+<link href="https://anycms.org/docs/site-structure/"/>
+<id>https://anycms.org/docs/site-structure/</id>
+<author><name>liangdi</name></author>
+<published>2026-06-01</published>
+<updated>2026-06-01</updated>
+<summary>一个 anycms 站点的标准目录布局</summary>
+</entry>
+
+<entry>
+<title>多语言</title>
+<link href="https://anycms.org/docs/i18n/"/>
+<id>https://anycms.org/docs/i18n/</id>
+<author><name>liangdi</name></author>
+<published>2026-06-01</published>
+<updated>2026-06-01</updated>
+<summary>内容多语言：文件名后缀组织、per-language URL 与 hreflang</summary>
+</entry>
+
+<entry>
 <title>模板</title>
 <link href="https://anycms.org/docs/templates/"/>
 <id>https://anycms.org/docs/templates/</id>
+<author><name>liangdi</name></author>
 <published>2026-06-01</published>
 <updated>2026-06-01</updated>
 <summary>MiniJinja 模板语法、overlay 解析与契约变量</summary>
@@ -107,6 +178,7 @@
 <title>内容模型</title>
 <link href="https://anycms.org/docs/content/"/>
 <id>https://anycms.org/docs/content/</id>
+<author><name>liangdi</name></author>
 <published>2026-06-01</published>
 <updated>2026-06-01</updated>
 <summary>&lt;h2 id=&quot;page-section&quot;&gt;Page 与 Section&lt;&#x2f;h2&gt;
@@ -119,6 +191,7 @@
 &lt;pre&gt;&lt;code class=&quot;language-markdown&quot;&gt;&lt;span class=&quot;text html markdown&quot;&gt;&lt;span class=&quot;meta paragraph markdown&quot;&gt;+++
 title = &amp;quot;Hello World&amp;quot;
 date = 2025-06-01
+author = &amp;quot;liangdi&amp;quot;
 draft = false
 slug = &amp;quot;hello&amp;quot;
 template = &amp;quot;page.html&amp;quot;
@@ -130,66 +203,23 @@ tags = [&amp;quot;rust&amp;quot;, &amp;quot;ssg&amp;quot;]
 </entry>
 
 <entry>
+<title>快速开始</title>
+<link href="https://anycms.org/docs/getting-started/"/>
+<id>https://anycms.org/docs/getting-started/</id>
+<author><name>liangdi</name></author>
+<published>2026-06-01</published>
+<updated>2026-06-01</updated>
+<summary>三步生成你的第一个 AnyCMS SSG 站点</summary>
+</entry>
+
+<entry>
 <title>分发：静态注册中心</title>
 <link href="https://anycms.org/docs/registry/"/>
 <id>https://anycms.org/docs/registry/</id>
+<author><name>liangdi</name></author>
 <published>2026-06-01</published>
 <updated>2026-06-01</updated>
 <summary>从一个带 index.json 的静态目录分发插件与主题</summary>
-</entry>
-
-<entry>
-<title>资源管线</title>
-<link href="https://anycms.org/docs/assets/"/>
-<id>https://anycms.org/docs/assets/</id>
-<published>2026-06-01</published>
-<updated>2026-06-01</updated>
-<summary>Sass 编译、TypeScript 转译、HTML 压缩与静态资源拷贝</summary>
-</entry>
-
-<entry>
-<title>站点结构</title>
-<link href="https://anycms.org/docs/site-structure/"/>
-<id>https://anycms.org/docs/site-structure/</id>
-<published>2026-06-01</published>
-<updated>2026-06-01</updated>
-<summary>一个 anycms 站点的标准目录布局</summary>
-</entry>
-
-<entry>
-<title>部署</title>
-<link href="https://anycms.org/docs/deployment/"/>
-<id>https://anycms.org/docs/deployment/</id>
-<published>2026-06-01</published>
-<updated>2026-06-01</updated>
-<summary>anycms deploy 一等命令：git &#x2f; ssh-rsync 发布到任意静态托管</summary>
-</entry>
-
-<entry>
-<title>配置（site.kdl）</title>
-<link href="https://anycms.org/docs/configuration/"/>
-<id>https://anycms.org/docs/configuration/</id>
-<published>2026-06-01</published>
-<updated>2026-06-01</updated>
-<summary>站点与主题配置使用 KDL，字段说明与示例</summary>
-</entry>
-
-<entry>
-<title>主题</title>
-<link href="https://anycms.org/docs/themes/"/>
-<id>https://anycms.org/docs/themes/</id>
-<published>2026-06-01</published>
-<updated>2026-06-01</updated>
-<summary>主题是可分发的 bundle，含 manifest、模板与可选静态资源</summary>
-</entry>
-
-<entry>
-<title>插件系统</title>
-<link href="https://anycms.org/docs/plugins/"/>
-<id>https://anycms.org/docs/plugins/</id>
-<published>2026-06-01</published>
-<updated>2026-06-01</updated>
-<summary>WASM 插件、两层扩展点、权限化 host 函数与贡献机制</summary>
 </entry>
 
 </feed>

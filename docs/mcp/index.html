@@ -21,7 +21,7 @@
       } catch (e) {}
     })();
   </script>
-  <title>开发调试面板 · AnyCMS 文档</title>
+  <title>MCP 端点（AI agent 接入） · AnyCMS 文档</title>
   <meta name="description" content="用 Rust 编写的插件驱动静态网站生成器：Markdown + KDL + 主题，输出可直接部署的静态 HTML。WASM 插件贯穿整个构建管线。">
   <link rel="stylesheet" href="/main.css">
   <link rel="stylesheet" href="/highlight.css">
@@ -41,7 +41,7 @@
   </style>
   
   
-  <link rel="alternate" hreflang="zh" href="https://anycms.org/docs/devtools/">
+  <link rel="alternate" hreflang="zh" href="https://anycms.org/docs/mcp/">
   
   
   
@@ -143,7 +143,7 @@
       
       <li><a href="/docs/check/">链接检查器</a></li>
       
-      <li><a href="/docs/devtools/" class="active">开发调试面板</a></li>
+      <li><a href="/docs/devtools/">开发调试面板</a></li>
       
       <li><a href="/docs/search/">搜索索引</a></li>
       
@@ -159,39 +159,65 @@
   </aside>
 
   <article class="docs-body prose">
-    <h1>开发调试面板</h1>
-    <p class="muted" style="margin-top:-0.5rem;font-size:1.1rem;">serve 自带的 DevTools 面板：切换主题、启停插件、可视化 params</p>
+    <h1>MCP 端点（AI agent 接入）</h1>
+    <p class="muted" style="margin-top:-0.5rem;font-size:1.1rem;">anycms admin 内置的 MCP 端点：让 AI agent 直接编写内容、发布、构建、部署</p>
     
     
     <p class="muted" style="margin-top:-0.3rem;font-size:0.92rem;">作者：<a href="/authors/liangdi/">Liangdi</a></p>
     
     <div class="post-body">
-      <p><code>anycms serve</code> 在本地开发服务器上自动注入一个<strong>调试面板</strong>（DevTools），仅在 localhost 下生效，帮助你在写内容时快速切换配置、观察构建状态。</p>
-<h2 id="heading">打开面板</h2>
-<p>启动 serve 后，浏览器右下角会出现一个浮动按钮，点击即在 <code>/__anycms_dev</code> 打开面板（SPA 路由）。也可以直接访问：</p>
-<pre><code>http://127.0.0.1:1111/__anycms_dev/
-</code></pre>
-<h2 id="heading-2">面板能力</h2>
-<ul>
-<li><strong>切换主题（theme）</strong>：在已安装主题之间快速切换，无需改 <code>site.kdl</code> 再重启。</li>
-<li><strong>启停插件（plugin）</strong>：勾选 / 取消勾选插件，即时看到带或不带某个插件的效果（等价于 <code>anycms plugin enable/disable</code>，但无需离开浏览器）。</li>
-<li><strong>可视化 params</strong>：浏览当前合并后的 <code>config.params</code>，确认主题默认值与 site 覆盖值如何叠加。</li>
-<li><strong>构建状态与路由表</strong>：查看上次构建是否成功，以及当前的路由表（哪些 URL 被生成）。</li>
-<li><strong>show drafts toggle</strong>：临时显示 / 隐藏草稿页面，对比发布前后的差异。</li>
-</ul>
-<h2 id="heading-3">关闭面板</h2>
-<pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> serve<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>no-devtools</span></span>
-</span></code></pre>
-<p>启用后调试路由（<code>/__anycms_dev/*</code>）返回 404，页面不再注入浮动按钮——适合做最终演示或录屏。</p>
-<h2 id="heading-4">增量重建</h2>
-<p>serve 的热重载不是「全量重建」——它会根据<strong>变更类型</strong>选择重建范围：</p>
-<table><thead><tr><th>变更</th><th>重建范围</th></tr></thead><tbody>
-<tr><th>单个内容页</th><th>仅重建受影响页面（跳过未变动的页面）</th></tr>
-<tr><th>模板 / <code>site.kdl</code> / asset / 插件</th><th>自动全量重建</th></tr>
+      <p><code>anycms admin</code>（内容编辑后台）除了浏览器 SPA,还内置一个 <strong>MCP</strong>（Model Context Protocol）端点,让外部 AI agent <strong>直接</strong>编写内容、发布、构建、部署——无需走 cookie 登录。基于 <a href="https://github.com/ai-station/anycms-mcp"><code>anycms-mcp</code></a> 0.3（axum 传输,支持 profile 过滤）。</p>
+<p>适合自动化场景:让 Claude / 其它 agent 读你的内容库、起草新文章、一键发布上线。</p>
+<h2 id="heading">端点路径</h2>
+<p>挂载在 admin 服务的根上（默认 <code>http://127.0.0.1:3333</code>）:</p>
+<table><thead><tr><th>路径</th><th>说明</th></tr></thead><tbody>
+<tr><th><code>/mcp</code></th><th>MCP streamable HTTP 端点（暴露所有工具）</th></tr>
+<tr><th><code>/mcp-profiles</code></th><th>profile 管理 REST（<code>/list</code>、<code>/info</code>、<code>/{id}</code>、<code>POST</code>、<code>PUT</code>、<code>DELETE</code>）；<code>/info</code> 列出当前可用工具</th></tr>
 </tbody></table>
-<p>所以改一篇文章能秒级刷新，而改模板或配置会触发整站重建。WebSocket 连接在构建完成后推送刷新指令，浏览器自动重载。</p>
-<h2 id="heading-5">安全</h2>
-<p>DevTools 仅在 localhost 下注入，<strong>不会</strong>出现在 <code>anycms build</code> 的产物中——它是开发期工具，不进入 <code>public/</code>。</p>
+<h2 id="fail-closed">启用（fail-closed）</h2>
+<p>MCP 端点能发布 / 部署,权限很大,因此<strong>默认不挂载</strong>。两种方式配置 bearer token,任一非空即启用（<code>site.kdl</code> 优先,都为空则 <code>/mcp</code> 返回 404）:</p>
+<pre><code>// site.kdl
+mcp {
+    token "a-long-random-secret"
+}
+</code></pre>
+<p>或环境变量兜底:</p>
+<pre><code class="language-sh"><span class="source shell bash"><span class="variable other readwrite assignment shell">ANYCMS_MCP_TOKEN</span><span class="keyword operator assignment shell">=</span><span class="string unquoted shell">secret</span> <span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> admin<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>root</span> my-site</span>
+</span></code></pre>
+<p>启动后会看到:</p>
+<pre><code>▶ MCP on http://127.0.0.1:3333/mcp  (profiles: /mcp-profiles)  — send `Authorization: Bearer &lt;token&gt;`
+</code></pre>
+<h2 id="heading-2">鉴权</h2>
+<p>每个请求带 bearer header:</p>
+<pre><code>Authorization: Bearer &lt;token&gt;
+Accept: application/json, text/event-stream
+</code></pre>
+<p>缺失 / 错误 token → <strong>401</strong>；端点未挂载（token 未配）→ <strong>404</strong>。</p>
+<h2 id="heading-3">工具</h2>
+<p>8 个工具,复用 editor 现有业务逻辑（与浏览器 SPA 走同一套代码,HTTP API 不变）:</p>
+<table><thead><tr><th>工具</th><th>作用</th></tr></thead><tbody>
+<tr><th><code>list_content</code></th><th>列出全部内容页（source 路径 / URL / 标题 / 草稿标记 / 日期）</th></tr>
+<tr><th><code>get_draft</code></th><th>读取草稿（无 DB 行则从磁盘种子,不写库）</th></tr>
+<tr><th><code>upsert_draft</code></th><th>新建 / 更新草稿 + 追加版本快照（不落盘 content/）</th></tr>
+<tr><th><code>list_draft_revisions</code></th><th>列出某草稿的版本历史</th></tr>
+<tr><th><code>publish</code></th><th>发布:写 <code>content/*.md</code> → rebuild → 可选 deploy</th></tr>
+<tr><th><code>build_site</code></th><th>触发整站重建</th></tr>
+<tr><th><code>deploy_site</code></th><th>部署 <code>output_dir/</code> 到配置的 target</th></tr>
+<tr><th><code>render_preview</code></th><th>Markdown → HTML（与编辑器实时预览同一渲染器）</th></tr>
+</tbody></table>
+<p>典型流程:<code>list_content</code> → <code>get_draft</code> → <code>upsert_draft</code> → <code>publish</code>。</p>
+<h2 id="heading-4">试一下</h2>
+<pre><code class="language-sh"><span class="source shell bash"><span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> 探测:列出全部工具</span><span class="comment line number-sign shell">
+</span><span class="meta function-call shell"><span class="variable function shell">curl</span></span><span class="meta function-call arguments shell"> http://127.0.0.1:3333/mcp-profiles/info<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> -</span>H</span> <span class="string quoted double shell"><span class="punctuation definition string begin shell">&quot;</span>Authorization: Bearer &lt;token&gt;<span class="punctuation definition string end shell">&quot;</span></span></span>
+</span></code></pre>
+<p>完整 MCP 调用走 streamable HTTP 握手（<code>initialize</code> → <code>notifications/initialized</code> → <code>tools/call</code>）,用任意 MCP 客户端（如 <a href="https://github.com/modelcontextprotocol/inspector">mcp-inspector</a>）指向 <code>http://127.0.0.1:3333/mcp</code> 并带上 bearer header 即可。</p>
+<h2 id="heading-5">安全说明</h2>
+<ul>
+<li><strong>fail-closed</strong>:token 未配则端点不挂载,绝不暴露无认证的 MCP。</li>
+<li>mutate 工具（<code>publish</code> / <code>build_site</code> / <code>deploy_site</code> / <code>upsert_draft</code>）以 <code>mcp-agent</code> 系统身份执行（无 session cookie）；启动时幂等插入一行 backing <code>users</code>（空密码、永远登不进 HTTP 登录）以满足 <code>drafts.updated_by</code> 等 FK 约束。</li>
+<li>token 是明文比较（服务端密钥,非用户密码）,建议用 <code>openssl rand -hex 32</code> 生成；生产环境配合 HTTPS / 反代使用。</li>
+<li>profile 过滤:可通过 <code>/mcp-profiles</code> REST 创建 profile 限定某 agent 只能用部分工具,请求时带 <code>X-MCP-Profile: &lt;name&gt;</code> header 或 <code>?profile=&lt;name&gt;</code> 即生效。</li>
+</ul>
 
     </div>
     <div class="doc-meta">
