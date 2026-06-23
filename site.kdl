@@ -1,0 +1,40 @@
+title "AnyCMS"
+base_url "https://anycms.org"
+default_language "zh"
+output_dir "public"
+
+// 内容分类法：文档与文章用 tags 组织。
+taxonomies {
+    taxonomy name="tags"
+}
+
+// 声明式、按语言组织的导航菜单。裸 `item` 节点构成默认（zh）菜单，
+// 按 `weight` 升序排序；绝对 URL（http(s)://）视为外链。
+menu {
+    item "首页" url="/"
+    item "文档" url="/docs/" weight=10
+    item "插件" url="/plugins/" weight=20
+    item "主题" url="/themes/" weight=30
+    item "作者" url="/authors/" weight=40
+    item "归档" url="/archive/" weight=50
+}
+
+// 主题级设计参数（覆盖主题默认值；此处站点自带模板，故作为本站调色板入口）。
+params {
+    accent "#2563eb"
+    dark "on"
+}
+
+// 发布目标：用项目自带的 `anycms deploy` 把 public/ 推到 GitHub Pages。
+// CNAME(anycms.org) 与 .nojekyll 放在 static/ 下，构建时一并拷入 public/。
+deploy {
+    target "gh-pages" {
+        provider "git"
+        repo     "git@github.com:anycms/website.git"
+        branch   "gh-pages"
+    }
+}
+
+mcp {
+    token "123"
+}

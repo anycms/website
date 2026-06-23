@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}{{ config.title }} — 插件驱动的 Rust 静态网站生成器{% endblock %}
+
+{% block content %}
+{# ── Hero ─────────────────────────────────────────────────────── #}
+<section class="hero wrap">
+  <span class="badge"><span class="dot"></span>v0.1 · 开源 · Rust</span>
+  <h1>为 <span class="accent">插件</span> 而生的<br>Rust 静态网站生成器</h1>
+  <p class="lede">
+    AnyCMS SSG 把 WASM 插件作为构建管线的主线——内容发现、Markdown 渲染、模板上下文、
+    SEO 与资源处理的每个阶段都可被 hook。输入 Markdown + KDL，输出可直接部署的静态站点。
+  </p>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="/docs/getting-started/">开始使用</a>
+    <a class="btn btn-ghost" href="/docs/">阅读文档</a>
+  </div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+      <span class="title">bash — anycms</span>
+    </div>
+    <pre><code><span class="cmt"># 三步生成你的第一个站点</span>
+<span class="prompt">$</span> anycms init my-site      <span class="cmt"># 生成站点骨架</span>
+<span class="prompt">$</span> cd my-site
+<span class="prompt">$</span> anycms build             <span class="ok">→ public/</span>
+<span class="prompt">$</span> anycms serve             <span class="cmt"># http://127.0.0.1:1111 实时热重载</span></code></pre>
+  </div>
+</section>
+
+{# ── Features ─────────────────────────────────────────────────── #}
+<section class="section">
+  <div class="section-head">
+    <h2>一切皆可扩展</h2>
+    <p>对标 Hugo / Zola 的全部常规能力，外加一套贯穿构建管线的 WASM 插件生态。</p>
+  </div>
+  <div class="feature-grid">
+    <div class="feature">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg></span>
+      <h3>WASM 插件生态</h3>
+      <p>10 个 Layer-1 管线 hook + 5 个 Layer-2 业务域，从 Markdown 渲染到 SEO、sitemap、feed 全阶段可 hook。</p>
+    </div>
+    <div class="feature">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5Z"/><path d="M3 13l9 5 9-5"/></svg></span>
+      <h3>主题与 overlay</h3>
+      <p>三级回退：site &gt; theme &gt; 内置。site 模板 / 静态 / Sass 覆盖主题同名文件，params 可主题化。</p>
+    </div>
+    <div class="feature">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="M7.5 6H15a3 3 0 0 1 3 3v6.5"/></svg></span>
+      <h3>纯 Rust 资源管线</h3>
+      <p>grass 编译 Sass、oxc 转译 TypeScript、minify-html 压缩、syntect 代码高亮，零外部依赖。</p>
+    </div>
+    <div class="feature">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c3 3 3 15 0 18"/></svg></span>
+      <h3>内容多语言</h3>
+      <p>文件名后缀组织翻译（page.fr.md），per-language URL、hreflang 互链、per-language feeds / sitemap。</p>
+    </div>
+    <div class="feature">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v5c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6l8-3Z"/><path d="m9 12 2 2 4-4"/></svg></span>
+      <h3>权限化沙箱</h3>
+      <p>插件在 extism wasm 沙箱运行，http / 文件读写按 manifest 声明权限强制放行，WASI 文件系统完全禁用。</p>
+    </div>
+    <div class="feature">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="M4 7.5l8 4.5 8-4.5"/><path d="M12 12v9"/></svg></span>
+      <h3>静态注册中心</h3>
+      <p>插件与主题从一个带 index.json 的静态目录分发，托管在任何静态服务上，无需动态服务器或数据库。</p>
+    </div>
+  </div>
+</section>
+
+{# ── Pipeline ─────────────────────────────────────────────────── #}
+<section class="section">
+  <div class="section-head">
+    <h2>插件贯穿构建管线</h2>
+    <p>每一个阶段都可以被插件观察、转换或增强。</p>
+  </div>
+  <div class="pipeline">
+    <div class="pipe-step"><span class="step-no">01</span><h4>内容发现</h4><p>on_content_discover 合成虚拟页面</p></div>
+    <div class="pipe-step"><span class="step-no">02</span><h4>解析渲染</h4><p>on_markdown / on_markdown_html 改写</p></div>
+    <div class="pipe-step"><span class="step-no">03</span><h4>模板上下文</h4><p>on_template_context 注入变量</p></div>
+    <div class="pipe-step"><span class="step-no">04</span><h4>输出增强</h4><p>on_asset / on_template_output</p></div>
+    <div class="pipe-step"><span class="step-no">05</span><h4>业务域</h4><p>SEO / Sitemap / Search / Feed / Inject</p></div>
+  </div>
+</section>
+
+{# ── Stats ────────────────────────────────────────────────────── #}
+<section class="stats">
+  <div class="stats-inner">
+    <div class="stat"><div class="n">10</div><div class="l">管线 hook（Layer 1）</div></div>
+    <div class="stat"><div class="n">5</div><div class="l">业务域（Layer 2）</div></div>
+    <div class="stat"><div class="n">3</div><div class="l">官方主题</div></div>
+    <div class="stat"><div class="n">100%</div><div class="l">纯 Rust 工具链</div></div>
+  </div>
+</section>
+
+{# ── CTA ──────────────────────────────────────────────────────── #}
+<section class="cta">
+  <div class="wrap">
+    <div class="cta-inner">
+      <h2>准备好开始了吗？</h2>
+      <p class="muted">几分钟内生成你的第一个站点，或为它写一个 WASM 插件。</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="/docs/getting-started/">阅读文档</a>
+        <a class="btn btn-ghost" href="/plugins/">浏览插件</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ page.title }} · {{ config.title }}{% endblock %}
+
+{% block content %}
+<div class="listing">
+  <article class="prose">
+    <h1>{{ page.title }}</h1>
+    {% if page.date %}<p class="muted" style="margin-top:-0.6rem;font-family:var(--font-mono);font-size:0.85rem;">{{ page.date }}</p>{% endif %}
+    {% if page.author %}
+    {% set a = author(page.author) %}
+    <p class="muted" style="margin-top:-0.4rem;font-size:0.9rem;">作者：{% if a %}<a href="{{ a.url | safe }}">{{ a.name }}</a>{% else %}{{ page.author }}{% endif %}</p>
+    {% endif %}
+    <div class="post-body">
+      {{ page.content | safe }}
+    </div>
+  </article>
+</div>
+{% endblock %}

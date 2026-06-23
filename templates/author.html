@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{{ page.title }} · {{ config.title }}{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div class="page-head-inner">
+    <span class="eyebrow">作者</span>
+    <h1>{{ page.title }}</h1>
+    {% if page.extra.role %}<p class="muted">{{ page.extra.role }}</p>{% endif %}
+    {% if page.extra.email or page.extra.website or page.extra.github %}
+    <p class="muted author-links">
+      {% if page.extra.email %}<a href="mailto:{{ page.extra.email }}">{{ page.extra.email }}</a>{% endif %}
+      {% if page.extra.website %}<a href="{{ page.extra.website | safe }}">网站</a>{% endif %}
+      {% if page.extra.github %}<a href="https://github.com/{{ page.extra.github | safe }}">GitHub</a>{% endif %}
+    </p>
+    {% endif %}
+  </div>
+</header>
+{% if page.content %}<section class="listing"><article class="prose">{{ page.content | safe }}</article></section>{% endif %}
+{% set a = author(page.slug) %}
+{% if a and a.posts %}
+<section class="listing">
+  <h2>文章</h2>
+  <ul class="post-list">
+    {% for p in a.posts %}
+    {% if p.lang == current_lang %}
+    <li>
+      <a class="title" href="{{ p.url | safe }}">{{ p.title }}</a>
+      {% if p.date %}<span class="muted date">{{ p.date }}</span>{% endif %}
+    </li>
+    {% endif %}
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+{% endblock %}

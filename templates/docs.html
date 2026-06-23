@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ page.title }} · {{ config.title }} 文档{% endblock %}
+
+{% block content %}
+<div class="docs">
+  {# Sidebar: auto-synced from the docs section via the get_section global. #}
+  <aside class="docs-sidebar">
+    <h5>文档</h5>
+    <ul>
+      {% set docs = get_section("/docs/") %}
+      {% for p in docs.pages %}
+      <li><a href="{{ p.url | safe }}"{% if p.url == page.url %} class="active"{% endif %}>{{ p.title }}</a></li>
+      {% endfor %}
+    </ul>
+  </aside>
+
+  <article class="docs-body prose">
+    <h1>{{ page.title }}</h1>
+    {% if page.description %}<p class="muted" style="margin-top:-0.5rem;font-size:1.1rem;">{{ page.description }}</p>{% endif %}
+    {% if page.author %}
+    {% set a = author(page.author) %}
+    <p class="muted" style="margin-top:-0.3rem;font-size:0.92rem;">作者：{% if a %}<a href="{{ a.url | safe }}">{{ a.name }}</a>{% else %}{{ page.author }}{% endif %}</p>
+    {% endif %}
+    <div class="post-body">
+      {{ page.content | safe }}
+    </div>
+    <div class="doc-meta">
+      <span>用 <strong>{{ config.title }}</strong> 构建</span>
+      <a href="https://github.com/anycms/anycms-ssg">在 GitHub 上编辑 ↗</a>
+    </div>
+  </article>
+</div>
+{% endblock %}
