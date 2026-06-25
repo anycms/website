@@ -155,6 +155,8 @@
       
       <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
       
+      <li><a href="/docs/mcp/">MCP 端点（AI agent 接入）</a></li>
+      
     </ul>
   </aside>
 
@@ -167,26 +169,26 @@
     
     <div class="post-body">
       <p>插件与主题可从<strong>静态注册中心</strong>分发——一个带 <code>index.json</code> 索引的目录，托管在任何静态服务上（GitHub Pages、S3、本地目录）。无需动态服务器、鉴权或数据库。</p>
-<h2 id="heading">维护者：构建注册中心</h2>
+<h2 id="维护者-构建注册中心">维护者：构建注册中心</h2>
 <pre><code class="language-sh"><span class="source shell bash"><span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> 把制品放入版本化目录后重建索引</span><span class="comment line number-sign shell">
 </span><span class="meta function-call shell"><span class="variable function shell">anycms-registry</span></span><span class="meta function-call arguments shell"> build /path/to/registry-root     <span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> 扫描 + 打包 theme tar.gz + 算 sha256 + 写 index.json</span><span class="comment line number-sign shell">
 </span></span><span class="meta function-call shell"><span class="variable function shell">anycms-registry</span></span><span class="meta function-call arguments shell"> serve /path/to/registry-root<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>port</span> 1111   <span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> 本地静态服务（用于测试）</span><span class="comment line number-sign shell">
 </span></span></span></code></pre>
 <p><code>anycms-registry</code> 是一个独立二进制。</p>
-<h2 id="heading-2">用户：从注册中心安装</h2>
+<h2 id="用户-从注册中心安装">用户：从注册中心安装</h2>
 <pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> plugin install shout<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>registry</span> https://example.com/registry<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>root</span> ./my-site</span>
 <span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> theme   install ink<span class="variable parameter option shell"><span class="punctuation definition parameter shell">   --</span>registry</span> https://example.com/registry<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>root</span> ./my-site<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>version</span> 0.1.0</span>
 <span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> plugin install shout<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>registry</span> /srv/registry<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>root</span> ./my-site   <span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> 本地路径也行</span><span class="comment line number-sign shell">
 </span></span></span></code></pre>
 <p>每个可下载制品在索引中带 <code>sha256</code>，下载时校验。</p>
-<h2 id="heading-3">安装源自动判别</h2>
+<h2 id="安装源自动判别">安装源自动判别</h2>
 <p><code>install</code> 的 <code>SOURCE</code> 自动判别：</p>
 <ul>
 <li><code>http(s)://</code> / <code>git@</code> / <code>ssh://</code> 开头 → git 仓库</li>
 <li>否则 → 本地目录</li>
 <li>配合 <code>--registry</code> → 注册中心包名</li>
 </ul>
-<h2 id="heading-4">完整流程</h2>
+<h2 id="完整流程">完整流程</h2>
 <p>打包 → 发布到注册中心 → 用户安装。详见 <a href="https://github.com/anycms/anycms-ssg/blob/master/docs/publishing.md"><code>docs/publishing.md</code></a> 与 <a href="https://github.com/anycms/anycms-ssg/blob/master/docs/registry.md"><code>docs/registry.md</code></a>。</p>
 
     </div>

@@ -155,6 +155,8 @@
       
       <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
       
+      <li><a href="/docs/mcp/">MCP 端点（AI agent 接入）</a></li>
+      
     </ul>
   </aside>
 
@@ -185,11 +187,11 @@
   }
 }
 </code></pre>
-<h2 id="engine-version">engine-version 校验</h2>
+<h2 id="engine-version-校验">engine-version 校验</h2>
 <p>安装时与构建时都会检查：主题声明的 <code>engine-version</code> 必须与 host engine 共享 <code>major.minor</code>，否则拒绝。这保证主题与 host 的模板契约兼容。</p>
-<h2 id="params">params 合并</h2>
+<h2 id="params-合并">params 合并</h2>
 <p>主题在 <code>params {}</code> 中声明默认值，site 的 <code>params {}</code> 覆盖之，模板中读 <code>config.params.&lt;key&gt;</code>。</p>
-<h2 id="heading">主题管理命令</h2>
+<h2 id="主题管理命令">主题管理命令</h2>
 <pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> theme install <span class="keyword operator assignment redirection shell">&lt;</span>SOURCE<span class="keyword operator assignment redirection shell">&gt;</span> <span class="keyword control regexp set begin shell">[</span>-<span class="keyword operator word shell">-</span>root ROOT<span class="keyword control regexp set end shell">]</span> <span class="keyword control regexp set begin shell">[</span>-<span class="keyword operator word shell">-</span>force<span class="keyword control regexp set end shell">]</span> <span class="keyword control regexp set begin shell">[</span>-<span class="keyword operator word shell">-</span>registry BASE<span class="keyword control regexp set end shell">]</span> <span class="keyword control regexp set begin shell">[</span>-<span class="keyword operator word shell">-</span>version VER<span class="keyword control regexp set end shell">]</span></span>
 <span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> theme list   <span class="keyword control regexp set begin shell">[</span>-<span class="keyword operator word shell">-</span>root ROOT<span class="keyword control regexp set end shell">]</span></span>
 <span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> theme uninstall <span class="keyword operator assignment redirection shell">&lt;</span>NAME<span class="keyword operator assignment redirection shell">&gt;</span> <span class="keyword control regexp set begin shell">[</span>-<span class="keyword operator word shell">-</span>root ROOT<span class="keyword control regexp set end shell">]</span></span>

@@ -141,13 +141,13 @@
     <div class="chips"><span class="chip">portfolio</span><span class="chip">gallery</span><span class="chip">landing</span></div>
   </article>
 </div>
-<h2 id="heading">安装主题</h2>
+<h2 id="安装主题">安装主题</h2>
 <pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> theme install ../themes/ink<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>root</span> ./my-site</span>
 </span></code></pre>
 <p>然后在 <code>site.kdl</code> 中启用，并删除 site 自带的 <code>templates/</code> 与 <code>sass/</code> 让主题接管（见<a href="/docs/getting-started/#%E4%BD%BF%E7%94%A8%E4%B8%BB%E9%A2%98">快速开始</a>）：</p>
 <pre><code>theme "ink"
 </code></pre>
-<h2 id="heading-2">主题契约速览</h2>
+<h2 id="主题契约速览">主题契约速览</h2>
 <p>每个主题是一个 bundle：<code>theme.kdl</code> manifest（含 <code>engine-version</code>、<code>params</code> 声明）+ 必需的 <code>templates/</code> + 可选 <code>static/</code> / <code>sass/</code>。详见<a href="/docs/themes/">主题文档</a>。</p>
 <blockquote>
 <p>本官方网站<strong>不使用任何主题</strong>——它自带 <code>templates/</code> 与 <code>sass/</code>，完全自包含。这也是一种合法的用法：当你想要完全定制的设计时，直接在 site 内写模板即可。</p>

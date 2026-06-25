@@ -155,6 +155,8 @@
       
       <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
       
+      <li><a href="/docs/mcp/">MCP 端点（AI agent 接入）</a></li>
+      
     </ul>
   </aside>
 
@@ -170,7 +172,7 @@
 <blockquote>
 <p>约定：缺失 / 无法解析的输入返回输入本身或 <code>undefined</code> / 空串，<strong>绝不中断构建</strong>。</p>
 </blockquote>
-<h2 id="heading">全局函数</h2>
+<h2 id="全局函数">全局函数</h2>
 <h3 id="now-format"><code>now(format?)</code></h3>
 <p>当前 UTC 时间字符串。</p>
 <ul>
@@ -211,7 +213,7 @@
 <blockquote>
 <p>本站文档侧边栏就是用 <code>get_section("/docs/")</code> 自动生成的。</p>
 </blockquote>
-<h2 id="heading-2">过滤器</h2>
+<h2 id="过滤器">过滤器</h2>
 <h3 id="base64-encode-base64-decode"><code>base64_encode</code> / <code>base64_decode</code></h3>
 <p>标准 base64（带 padding）编解码。<strong>非法输入解码为空串，不会 panic。</strong></p>
 <pre><code>{{ "hello" | base64_encode }}            {# aGVsbG8= #}
@@ -227,7 +229,7 @@
 <pre><code>{{ "**bold** and [link](/x/)" | markdown | safe }}
 {# &lt;strong&gt;bold&lt;/strong&gt; and &lt;a href="/x/"&gt;link&lt;/a&gt; #}
 </code></pre>
-<h2 id="safe"><code>| safe</code> 约定</h2>
+<h2 id="safe-约定"><code>| safe</code> 约定</h2>
 <p>MiniJinja 会把生成的 URL 中的 <code>/</code> 转义成 <code>&amp;#x2f;</code>。因此<strong>所有</strong> <code>get_url</code> / <code>page.url</code> / <code>term.permalink</code> 等 URL 在 <code>href</code> / <code>src</code> 中必须标 <code>| safe</code>，否则浏览器会请求到带转义字符的坏地址。</p>
 <pre><code>{# 正确 #}
 &lt;a href="{{ page.url | safe }}"&gt;

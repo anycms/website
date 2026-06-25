@@ -155,6 +155,8 @@
       
       <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
       
+      <li><a href="/docs/mcp/">MCP 端点（AI agent 接入）</a></li>
+      
     </ul>
   </aside>
 
@@ -167,7 +169,7 @@
     
     <div class="post-body">
       <p>插件是 WebAssembly 模块，构建时由 host 加载并按 <strong>priority 顺序</strong>（数字越小越先执行）调度。当前 API 契约版本为 <strong>v0.2</strong>。</p>
-<h2 id="heading">两层扩展点</h2>
+<h2 id="两层扩展点">两层扩展点</h2>
 <ul>
 <li><strong>Layer 1 — 10 个通用管线 hook</strong>：<code>on_build_start</code> / <code>on_build_end</code> / <code>on_config</code> / <code>on_content_discover</code> / <code>on_page_parse</code> / <code>on_markdown</code> / <code>on_markdown_html</code> / <code>on_template_context</code> / <code>on_template_output</code> / <code>on_asset</code>。</li>
 <li><strong>Layer 2 — 8 个业务域 hook，覆盖 5 个域</strong>：<ul>
@@ -180,7 +182,7 @@
 </li>
 <li><strong>贡献（contribute）</strong>：插件向模板引擎注册 <code>filter</code>（含多参 <code>filter_args</code>）/ <code>global_function</code> / <code>shortcode</code>。</li>
 </ul>
-<h2 id="heading-2">写一个插件</h2>
+<h2 id="写一个插件">写一个插件</h2>
 <pre><code class="language-rust"><span class="source rust"><span class="keyword other rust">use</span> <span class="meta path rust">anycms_ssg_plugin_sdk<span class="punctuation accessor rust">::</span></span><span class="meta block rust"><span class="punctuation section block begin rust">{</span>plugin_fn<span class="punctuation separator rust">,</span> FnResult<span class="punctuation separator rust">,</span> TemplateContext</span><span class="meta block rust"><span class="punctuation section block end rust">}</span></span><span class="punctuation terminator rust">;</span>
 
 <span class="comment line documentation rust"><span class="punctuation definition comment rust">///</span> 注入 reading_time 模板变量
@@ -227,7 +229,7 @@ extism-pdk = "1"                             # #[plugin_fn] 宏的直接依赖
   }
 }
 </code></pre>
-<h2 id="host-functions">Host Functions（权限化）</h2>
+<h2 id="host-functions-权限化">Host Functions（权限化）</h2>
 <table><thead><tr><th>Host 函数</th><th>所需权限</th><th>说明</th></tr></thead><tbody>
 <tr><th><code>host::get_config()</code></th><th>无</th><th>当前 SiteConfig 视图</th></tr>
 <tr><th><code>host::get_plugin_config()</code></th><th>无</th><th>本插件合并后的配置</th></tr>
@@ -242,9 +244,9 @@ extism-pdk = "1"                             # #[plugin_fn] 宏的直接依赖
 <tr><th><code>host::write_output(path, bytes)</code></th><th><code>fs-write</code></th><th>写输出目录</th></tr>
 </tbody></table>
 <p>未声明权限的插件只能观察 / 转换 host 交给它的数据，无法触达文件系统或网络。host 用 <code>extism::Plugin::new</code> 加载插件且不传递 Manifest / <code>allowed_paths</code>，<strong>WASI 文件系统访问完全禁用</strong>，所有 FS / 网络访问都收敛到受权限保护的 host function。</p>
-<h2 id="strict">Strict 模式</h2>
+<h2 id="strict-模式">Strict 模式</h2>
 <p>设置环境变量 <code>ANYCMS_PLUGIN_STRICT=1</code>（任何非空非 <code>"0"</code> 值）后，任何插件的 hook 调度错误会<strong>中止整个构建</strong>（而非默认的 log + 跳过）。适用于 CI / 严格场景。</p>
-<h2 id="heading-3">示例插件</h2>
+<h2 id="示例插件">示例插件</h2>
 <p><a href="https://github.com/anycms/anycms-ssg/tree/master/examples/plugins"><code>examples/plugins/</code></a> 下有 <strong>14 个端到端可运行</strong>的示例：</p>
 <table><thead><tr><th>示例</th><th>Hook / 贡献</th><th>演示</th></tr></thead><tbody>
 <tr><th><code>reading-time</code></th><th><code>on_template_context</code></th><th>注入 <code>reading_time</code> 模板变量</th></tr>
@@ -262,7 +264,7 @@ extism-pdk = "1"                             # #[plugin_fn] 宏的直接依赖
 <tr><th><code>multi-filter</code></th><th>contribute <code>filter</code>（<code>filter_args</code>）</th><th>多参 filter（`{{ s</th></tr>
 <tr><th><code>badge</code></th><th>contribute <code>shortcode</code></th><th>插件声明内联 shortcode（<code>{{&lt; badge &gt;}}</code>）</th></tr>
 </tbody></table>
-<h2 id="tier-1">官方插件（Tier 1）</h2>
+<h2 id="官方插件-tier-1">官方插件（Tier 1）</h2>
 <p><a href="https://github.com/anycms/anycms-ssg/tree/master/plugins"><code>plugins/</code></a> 下提供 5 个开箱即用的官方插件（crate 名 <code>anycms-plugin-*</code>），只增强 host 内置 provider，不替换渲染管线：</p>
 <table><thead><tr><th>插件</th><th>Hook</th><th>作用</th></tr></thead><tbody>
 <tr><th><code>seo-suite</code></th><th><code>on_seo</code></th><th>OpenGraph / Twitter card / canonical / description 回退 / 去重 JSON-LD</th></tr>

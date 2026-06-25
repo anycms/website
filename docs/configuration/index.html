@@ -155,6 +155,8 @@
       
       <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
       
+      <li><a href="/docs/mcp/">MCP 端点（AI agent 接入）</a></li>
+      
     </ul>
   </aside>
 
@@ -189,7 +191,7 @@ plugins {
     }
 }
 </code></pre>
-<h2 id="heading">字段说明</h2>
+<h2 id="字段说明">字段说明</h2>
 <table><thead><tr><th>字段</th><th>说明</th></tr></thead><tbody>
 <tr><th><code>title</code> / <code>base_url</code></th><th>站点标题与基准 URL（用于绝对链接、feeds、sitemap）</th></tr>
 <tr><th><code>default_language</code></th><th>默认语言代码</th></tr>
@@ -205,7 +207,7 @@ plugins {
 <tr><th><code>search</code></th><th>搜索索引格式与字段裁剪（json / fuse_json / fuse_javascript / elasticlunr_json）</th></tr>
 <tr><th><code>deploy</code></th><th>部署目标声明（见<a href="/docs/deployment/">部署</a>）</th></tr>
 </tbody></table>
-<h2 id="heading-2">声明式导航菜单</h2>
+<h2 id="声明式导航菜单">声明式导航菜单</h2>
 <p>用 <code>menu {}</code> 块声明导航，模板中通过 <code>config.menu</code> 读取。裸 <code>item</code> 节点构成默认语言菜单，<code>lang "&lt;code&gt;" {}</code> 子块提供按语言的覆盖：</p>
 <pre><code>menu {
     item "Home" url="/"
@@ -222,7 +224,7 @@ plugins {
 <blockquote>
 <p><strong>KDL 注释</strong>是 <code>//</code>，不是 <code>#</code>——<code>#</code> 在 KDL 里是布尔字面量前缀，写成注释会导致解析失败。</p>
 </blockquote>
-<h2 id="image">图像处理管线（<code>image {}</code>）</h2>
+<h2 id="图像处理管线-image">图像处理管线（<code>image {}</code>）</h2>
 <p>控制构建时的图像处理管线（默认 <code>enabled #false</code>，需显式开启）：</p>
 <pre><code>image {
     enabled #true                 // 默认 false
@@ -237,14 +239,14 @@ plugins {
 <li><strong>输出格式</strong>（<code>format</code>，默认 <code>auto</code>）：<code>auto</code> 保留源格式；也可统一转码为 <code>jpeg</code> / <code>png</code> / <code>webp</code> / <code>avif</code>。</li>
 <li><strong>AVIF 输出</strong>：选择 <code>avif</code> 需启用 cargo 特性 <code>cargo build --features avif</code>（默认关闭）。编码器是纯 Rust 的 <code>ravif</code>，无需 C 工具链。注意仅支持 AVIF 编码、不支持解码。</li>
 </ul>
-<h2 id="check">链接检查（<code>check {}</code>）</h2>
+<h2 id="链接检查-check">链接检查（<code>check {}</code>）</h2>
 <p><code>anycms check</code> 命令的链接检查选项。默认关闭外链 HTTP 校验，开启后用 <code>HEAD</code>→<code>GET</code> 回退校验（8 并发、10s 超时）：</p>
 <pre><code>check {
     external_links #true          // 默认 false — 启用外链 HTTP 校验
 }
 </code></pre>
 <p>CLI 标志 <code>--skip-external-links</code> 可强制关闭外链检查（即便配置里开了）。详见 <a href="/docs/getting-started/">CLI check</a>。</p>
-<h2 id="search">搜索索引（<code>search {}</code>）</h2>
+<h2 id="搜索索引-search">搜索索引（<code>search {}</code>）</h2>
 <p>控制内置搜索索引（<code>DefaultSearch</code> provider）的输出格式与字段裁剪。缺省该块时使用默认值（<code>json</code> 格式、含 title + content）。插件可通过 <code>on_search_index</code> 整站聚合 hook 接管索引输出。</p>
 <pre><code>search {
     format "fuse_json"          // 默认 json；可选 fuse_json / fuse_javascript / elasticlunr_json
@@ -260,9 +262,14 @@ plugins {
 <li><code>json</code> 输出单一 <code>search.json</code>（语言无关）；<code>fuse_json</code> / <code>fuse_javascript</code> / <code>elasticlunr_json</code> 按语言分文件 <code>search_index.&lt;lang&gt;.json</code> / <code>.js</code>（<code>fuse_javascript</code> 包裹为 <code>window.searchIndex = …</code>，便于 <code>&lt;script&gt;</code> 直接引入）。</li>
 <li><code>elasticlunr_json</code> 需 <code>cargo build --features elasticlunr</code>（默认关闭）；未启用时选择该格式返回明确错误而非静默生成坏索引。</li>
 </ul>
-<h2 id="deploy">部署（<code>deploy {}</code>）</h2>
-<p>声明一个或多个部署目标，供 <code>anycms deploy</code> 发布。内置三个 provider：<code>git</code>（GitHub Pages 风格 <code>git push</code>）、<code>ssh-rsync</code>（<code>rsync -avz --delete</code> over SSH），以及 <code>s3</code>（原生镜像同步到 S3 兼容存储，需 <code>--features s3</code>）。详见<a href="/docs/deployment/">部署</a>。</p>
+<h2 id="部署-deploy">部署（<code>deploy {}</code>）</h2>
+<p>声明一个或多个部署目标，供 <code>anycms deploy</code> 发布。内置四个 provider：<code>local</code>（镜像到本地目录，纯文件复制、零依赖）、<code>git</code>（GitHub Pages 风格 <code>git push</code>）、<code>ssh-rsync</code>（<code>rsync -avz --delete</code> over SSH），以及 <code>s3</code>（原生镜像同步到 S3 兼容存储，需 <code>--features s3</code>）。详见<a href="/docs/deployment/">部署</a>。</p>
 <pre><code>deploy {
+    target "local-mirror" {
+        provider  "local"
+        path      "/var/www/site"      // 本地目标目录（绝对或相对 CWD）
+        delete    #true                // 默认 true，镜像删除多余文件
+    }
     target "gh-pages" {
         provider "git"
         repo     "git@github.com:user/user.github.io.git"
@@ -270,7 +277,8 @@ plugins {
     }
     target "prod" {
         provider  "ssh-rsync"
-        dest      "user@host:/var/www/site/"
+        host      "user@host"
+        path      "/var/www/site/"
         delete    #true
     }
 }

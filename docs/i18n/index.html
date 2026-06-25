@@ -155,6 +155,8 @@
       
       <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
       
+      <li><a href="/docs/mcp/">MCP 端点（AI agent 接入）</a></li>
+      
     </ul>
   </aside>
 
@@ -167,14 +169,14 @@
     
     <div class="post-body">
       <p>AnyCMS SSG 的多语言指<strong>内容多语言</strong>（不包含工具自身 UI 的系统本地化）。采用<strong>文件名后缀</strong>组织（Zola 模式，最少侵入）。</p>
-<h2 id="heading">文件名约定</h2>
+<h2 id="文件名约定">文件名约定</h2>
 <p><code>hello-world.md</code>（默认语言）+ <code>hello-world.fr.md</code>（法语）：</p>
 <pre><code>content/
 ├── hello-world.md        # 默认语言（en）
 └── hello-world.fr.md     # 法语翻译
 </code></pre>
 <p>翻译自动关联，生成 per-language URL、hreflang 互链、per-language feeds / sitemap。</p>
-<h2 id="heading-2">声明支持的语言</h2>
+<h2 id="声明支持的语言">声明支持的语言</h2>
 <p>在 <code>site.kdl</code> 中声明额外支持的语言：</p>
 <pre><code>default_language "en"
 
@@ -184,7 +186,7 @@ languages {
 }
 </code></pre>
 <p>默认语言无需在 <code>languages</code> 中重复声明。</p>
-<h2 id="per-language">per-language 菜单</h2>
+<h2 id="per-language-菜单">per-language 菜单</h2>
 <p><code>menu {}</code> 块支持按语言覆盖。默认语言的裸 <code>item</code> 节点之外，用 <code>lang "&lt;code&gt;" {}</code> 子块提供翻译：</p>
 <pre><code>menu {
     item "Home" url="/"
@@ -196,7 +198,7 @@ languages {
     }
 }
 </code></pre>
-<h2 id="heading-3">自动生成的产物</h2>
+<h2 id="自动生成的产物">自动生成的产物</h2>
 <ul>
 <li>per-language URL 前缀（如 <code>/fr/...</code>）</li>
 <li>页面间的 <code>&lt;link rel="alternate" hreflang&gt;</code> 互链</li>

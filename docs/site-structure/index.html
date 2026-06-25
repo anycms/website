@@ -155,6 +155,8 @@
       
       <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
       
+      <li><a href="/docs/mcp/">MCP 端点（AI agent 接入）</a></li>
+      
     </ul>
   </aside>
 
@@ -190,7 +192,7 @@
 │   └── reading-time.{wasm,kdl}
 └── public/               # 构建输出（生成物，勿提交）
 </code></pre>
-<h2 id="heading">关键目录</h2>
+<h2 id="关键目录">关键目录</h2>
 <table><thead><tr><th>目录 / 文件</th><th>作用</th></tr></thead><tbody>
 <tr><th><code>site.kdl</code></th><th>站点配置，唯一必需的入口文件（至少要有 <code>title</code>）</th></tr>
 <tr><th><code>content/</code></th><th>所有 Markdown 内容，目录结构映射为 URL</th></tr>
@@ -202,7 +204,7 @@
 <tr><th><code>plugins/</code></th><th>通过 <code>plugin install</code> 安装的插件</th></tr>
 <tr><th><code>public/</code></th><th>构建产物，应当加入 <code>.gitignore</code></th></tr>
 </tbody></table>
-<h2 id="overlay">overlay 三级回退</h2>
+<h2 id="overlay-三级回退">overlay 三级回退</h2>
 <p>模板与静态资源按 <strong>site → theme → 内置</strong> 的顺序回退：</p>
 <ol>
 <li><strong>site</strong> 的 <code>templates/*.html</code>、<code>sass/main.scss</code>、<code>static/**</code> 优先级最高；</li>
@@ -212,7 +214,7 @@
 <blockquote>
 <p>本官方网站就是完全自包含的站点：它自带 <code>templates/</code> 与 <code>sass/</code>，不依赖任何主题——这同样是一种合法的用法。</p>
 </blockquote>
-<h2 id="heading-2">最小化站点</h2>
+<h2 id="最小化站点">最小化站点</h2>
 <p>一个最小可构建的站点只需要：</p>
 <pre><code>my-site/
 ├── site.kdl        # title "Hello"

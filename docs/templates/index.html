@@ -155,6 +155,8 @@
       
       <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
       
+      <li><a href="/docs/mcp/">MCP 端点（AI agent 接入）</a></li>
+      
     </ul>
   </aside>
 
@@ -172,9 +174,9 @@
 <li><code>{% … %}</code> 控制流</li>
 <li><code>{% extends %}</code> / <code>{% block %}</code> 继承</li>
 </ul>
-<h2 id="overlay">overlay 解析（三级回退）</h2>
+<h2 id="overlay-解析-三级回退">overlay 解析（三级回退）</h2>
 <p>模板按 <strong>site → theme → 内置技术模板</strong> 的顺序解析。内置的 sitemap / rss / robots 模板可以被 site 或主题的同名文件覆盖。</p>
-<h2 id="heading">契约变量</h2>
+<h2 id="契约变量">契约变量</h2>
 <p><code>base.html</code> 必须用 <code>| safe</code> 渲染三个接缝变量——插件注入和 SEO 才有落点：</p>
 <pre><code class="language-html"><span class="text html basic"><span class="meta tag structure any html"><span class="punctuation definition tag begin html">&lt;</span><span class="entity name tag structure any html">head</span><span class="punctuation definition tag end html">&gt;</span></span>
   {{ seo_head | safe }}      {# SEO meta/canonical/OG/JSON-LD，由 host 生成 #}
@@ -187,7 +189,7 @@
 <blockquote>
 <p>⚠️ MiniJinja 会把生成 URL 中的 <code>/</code> 转义成 <code>&amp;#x2f;</code>，因此所有生成的链接在 <code>href</code> / <code>src</code> 中须标记 <code>| safe</code>。</p>
 </blockquote>
-<h2 id="heading-2">可用变量</h2>
+<h2 id="可用变量">可用变量</h2>
 <p>页面模板（<code>page.html</code>）上下文：</p>
 <table><thead><tr><th>变量</th><th>说明</th></tr></thead><tbody>
 <tr><th><code>page.title</code> / <code>page.content</code></th><th>标题与渲染后的 HTML</th></tr>
@@ -200,7 +202,7 @@
 </tbody></table>
 <p>Section 模板（<code>section.html</code>）额外有 <code>section.title</code>、<code>section.content</code>、<code>section.pages</code>、<code>section.translations</code>。</p>
 <p>全局变量：<code>config</code>（站点配置）、<code>current_lang</code>、<code>taxonomy</code>、<code>term</code>。</p>
-<h2 id="heading-3">模板全局函数</h2>
+<h2 id="模板全局函数">模板全局函数</h2>
 <table><thead><tr><th>函数</th><th>说明</th></tr></thead><tbody>
 <tr><th><code>get_page(url)</code></th><th>按 URL 查询任意页面，返回 page view 或空</th></tr>
 <tr><th><code>get_section(url)</code></th><th>按 URL 查询任意 section，含 <code>.pages</code> 列表</th></tr>
@@ -218,7 +220,7 @@
 {{ trans("greeting") }}                        {# 缺失时回退到 "greeting" 本身 #}
 {{ get_image_metadata("/static/cover.png").width }}
 </code></pre>
-<h2 id="heading-4">模板过滤器</h2>
+<h2 id="模板过滤器">模板过滤器</h2>
 <p>除插件贡献的 dispatcher 外，host 还注册了一批第一方过滤器（不加载插件也始终可用）：</p>
 <table><thead><tr><th>过滤器</th><th>说明</th></tr></thead><tbody>
 <tr><th><code>base64_encode</code> / <code>base64_decode</code></th><th>标准 base64（带 padding）编解码；非法输入解码为空串，不会 panic</th></tr>
@@ -232,7 +234,7 @@
 <blockquote>
 <p>约定：缺失 / 无法解析的输入返回输入本身或 <code>undefined</code> / 空串，绝不中断构建。</p>
 </blockquote>
-<h2 id="heading-5">导航菜单</h2>
+<h2 id="导航菜单">导航菜单</h2>
 <p><code>config.menu</code> 是一个「语言代码 → 菜单项数组」的映射。渲染当前语言的菜单，缺失时回退到默认语言：</p>
 <pre><code>{% set ml = current_lang | default(config.default_language) %}
 {% set items = config.menu[ml] | default(config.menu[config.default_language]) %}

@@ -155,6 +155,8 @@
       
       <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
       
+      <li><a href="/docs/mcp/">MCP 端点（AI agent 接入）</a></li>
+      
     </ul>
   </aside>
 
@@ -169,9 +171,9 @@
       <p><code>anycms check</code> 在不写出任何输出的前提下校验内容与链接，<strong>错误返回非零退出码、警告不会</strong>——非常适合挂进 CI 流水线。</p>
 <pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> check <span class="keyword control regexp set begin shell">[</span>-<span class="keyword operator word shell">-</span>root ROOT<span class="keyword control regexp set end shell">]</span> <span class="keyword control regexp set begin shell">[</span>-<span class="keyword operator word shell">-</span>skip<span class="keyword operator word shell">-</span>external<span class="keyword operator word shell">-</span>links<span class="keyword control regexp set end shell">]</span></span>
 </span></code></pre>
-<h2 id="heading">校验范围</h2>
+<h2 id="校验范围">校验范围</h2>
 <p>按以下顺序逐项校验：</p>
-<h3 id="heading-2">内部链接</h3>
+<h3 id="内部链接">内部链接</h3>
 <p>识别两种写法：</p>
 <ul>
 <li>标准 Markdown 链接：<code>[文本](./path.md)</code> / <code>[文本](/blog/hello/)</code></li>
@@ -184,9 +186,9 @@
 </ul>
 <p>全部解析到构建出的 URL 索引。悬空链接（指向不存在的页面）报为错误。</p>
 <p>不在检查范围的 scheme：<code>mailto:</code>、<code>tel:</code>、<code>ftp:</code>、<code>data:</code> 等非 <code>http(s)</code> 协议被跳过；<strong>围栏代码块</strong>中的链接也被忽略。</p>
-<h3 id="fragment">锚点 <code>#fragment</code></h3>
+<h3 id="锚点-fragment">锚点 <code>#fragment</code></h3>
 <p>链接中带 <code>#fragment</code> 时，该 fragment 必须指向目标页<strong>真实存在的标题 id</strong>。标题 id 由渲染器 slugify + 去重生成，与渲染端一致——你写 <code>[用法](/docs/#usage)</code>，就要求目标页确实有 <code>## 用法</code> 这个标题。</p>
-<h3 id="heading-3">外链（可选，默认关）</h3>
+<h3 id="外链-可选-默认关">外链（可选，默认关）</h3>
 <p>仅当 <code>site.kdl</code> 中显式开启时才校验外部 <code>http(s)</code> 链接：</p>
 <pre><code>check {
     external_links #true      // 默认 #false
@@ -196,9 +198,9 @@
 <p>CLI 标志 <code>--skip-external-links</code> 可以<strong>强制关闭</strong>外链检查——即便配置里开了也跳过，用于离线或受限网络环境下的快速校验：</p>
 <pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> check<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>skip-external-links</span></span>
 </span></code></pre>
-<h2 id="heading-4">与内部链接语法配合</h2>
+<h2 id="与内部链接语法配合">与内部链接语法配合</h2>
 <p><code>@/</code> 内容互链语法（见 <a href="./content/#%E5%86%85%E5%AE%B9%E4%BA%92%E9%93%BE">内容模型 · 内容互链</a>）解析后同样进入 URL 索引，若指向的源文件不存在，<code>check</code> 会报告悬空链。</p>
-<h2 id="ci">典型 CI 用法</h2>
+<h2 id="典型-ci-用法">典型 CI 用法</h2>
 <pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> build</span> <span class="keyword operator logical and shell">&amp;&amp;</span> <span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> check</span> <span class="keyword operator logical and shell">&amp;&amp;</span> <span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> deploy</span>
 </span></code></pre>
 <p><code>check</code> 失败（非零退出）会中断流水线，保证带坏链的站点不会被发布。</p>

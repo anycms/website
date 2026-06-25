@@ -155,6 +155,8 @@
       
       <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
       
+      <li><a href="/docs/mcp/">MCP 端点（AI agent 接入）</a></li>
+      
     </ul>
   </aside>
 
@@ -192,9 +194,9 @@ body {
 <li><strong>仅转译，不做 bundle，也不做类型检查</strong></li>
 <li>适合写少量交互脚本，而非完整前端应用</li>
 </ul>
-<h2 id="html">HTML 压缩</h2>
+<h2 id="html-压缩">HTML 压缩</h2>
 <p>所有渲染出的 HTML 都会经过 minify-html 压缩（去注释、折叠空白、缩短布尔属性等）。</p>
-<h2 id="heading">图像处理管线</h2>
+<h2 id="图像处理管线">图像处理管线</h2>
 <p><code>site.kdl</code> 中的 <code>image {}</code> 块控制图像处理管线（默认 <code>enabled #false</code>，需显式开启）。它处理两件事：EXIF 方向自动矫正、输出格式转换。</p>
 <pre><code>image {
     enabled #true                 // 默认 false
@@ -209,9 +211,9 @@ body {
 <li><strong>输出格式</strong>（<code>format</code>，默认 <code>auto</code>）：<code>auto</code> 保留源格式；也可统一转码为 <code>jpeg</code> / <code>png</code> / <code>webp</code> / <code>avif</code>。</li>
 <li><strong>AVIF 输出</strong>：选择 <code>avif</code> 需启用 cargo 特性 <code>cargo build --features avif</code>（默认关闭，保持默认构建精简）。编码器为纯 Rust 的 <code>ravif</code>（经 <code>image</code> crate 的 <code>avif</code> 特性引入），无需 C 工具链，可在任意平台编译。<strong>注意：仅支持 AVIF 编码，不支持 AVIF 解码</strong>（解码需 C 工具链的 dav1d，故有意排除）。启用后 release 二进制体积约增加 ~1.05 MB。</li>
 </ul>
-<h2 id="heading-2">响应式图像</h2>
+<h2 id="响应式图像">响应式图像</h2>
 <p>官方插件 <strong>responsive-images</strong>（见<a href="/docs/plugins/">插件</a>）按命名约定为文章内的 <code>&lt;img&gt;</code> 添加 <code>srcset</code> / <code>sizes</code> / <code>loading="lazy"</code> / <code>decoding="async"</code>。它只改写 HTML 标记、不重新编码图像，与上面的图像处理管线互补。</p>
-<h2 id="heading-3">设计参数</h2>
+<h2 id="设计参数">设计参数</h2>
 <p>主题通过 <code>params</code> 声明可调设计令牌，site 在 <code>params {}</code> 中覆盖，模板内联注入的 <code>:root</code> CSS 变量会覆盖主题默认值。本站就是用这种方式让 <code>--accent</code> / <code>--accent-2</code> 可在 <code>site.kdl</code> 里调整：</p>
 <pre><code>params {
     accent "#4f46e5"

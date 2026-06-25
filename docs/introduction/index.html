@@ -155,6 +155,8 @@
       
       <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
       
+      <li><a href="/docs/mcp/">MCP 端点（AI agent 接入）</a></li>
+      
     </ul>
   </aside>
 
@@ -170,11 +172,11 @@
 <blockquote>
 <p>输入：Markdown + KDL 配置 + 主题；输出：可直接部署的静态 HTML 站点。</p>
 </blockquote>
-<h2 id="heading">它解决了什么</h2>
+<h2 id="它解决了什么">它解决了什么</h2>
 <p>与 Hugo / Zola 等「常规 SSG」相比，AnyCMS SSG 的根本差异在于：</p>
 <p><strong>WASM 插件扩展机制 + 插件 / 主题市场。</strong></p>
 <p>插件在这里不是附加功能，而是贯穿整个构建管线的主轴——内容发现、Markdown 渲染、模板上下文、SEO、sitemap、feed、资源处理，每一个阶段都可以被插件 hook。</p>
-<h2 id="heading-2">技术栈</h2>
+<h2 id="技术栈">技术栈</h2>
 <ul>
 <li><strong>模板引擎</strong>：<a href="https://github.com/mitsuhiko/minijinja">MiniJinja</a>（Jinja2 的 Rust 实现）</li>
 <li><strong>Markdown</strong>：<a href="https://github.com/pulldown-cmark/pulldown-cmark">pulldown-cmark</a>（GFM 扩展）</li>
@@ -186,7 +188,7 @@
 <li><strong>插件运行时</strong>：<a href="https://extism.org/">extism</a> wasm 沙箱（host SDK + PDK）</li>
 <li><strong>开发服务器</strong>：axum + notify + WebSocket 实时热重载</li>
 </ul>
-<h2 id="heading-3">适用场景</h2>
+<h2 id="适用场景">适用场景</h2>
 <ul>
 <li>个人博客、技术文档、作品集</li>
 <li>需要在构建期对内容做<strong>程序化加工</strong>的站点（阅读时长、聚合页、外部数据拉取、SEO 增强……）</li>

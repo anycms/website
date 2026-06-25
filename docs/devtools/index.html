@@ -155,6 +155,8 @@
       
       <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
       
+      <li><a href="/docs/mcp/">MCP 端点（AI agent 接入）</a></li>
+      
     </ul>
   </aside>
 
@@ -167,11 +169,11 @@
     
     <div class="post-body">
       <p><code>anycms serve</code> 在本地开发服务器上自动注入一个<strong>调试面板</strong>（DevTools），仅在 localhost 下生效，帮助你在写内容时快速切换配置、观察构建状态。</p>
-<h2 id="heading">打开面板</h2>
+<h2 id="打开面板">打开面板</h2>
 <p>启动 serve 后，浏览器右下角会出现一个浮动按钮，点击即在 <code>/__anycms_dev</code> 打开面板（SPA 路由）。也可以直接访问：</p>
 <pre><code>http://127.0.0.1:1111/__anycms_dev/
 </code></pre>
-<h2 id="heading-2">面板能力</h2>
+<h2 id="面板能力">面板能力</h2>
 <ul>
 <li><strong>切换主题（theme）</strong>：在已安装主题之间快速切换，无需改 <code>site.kdl</code> 再重启。</li>
 <li><strong>启停插件（plugin）</strong>：勾选 / 取消勾选插件，即时看到带或不带某个插件的效果（等价于 <code>anycms plugin enable/disable</code>，但无需离开浏览器）。</li>
@@ -179,18 +181,18 @@
 <li><strong>构建状态与路由表</strong>：查看上次构建是否成功，以及当前的路由表（哪些 URL 被生成）。</li>
 <li><strong>show drafts toggle</strong>：临时显示 / 隐藏草稿页面，对比发布前后的差异。</li>
 </ul>
-<h2 id="heading-3">关闭面板</h2>
+<h2 id="关闭面板">关闭面板</h2>
 <pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">anycms</span></span><span class="meta function-call arguments shell"> serve<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>no-devtools</span></span>
 </span></code></pre>
 <p>启用后调试路由（<code>/__anycms_dev/*</code>）返回 404，页面不再注入浮动按钮——适合做最终演示或录屏。</p>
-<h2 id="heading-4">增量重建</h2>
+<h2 id="增量重建">增量重建</h2>
 <p>serve 的热重载不是「全量重建」——它会根据<strong>变更类型</strong>选择重建范围：</p>
 <table><thead><tr><th>变更</th><th>重建范围</th></tr></thead><tbody>
 <tr><th>单个内容页</th><th>仅重建受影响页面（跳过未变动的页面）</th></tr>
 <tr><th>模板 / <code>site.kdl</code> / asset / 插件</th><th>自动全量重建</th></tr>
 </tbody></table>
 <p>所以改一篇文章能秒级刷新，而改模板或配置会触发整站重建。WebSocket 连接在构建完成后推送刷新指令，浏览器自动重载。</p>
-<h2 id="heading-5">安全</h2>
+<h2 id="安全">安全</h2>
 <p>DevTools 仅在 localhost 下注入，<strong>不会</strong>出现在 <code>anycms build</code> 的产物中——它是开发期工具，不进入 <code>public/</code>。</p>
 
     </div>

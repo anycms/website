@@ -155,6 +155,8 @@
       
       <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
       
+      <li><a href="/docs/mcp/">MCP 端点（AI agent 接入）</a></li>
+      
     </ul>
   </aside>
 
@@ -175,17 +177,17 @@
     format "auto"                 // 默认 auto；可选 jpeg/png/webp/avif（大小写不敏感）
 }
 </code></pre>
-<h2 id="exif">EXIF 方向自动矫正</h2>
+<h2 id="exif-方向自动矫正">EXIF 方向自动矫正</h2>
 <p>手机拍摄的图片常带 EXIF <code>Orientation</code> 标签（1–8），像素数据本身是侧躺 / 倒置的，靠这个标签告诉显示器怎么转正。如果不处理，缩略图会显示歪。</p>
 <p><code>auto_orient</code>（默认 <code>true</code>）在<strong>尺寸计算与变体生成之前</strong>读取该标签，把源图旋转成正立朝向，确保所有变体都是正确的。EXIF 读取失败时回退到不旋转（orientation 1）并打印警告，<strong>不中断构建</strong>。</p>
-<h2 id="heading">输出格式</h2>
+<h2 id="输出格式">输出格式</h2>
 <p><code>format</code>（默认 <code>auto</code>，大小写不敏感）：</p>
 <table><thead><tr><th>值</th><th>行为</th></tr></thead><tbody>
 <tr><th><code>auto</code></th><th>保留源格式</th></tr>
 <tr><th><code>jpeg</code> / <code>png</code> / <code>webp</code></th><th>统一转码为该格式</th></tr>
 <tr><th><code>avif</code></th><th>转码为 AVIF（需特性，见下）</th></tr>
 </tbody></table>
-<h2 id="avif">AVIF 编码</h2>
+<h2 id="avif-编码">AVIF 编码</h2>
 <p>选择 <code>avif</code> 需启用 cargo 特性（默认关闭，保持默认构建精简）：</p>
 <pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">cargo</span></span><span class="meta function-call arguments shell"> build<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>features</span> avif</span>
 </span></code></pre>
@@ -194,16 +196,16 @@
 <li>启用后 release 二进制体积约增加 ~1.05 MB。</li>
 <li><strong>仅支持编码，不支持解码</strong>——AVIF 解码需要 C 工具链的 dav1d，破坏 clean build，故有意排除。这意味着源图不能是 AVIF，但可以把 JPEG/PNG/WebP 源图转码输出为 AVIF。</li>
 </ul>
-<h2 id="responsive-images">与 responsive-images 插件协作</h2>
+<h2 id="与-responsive-images-插件协作">与 responsive-images 插件协作</h2>
 <p>图像管线负责<strong>生成多分辨率变体文件</strong>（按 <code>widths</code> 配置），而官方插件 <a href="./official-plugins/#responsive-images">responsive-images</a> 负责<strong>改写 HTML</strong>——把变体写进 <code>&lt;img&gt;</code> 的 <code>srcset</code> / <code>sizes</code>，加上 <code>loading="lazy"</code> / <code>decoding</code>。两者分工：</p>
 <ul>
 <li>管线：产出文件</li>
 <li>插件：把文件引用写进标记</li>
 </ul>
 <p>插件本身不重新编码图像，只做标记增强。</p>
-<h2 id="heading-2">内容哈希缓存</h2>
+<h2 id="内容哈希缓存">内容哈希缓存</h2>
 <p>变体生成基于<strong>内容哈希</strong>做缓存——源文件未变时跳过重复编码，大幅加速增量重建（dev serve 下尤其明显）。改图后才重新生成对应变体。</p>
-<h2 id="heading-3">关闭管线</h2>
+<h2 id="关闭管线">关闭管线</h2>
 <p>不声明 <code>image {}</code> 块，或显式 <code>enabled #false</code>，则图像原样处理（仅由 responsive-images 插件改写标记，不产出变体）。</p>
 
     </div>

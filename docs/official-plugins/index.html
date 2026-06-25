@@ -155,6 +155,8 @@
       
       <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
       
+      <li><a href="/docs/mcp/">MCP 端点（AI agent 接入）</a></li>
+      
     </ul>
   </aside>
 
@@ -207,7 +209,7 @@
 <li><strong>典型场景</strong>：想让文章里的图片按视口自适应、懒加载。</li>
 <li><strong>与图像管线的关系</strong>：本插件只改 HTML 标记；真正的多分辨率变体生成由 <a href="./image-processing/">图像处理管线</a> 负责。两者协同：管线产出变体文件，插件把它们写进 <code>srcset</code>。</li>
 </ul>
-<h2 id="heading">统一覆盖方式</h2>
+<h2 id="统一覆盖方式">统一覆盖方式</h2>
 <pre><code>plugins {
     plugin "search-index" {
         default_boost 2.0

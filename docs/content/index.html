@@ -155,6 +155,8 @@
       
       <li><a href="/docs/permalinks/">URL 规则与重定向</a></li>
       
+      <li><a href="/docs/mcp/">MCP 端点（AI agent 接入）</a></li>
+      
     </ul>
   </aside>
 
@@ -166,7 +168,7 @@
     <p class="muted" style="margin-top:-0.3rem;font-size:0.92rem;">作者：<a href="/authors/liangdi/">Liangdi</a></p>
     
     <div class="post-body">
-      <h2 id="page-section">Page 与 Section</h2>
+      <h2 id="page-与-section">Page 与 Section</h2>
 <ul>
 <li><strong>Page</strong>：单个 Markdown 文件，对应一个 URL。</li>
 <li><strong>Section</strong>：一个目录，<code>_index.md</code> 是该 section 的列表页。</li>
@@ -190,13 +192,14 @@ tags = [&quot;rust&quot;, &quot;ssg&quot;]
 </span>
 <span class="meta paragraph markdown">摘要之后的内容。
 </span></span></code></pre>
-<h2 id="heading">排序</h2>
+<h2 id="排序">排序</h2>
 <p>Section 中的页面按 <strong><code>weight</code> 升序</strong>排序；<code>weight</code> 相同或缺失时按 <strong><code>date</code> 降序</strong>。文档类内容建议显式设置 <code>weight</code> 控制顺序。</p>
-<h2 id="front-matter-2">常用 front matter 字段</h2>
+<h2 id="常用-front-matter-字段">常用 front matter 字段</h2>
 <table><thead><tr><th>字段</th><th>作用</th></tr></thead><tbody>
 <tr><th><code>title</code></th><th>页面标题（必需）</th></tr>
 <tr><th><code>date</code></th><th>发布日期，影响排序与 feeds</th></tr>
 <tr><th><code>description</code></th><th>描述 / 摘要，用于 SEO 与列表页</th></tr>
+<tr><th><code>cover</code></th><th>封面图路径（见下方「封面图」）</th></tr>
 <tr><th><code>draft</code></th><th><code>true</code> 的页面在 <code>build</code> 时被排除</th></tr>
 <tr><th><code>slug</code></th><th>自定义 URL slug</th></tr>
 <tr><th><code>weight</code></th><th>排序权重（整数，升序）</th></tr>
@@ -205,7 +208,7 @@ tags = [&quot;rust&quot;, &quot;ssg&quot;]
 <tr><th><code>aliases</code></th><th>重定向别名 URL 数组（如 <code>["/old/path/"]</code>），构建时生成跳转</th></tr>
 <tr><th><code>expiry_date</code></th><th>过期日期字符串（如 <code>"2026-12-31"</code>），过期页在构建时被剔除</th></tr>
 </tbody></table>
-<h3 id="heading-2">定时发布与过期</h3>
+<h3 id="定时发布与过期">定时发布与过期</h3>
 <ul>
 <li><strong>定时（scheduled）</strong>：<code>date</code> 为<strong>未来日期</strong>的页面不会发布——构建时被剔除，直到日期到达。</li>
 <li><strong>过期</strong>：设置 <code>expiry_date</code> 到一个已过去的日期，该页同样在构建时被剔除。</li>
@@ -221,14 +224,29 @@ expiry_date = "2026-12-31"
 # 重定向别名：旧 URL 跳转到本页
 aliases = ["/old/blog/hello/", "/legacy/hello.html"]
 </code></pre>
-<h2 id="heading-3">摘要与目录</h2>
+<h2 id="封面图">封面图</h2>
+<p><code>cover</code> 字段给页面指定一张封面图，列表卡片与单页都会用到。支持三种路径写法：</p>
+<table><thead><tr><th>写法</th><th>示例</th><th>行为</th></tr></thead><tbody>
+<tr><th><strong>绝对 / static</strong></th><th><code>cover = "/covers/x.png"</code></th><th>指向 <code>static/</code> 下的文件（<code>static/covers/x.png</code>），原样输出</th></tr>
+<tr><th><strong>bundle 相对</strong></th><th><code>cover = "assets/x.png"</code></th><th>相对页面<strong>自身目录</strong>解析（Hugo 式），无需手动拷贝到 <code>static/</code></th></tr>
+<tr><th><strong>远程</strong></th><th><code>cover = "https://…"</code></th><th>透传，不做处理</th></tr>
+</tbody></table>
+<pre><code>title = "我的文章"
+cover = "assets/cover.png"   # 与本文同目录的图片
+</code></pre>
+<p>本地封面（前两种）会走图像处理管线，生成多宽度响应式变体（输出到 <code>/_img/</code>），模板里以 <code>page.cover</code>（单页）和 <code>p.cover</code>（列表项）的形式拿到 <code>{ url, srcset }</code>。远程封面只给 <code>url</code>，无 <code>srcset</code>。</p>
+<blockquote>
+<p>需在 <code>site.kdl</code> 开启 <code>image { enabled #true }</code> 才会生成变体；关闭时本地封面按 static 路径原样引用，不做处理。</p>
+</blockquote>
+<p>官方主题 <code>ink</code> / <code>folio</code> / <code>manual</code> 都已内置封面渲染（列表缩略图 + 单页 hero）。</p>
+<h2 id="摘要与目录">摘要与目录</h2>
 <ul>
 <li><strong>摘要</strong>：用 <code>&lt;!-- more --&gt;</code> 分割，前半段作为 <code>page.summary</code>。</li>
 <li><strong>目录（TOC）</strong>：由标题自动生成，通过 <code>page.toc</code> 暴露给模板。</li>
 </ul>
-<h2 id="heading-4">分类法页</h2>
+<h2 id="分类法页">分类法页</h2>
 <p>由 <code>taxonomies</code> 配置自动生成。例如声明 <code>taxonomy name="tags"</code> 后，带 <code>tags = ["rust"]</code> 的页面会出现在 <code>/tags/rust/</code>。</p>
-<h2 id="heading-5">代码高亮</h2>
+<h2 id="代码高亮">代码高亮</h2>
 <p>用围栏代码块并声明语言，输出 class-based span，配合 <code>static/highlight.css</code> 着色：</p>
 <pre><code class="language-markdown"><span class="text html markdown"><span class="meta paragraph markdown"><span class="markup raw code-fence markdown"><span class="punctuation definition raw code-fence begin markdown">```</span><span class="constant other language-name markdown">rust</span>
 fn main() {
@@ -236,12 +254,12 @@ fn main() {
 }
 <span class="punctuation definition raw code-fence end markdown">```
 </span></span></span></span></code></pre>
-<h2 id="heading-6">内容互链</h2>
+<h2 id="内容互链">内容互链</h2>
 <p>Markdown 中的相对链接会被解析为站点内链接，无需手写完整路径。另外支持 <code>@/</code> 前缀的<strong>内容互链语法</strong>——以工程内容根为基准指向目标页面，解析后输出目标页的最终 URL：</p>
 <pre><code class="language-markdown"><span class="text html markdown"><span class="meta paragraph markdown">详见 <span class="meta link inline markdown"><span class="punctuation definition link begin markdown">[</span></span><span class="meta link inline description markdown">部署文档</span><span class="meta link inline markdown"><span class="punctuation definition link end markdown">]</span></span><span class="meta link inline markdown"><span class="punctuation definition metadata begin markdown">(</span><span class="markup underline link markdown">@/docs/deployment.md</span><span class="punctuation definition metadata end markdown">)</span></span>。
 </span></span></code></pre>
 <p><code>@/docs/deployment.md</code> 会被解析为该内容文件对应的站点 URL（如 <code>/docs/deployment/</code>），重命名或调整 permalink 时链接自动跟随，无需手改路径。</p>
-<h2 id="permalinks">永久链接（permalinks）</h2>
+<h2 id="永久链接-permalinks">永久链接（permalinks）</h2>
 <p>在 <code>site.kdl</code> 中用 <code>permalink {}</code> 块自定义页面 / section 的 URL 模板，支持 <code>:year</code> / <code>:month</code> / <code>:day</code> / <code>:slug</code> 等占位符：</p>
 <pre><code>permalink {
     page "/:year/:slug/"
