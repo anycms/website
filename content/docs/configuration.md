@@ -124,10 +124,15 @@ search {
 
 ## 部署（`deploy {}`）
 
-声明一个或多个部署目标，供 `anycms deploy` 发布。内置三个 provider：`git`（GitHub Pages 风格 `git push`）、`ssh-rsync`（`rsync -avz --delete` over SSH），以及 `s3`（原生镜像同步到 S3 兼容存储，需 `--features s3`）。详见[部署](/docs/deployment/)。
+声明一个或多个部署目标，供 `anycms deploy` 发布。内置四个 provider：`local`（镜像到本地目录，纯文件复制、零依赖）、`git`（GitHub Pages 风格 `git push`）、`ssh-rsync`（`rsync -avz --delete` over SSH），以及 `s3`（原生镜像同步到 S3 兼容存储，需 `--features s3`）。详见[部署](/docs/deployment/)。
 
 ```kdl
 deploy {
+    target "local-mirror" {
+        provider  "local"
+        path      "/var/www/site"      // 本地目标目录（绝对或相对 CWD）
+        delete    #true                // 默认 true，镜像删除多余文件
+    }
     target "gh-pages" {
         provider "git"
         repo     "git@github.com:user/user.github.io.git"
@@ -135,7 +140,8 @@ deploy {
     }
     target "prod" {
         provider  "ssh-rsync"
-        dest      "user@host:/var/www/site/"
+        host      "user@host"
+        path      "/var/www/site/"
         delete    #true
     }
 }
