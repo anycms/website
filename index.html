@@ -123,6 +123,12 @@
     <a class="btn btn-ghost" href="/docs/">阅读文档</a>
   </div>
 
+  <div class="install-strip" data-copy>
+    <span class="prompt">$</span>
+    <code>curl -fsSL https://anycms.org/install.sh | sh</code>
+    <button class="copy-btn" type="button" aria-label="复制安装命令">复制</button>
+  </div>
+
   <div class="terminal">
     <div class="terminal-bar">
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
@@ -134,6 +140,42 @@
 <span class="prompt">$</span> anycms build             <span class="ok">→ public/</span>
 <span class="prompt">$</span> anycms serve             <span class="cmt"># http://127.0.0.1:1111 实时热重载</span></code></pre>
   </div>
+</section>
+
+
+<section class="section install">
+  <div class="section-head">
+    <h2>下载与安装</h2>
+    <p>选择你的平台，一行命令装好；或直接下载预编译二进制（静态链接，开箱即用）。</p>
+  </div>
+  <div class="install-grid">
+    <div class="install-card">
+      <h3>Linux / macOS</h3>
+      <div class="install-cmd" data-copy>
+        <code>curl -fsSL https://anycms.org/install.sh | sh</code>
+        <button class="copy-btn" type="button" aria-label="复制命令">复制</button>
+      </div>
+      <div class="dl-links">
+        <a href="/dl/anycms-0.1.0-x86_64-unknown-linux-musl.tar.gz">↓ Linux x86_64（.tar.gz · 静态 musl）</a>
+        <a href="/dl/anycms-0.1.0-universal-apple-darwin.tar.gz">↓ macOS（.tar.gz · 占位包）</a>
+      </div>
+    </div>
+    <div class="install-card">
+      <h3>Windows</h3>
+      <div class="install-cmd" data-copy>
+        <code>iwr -useb https://anycms.org/install.ps1 | iex</code>
+        <button class="copy-btn" type="button" aria-label="复制命令">复制</button>
+      </div>
+      <div class="dl-links">
+        <a href="/dl/anycms-0.1.0-x86_64-pc-windows-msvc.zip">↓ Windows x86_64（.zip · msvc）</a>
+      </div>
+    </div>
+  </div>
+  <p class="install-note">
+    macOS 原生构建尚未发布——安装脚本会装一个占位 <code>anycms</code>，运行时提示用 Cargo 从源码构建。
+    也可直接 <a href="/docs/getting-started/">从源码安装</a>。
+    校验下载：<a href="/dl/SHA256SUMS">SHA-256 校验和</a>。
+  </p>
 </section>
 
 

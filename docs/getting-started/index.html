@@ -174,7 +174,21 @@
 <li>编写插件还需添加 wasm 编译目标：<code>rustup target add wasm32-unknown-unknown</code></li>
 </ul>
 <h2 id="安装">安装</h2>
-<pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">git</span></span><span class="meta function-call arguments shell"> clone <span class="keyword operator assignment redirection shell">&lt;</span>repo-url<span class="keyword operator assignment redirection shell">&gt;</span> anycms-ssg</span>
+<p><strong>预编译二进制</strong>（推荐，无需 Rust 工具链，静态链接开箱即用）：</p>
+<ul>
+<li>Linux / macOS：<pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">curl</span></span><span class="meta function-call arguments shell"><span class="variable parameter option shell"><span class="punctuation definition parameter shell"> -</span>fsSL</span> https://anycms.org/install.sh</span> <span class="keyword operator logical pipe shell">|</span> <span class="meta function-call shell"><span class="variable function shell">sh</span></span>
+</span></code></pre>
+</li>
+<li>Windows（PowerShell）：<pre><code>iwr -useb https://anycms.org/install.ps1 | iex
+</code></pre>
+</li>
+</ul>
+<p>安装到 <code>~/.anycms/bin</code>（Windows 为 <code>%LOCALAPPDATA%\anycms\bin</code>），按提示加入 <code>PATH</code> 即可。下载校验见 <a href="/dl/SHA256SUMS">SHA-256 校验和</a>。</p>
+<blockquote>
+<p>macOS 原生构建尚未发布：安装脚本会装一个占位 <code>anycms</code>，运行时提示用 Cargo 从源码构建（见下）。</p>
+</blockquote>
+<p><strong>从源码构建</strong>（开发或需要最新主干时）：</p>
+<pre><code class="language-sh"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">git</span></span><span class="meta function-call arguments shell"> clone https://github.com/anycms/anycms-ssg anycms-ssg</span>
 <span class="meta function-call shell"><span class="support function cd shell">cd</span></span><span class="meta function-call arguments shell"> anycms-ssg</span>
 <span class="meta function-call shell"><span class="variable function shell">cargo</span></span><span class="meta function-call arguments shell"> install<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>path</span> .        <span class="comment line number-sign shell"><span class="punctuation definition comment begin shell">#</span></span><span class="comment line number-sign shell"> 安装 `anycms` 二进制到 ~/.cargo/bin</span><span class="comment line number-sign shell">
 </span></span></span></code></pre>
